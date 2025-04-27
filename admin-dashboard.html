@@ -829,6 +829,77 @@
                 font-size: 1.5rem;
             }
         }
+
+        .cutstudios-badge {
+            position: fixed;
+            right: 0;
+            bottom: 30%;
+            z-index: 990;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 14px 10px;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            opacity: 0.8;
+            font-family: 'Poppins', sans-serif;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            display: flex;
+            align-items: center;
+        }
+
+        .cutstudios-badge:hover {
+            transform: translateX(-3px) rotate(180deg);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            opacity: 1;
+        }
+
+        .cutstudios-badge a {
+            text-decoration: none;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .cutstudios-badge span {
+            color: #888;
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cut-logo {
+            width: 28px;
+            height: auto;
+            object-fit: contain;
+            transform: rotate(90deg);
+            margin-bottom: 2px;
+            position: relative;
+            z-index: 2;
+            opacity: 1 !important;
+            filter: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .cutstudios-badge {
+                padding: 8px 6px;
+                bottom: 25%;
+            }
+
+            .cut-logo {
+                width: 18px;
+                opacity: 1 !important;
+                filter: none !important;
+            }
+
+            .cutstudios-badge span {
+                font-size: 0.6rem;
+            }
+        }
     </style>
 </head>
 <body class="admin-page">
@@ -1827,7 +1898,7 @@
     <div class="cutstudios-badge">
         <a href="https://cutstudios.pt" target="_blank" rel="noopener noreferrer">
             <span>created by</span>
-            <img src="public/images/NICOLA logo.png" alt="CUT STUDIOS" class="cut-logo">
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
         </a>
     </div>
 </body>

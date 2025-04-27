@@ -1483,8 +1483,6 @@ newsletterForms.forEach(form => {
             submitButton.disabled = true;
             
             try {
-                // Instead of making the API call directly from the frontend,
-                // we'll send the data to our backend which will handle the Brevo API call
                 const response = await fetch('/api/subscribe', {
                     method: 'POST',
                     headers: {
