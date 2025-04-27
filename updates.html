@@ -1185,7 +1185,7 @@
                 const { data: galleries, error } = await supabaseClient
                     .from('galleries')
                     .select('*')
-                    .order('created_at', { ascending: false });
+                    .order('event_date', { ascending: false });
                 
                 if (error) throw error;
                 
@@ -1220,42 +1220,9 @@
                         `;
                         
                         // Add click handler
-                        if ('ontouchstart' in window) {
-                            let touchStartX = 0;
-                            let touchStartY = 0;
-                            let touchEndX = 0;
-                            let touchEndY = 0;
-                            let hasMoved = false;
-                            
-                            galleryElement.addEventListener('touchstart', (e) => {
-                                touchStartX = e.touches[0].clientX;
-                                touchStartY = e.touches[0].clientY;
-                                hasMoved = false;
-                            }, { passive: true });
-                            
-                            galleryElement.addEventListener('touchmove', (e) => {
-                                touchEndX = e.touches[0].clientX;
-                                touchEndY = e.touches[0].clientY;
-                                
-                                // Check if the touch has moved more than a threshold
-                                const diffX = Math.abs(touchStartX - touchEndX);
-                                const diffY = Math.abs(touchStartY - touchEndY);
-                                
-                                if (diffX > 5 || diffY > 5) {
-                                    hasMoved = true;
-                                }
-                            }, { passive: true });
-                            
-                            galleryElement.addEventListener('touchend', (e) => {
-                                if (!hasMoved) {
-                                    openGallery(gallery.id);
-                                }
-                            }, { passive: true });
-                        } else {
-                            galleryElement.addEventListener('click', function() {
-                                openGallery(gallery.id);
-                            });
-                        }
+                        galleryElement.addEventListener('click', () => {
+                            window.location.href = `gallery.html?id=${gallery.id}`;
+                        });
                         
                         galleriesGrid.appendChild(galleryElement);
                     });
