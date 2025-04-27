@@ -971,11 +971,10 @@
     </div>
 
     <script src="js/translations.js"></script>
+    <script src="js/config.js"></script>
     <script>
         // Initialize Supabase client
-        const supabaseUrl = process.env.SUPABASE_URL;
-        const supabaseKey = process.env.SUPABASE_KEY;
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
         // Load updates
         async function loadUpdates() {

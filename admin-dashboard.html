@@ -9,6 +9,7 @@
     <link rel="icon" type="image/x-icon" href="public/images/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js"></script>
     <style>
         :root {
             --spacing-xs: 0.25rem;
@@ -1014,9 +1015,7 @@
 
     <script>
         // Initialize Supabase client
-        const supabaseUrl = process.env.SUPABASE_URL;
-        const supabaseKey = process.env.SUPABASE_KEY;
-        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+        const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
         // Check authentication status
         async function checkAuth() {
