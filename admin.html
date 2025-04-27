@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin | Nicola Senn | Professional Tennis Player</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="icon" type="image/x-icon" href="public/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .admin-section {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: var(--color-dark);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .admin-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, rgba(var(--color-primary-rgb), 0.1) 0%, transparent 70%);
+            z-index: 1;
+        }
+
+        .login-container {
+            background: rgba(41, 41, 41, 0.95);
+            padding: 3rem;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+            position: relative;
+            z-index: 2;
+            border: 1px solid rgba(var(--color-primary-rgb), 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .login-logo {
+            font-size: 3rem;
+            color: var(--color-primary);
+            margin-bottom: 2rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(var(--color-primary-rgb), 0.3);
+            position: relative;
+            display: inline-block;
+        }
+
+        .admin-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: none;
+        }
+        
+        .login-logo::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--color-primary);
+            border-radius: 2px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .form-group {
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--color-light);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+            border-radius: 8px;
+            background: rgba(41, 41, 41, 0.6);
+            color: var(--color-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.2);
+            background: rgba(41, 41, 41, 0.8);
+        }
+
+        .login-button {
+            position: relative;
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .login-button:hover {
+            transform: translateY(-2px);
+            background: var(--color-primary-dark);
+            box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.4);
+        }
+        
+        .login-button .button-fx {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.5s ease;
+        }
+        
+        .login-button:hover .button-fx {
+            transform: translateX(100%);
+        }
+
+        .error-message {
+            color: #ff4444;
+            margin-top: 1.5rem;
+            display: none;
+            padding: 0.8rem;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #ff4444;
+            font-weight: 500;
+        }
+
+        .success-message {
+            color: #00C851;
+            margin-top: 1.5rem;
+            display: none;
+            padding: 0.8rem;
+            background: rgba(0, 200, 81, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid #00C851;
+            font-weight: 500;
+        }
+        
+        .back-to-site {
+            position: absolute;
+            top: 2rem;
+            left: 2rem;
+            color: var(--color-light);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.5rem;
+            background: rgba(41, 41, 41, 0.8);
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            z-index: 10;
+            border: 1px solid rgba(var(--color-primary-rgb), 0.2);
+        }
+        
+        .back-to-site:hover {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            transform: translateY(-2px);
+        }
+        
+        .login-subtitle {
+            color: var(--color-gray);
+            margin-bottom: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .login-container {
+                padding: 2rem;
+                width: 90%;
+                max-width: 350px;
+            }
+            
+            .back-to-site {
+                top: 1rem;
+                left: 1rem;
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .admin-logo {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 1.5rem;
+            }
+            
+            .admin-logo {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .login-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .form-group input {
+                padding: 0.7rem;
+            }
+            
+            .login-button {
+                padding: 0.8rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="admin-page">
+    <div class="cursor"></div>
+    <div class="noise-overlay"></div>
+
+    <main>
+        <section class="admin-section">
+            <a href="index.html" class="back-to-site">
+                <i class="fas fa-arrow-left"></i>
+                Back to Site
+            </a>
+            <div class="login-container">
+                <div class="login-logo">
+                    <img src="public/images/NICOLA logo.png" alt="Nicola Senn" class="admin-logo">
+                </div>
+                <p class="login-subtitle">Admin Dashboard Login</p>
+                <form class="login-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" required>
+                    </div>
+                    <button type="submit" class="login-button">
+                        <span>Login</span>
+                        <div class="button-fx"></div>
+                    </button>
+                </form>
+                <div class="error-message" id="errorMessage"></div>
+                <div class="success-message" id="successMessage"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_KEY;
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Handle login form submission
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+            
+            try {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
+
+                if (error) throw error;
+
+                // Show success message
+                errorMessage.style.display = 'none';
+                successMessage.style.display = 'block';
+                successMessage.textContent = 'Login successful!';
+
+                // Redirect to dashboard
+                setTimeout(() => {
+                    window.location.href = 'admin-dashboard.html';
+                }, 1000);
+
+            } catch (error) {
+                // Show error message
+                successMessage.style.display = 'none';
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Invalid email or password';
+            }
+        });
+
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+    </script>
+    <div class="cutstudios-badge">
+        <a href="https://cutstudios.pt" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
+    </div>
+</body>
+</html> 

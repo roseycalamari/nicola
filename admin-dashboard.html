@@ -1,0 +1,1834 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Nicola Senn | Professional Tennis Player</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="public/css/admin.css">
+    <link rel="icon" type="image/x-icon" href="public/images/favicon.ico">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-xxl: 3rem;
+            
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 20px;
+            --border-radius-round: 30px;
+            
+            --transition-speed: 300ms;
+            
+            --color-dark-elevation-1: rgba(30, 30, 30, 0.9);
+            --color-dark-elevation-2: rgba(40, 40, 40, 0.8);
+            --color-dark-elevation-3: rgba(50, 50, 50, 0.7);
+        }
+        
+        /* Base styles */
+        body.admin-page {
+            background: var(--color-darker);
+            color: var(--color-light);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+        }
+        
+        /* Dashboard layout */
+        .dashboard {
+            min-height: 100vh;
+            padding: var(--spacing-md);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Dashboard header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--color-dark-elevation-1);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: var(--spacing-md);
+            z-index: 10;
+        }
+        
+        .dashboard-logo {
+            font-size: 1.75rem;
+            color: var(--color-primary);
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: none; /* Ensures logo is not black and white */
+        }
+        
+        .cut-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: none; /* Ensures logo is not black and white */
+        }
+        
+        .dashboard-logo::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+        
+        .logout-button {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--border-radius-round);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .logout-button:hover {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        /* Dashboard content */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-xl);
+        }
+        
+        /* Dashboard sections */
+        .dashboard-section {
+            background: var(--color-dark-elevation-1);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .dashboard-section:hover {
+            transform: translateY(-3px);
+        }
+        
+        .dashboard-section h2 {
+            color: var(--color-light);
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--color-dark-elevation-3);
+            padding-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+        }
+        
+        .dashboard-section h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: var(--color-primary);
+            margin-right: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .dashboard-section p {
+            color: var(--color-gray);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        /* Form styles */
+        .admin-form,
+        .update-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .form-group label {
+            color: var(--color-light);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            background: var(--color-dark-elevation-2);
+            color: var(--color-light);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .form-group input[type="file"] {
+            background: none;
+            padding: var(--spacing-sm) 0;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .form-actions {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .submit-button,
+        .admin-button,
+        .cta-button {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--border-radius-round);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            min-width: 150px;
+        }
+        
+        .submit-button:hover,
+        .admin-button:hover,
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        .submit-button:disabled,
+        .admin-button:disabled,
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Image preview */
+        .image-preview {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            display: none;
+            margin-top: var(--spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .image-preview:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Updates list */
+        .recent-items-list,
+        .updates-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .update-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--color-dark-elevation-2);
+            border-radius: var(--border-radius-sm);
+            align-items: center;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .update-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .update-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+        }
+        
+        .update-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .update-item:hover .update-thumbnail img {
+            transform: scale(1.1);
+        }
+        
+        .update-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .update-title {
+            color: var(--color-light);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .update-category {
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .update-date {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .update-date i {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .update-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .delete-button {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-round);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .delete-button:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+        }
+        
+        /* Success and error messages */
+        .success-message,
+        .error-message {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            margin-top: var(--spacing-md);
+            display: none;
+            font-weight: 500;
+            animation: fadeIn var(--transition-speed) ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success-message {
+            background: rgba(0, 200, 81, 0.1);
+            color: #00C851;
+            border-left: 4px solid #00C851;
+        }
+        
+        .error-message {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        /* Galleries grid */
+        .galleries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .gallery-card {
+            background: var(--color-dark-elevation-2);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .gallery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gallery-cover {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .gallery-card:hover .gallery-cover {
+            transform: scale(1.05);
+        }
+        
+        .gallery-info {
+            padding: var(--spacing-lg);
+        }
+        
+        .gallery-title {
+            color: var(--color-light);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .gallery-description {
+            color: var(--color-gray);
+            margin-bottom: var(--spacing-md);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+        
+        .gallery-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .gallery-actions button {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .gallery-actions .delete-btn {
+            background-color: #ff4444;
+            color: white;
+        }
+        
+        .gallery-actions .delete-btn:hover {
+            background-color: #cc0000;
+            transform: translateY(-2px);
+        }
+        
+        #gallery-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .preview-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .preview-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Diagnostic section styling */
+        #diagnosticResults {
+            background: var(--color-dark-elevation-2);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow: auto;
+        }
+        
+        /* Cursor */
+        .cursor {
+            pointer-events: none;
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s;
+        }
+        
+        /* Responsive styles */
+        /* Mobile first - these are the base styles */
+        
+        /* Medium screens */
+        @media (min-width: 768px) {
+            .dashboard {
+                padding: var(--spacing-lg);
+            }
+            
+            .dashboard-header {
+                padding: var(--spacing-lg) var(--spacing-xl);
+            }
+            
+            .update-item {
+                grid-template-columns: 100px 1fr auto;
+            }
+            
+            .update-thumbnail {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        /* Large screens */
+        @media (min-width: 1024px) {
+            .dashboard {
+                padding: var(--spacing-xl);
+            }
+            
+            .dashboard-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .dashboard-section {
+                padding: var(--spacing-xl);
+            }
+            
+            .dashboard-section:first-child,
+            .dashboard-section:nth-child(2),
+            .dashboard-section:nth-child(3) {
+                grid-column: span 1;
+            }
+            
+            .dashboard-section:nth-child(4),
+            .dashboard-section:nth-child(5) {
+                grid-column: span 2;
+            }
+        }
+        
+        /* Extra large screens */
+        @media (min-width: 1400px) {
+            .dashboard-content {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .dashboard-section:first-child,
+            .dashboard-section:nth-child(2),
+            .dashboard-section:nth-child(3) {
+                grid-column: span 1;
+            }
+            
+            .dashboard-section:nth-child(4),
+            .dashboard-section:nth-child(5) {
+                grid-column: span 3;
+            }
+        }
+        
+        /* Improved mobile responsiveness */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: var(--spacing-sm);
+                overflow-x: hidden;
+                width: 100%;
+            }
+            
+            .dashboard-header {
+                padding: var(--spacing-md);
+                flex-wrap: wrap;
+                gap: var(--spacing-md);
+            }
+            
+            .dashboard-logo {
+                margin-right: auto;
+            }
+            
+            .admin-logo, .cut-logo {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .dashboard-content {
+                gap: var(--spacing-md);
+            }
+            
+            .dashboard-section {
+                padding: var(--spacing-md);
+                overflow-x: auto;
+            }
+            
+            .form-group input, 
+            .form-group textarea, 
+            .form-group select {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .update-item {
+                grid-template-columns: 60px 1fr;
+            }
+            
+            .update-actions {
+                grid-column: span 2;
+                justify-content: flex-end;
+                margin-top: var(--spacing-sm);
+            }
+            
+            .update-thumbnail {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .admin-logo, .cut-logo {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .dashboard-section h2 {
+                font-size: 1.2rem;
+            }
+            
+            .update-item {
+                gap: var(--spacing-sm);
+            }
+            
+            .galleries-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            opacity: 1;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-content {
+            background: var(--color-dark-elevation-1);
+            width: 100%;
+            max-width: 800px;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            margin: var(--spacing-xl) 0;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            font-size: 1.5rem;
+            color: var(--color-light);
+            cursor: pointer;
+            z-index: 10;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .modal-header {
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--color-dark-elevation-3);
+        }
+        
+        .modal-header h3 {
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-light);
+        }
+        
+        .modal-category {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background-color: rgba(var(--color-primary-rgb), 0.2);
+            color: var(--color-primary);
+            border-radius: var(--border-radius-round);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-sm);
+            text-transform: capitalize;
+        }
+        
+        .modal-date {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+        
+        .modal-body {
+            padding: 0 var(--spacing-xl) var(--spacing-xl);
+        }
+        
+        .modal-image-container {
+            width: 100%;
+            margin: var(--spacing-lg) 0;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-image-container img {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+        
+        .modal-image-container:hover img {
+            transform: scale(1.02);
+        }
+        
+        .modal-text {
+            color: var(--color-light);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                margin-top: var(--spacing-lg);
+            }
+            
+            .modal-header {
+                padding: var(--spacing-lg);
+            }
+            
+            .modal-body {
+                padding: 0 var(--spacing-lg) var(--spacing-lg);
+            }
+            
+            .modal-header h3 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="admin-page">
+    <div class="cursor"></div>
+    <div class="noise-overlay"></div>
+
+    <main class="dashboard">
+        <header class="dashboard-header">
+            <div class="dashboard-logo">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn" class="admin-logo">
+            </div>
+            <button class="logout-button" id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="dashboard-section">
+                <h2>Create New Update</h2>
+                <form class="update-form" id="updateForm">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="matches">Matches</option>
+                            <option value="training">Training</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="achievements">Achievements</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">Content</label>
+                        <textarea id="content" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Media Upload</label>
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag & drop photos and videos here</p>
+                                <p class="upload-hint">or click to browse files</p>
+                        </div>
+                            <input type="file" id="media" multiple accept="image/*,video/*" class="upload-input">
+                        </div>
+                        <div class="media-preview" id="mediaPreview"></div>
+                    </div>
+
+                    <button type="submit" class="submit-button">
+                        <span>Create Update</span>
+                        <div class="button-fx"></div>
+                    </button>
+                </form>
+                <div class="success-message" id="createSuccess"></div>
+                <div class="error-message" id="createError"></div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Create New Gallery</h2>
+                <form id="gallery-form" class="admin-form">
+                    <div class="form-group">
+                        <label for="gallery-title">Gallery Title</label>
+                        <input type="text" id="gallery-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-description">Description</label>
+                        <textarea id="gallery-description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-date">Event Date</label>
+                        <input type="date" id="gallery-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-images">Gallery Images</label>
+                        <div class="upload-area" id="galleryUploadArea">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-images"></i>
+                                <p>Drag & drop gallery images here</p>
+                                <p class="upload-hint">or click to browse files</p>
+                    </div>
+                            <input type="file" id="gallery-images" multiple accept="image/*" required class="upload-input">
+                        </div>
+                        <div id="gallery-preview" class="media-preview"></div>
+                    </div>
+                    <button type="submit" class="submit-button">
+                        <span>Create Gallery</span>
+                        <div class="button-fx"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Update Career Statistics</h2>
+                <p>Update your career numbers that appear on the homepage.</p>
+                
+                <form id="career-stats-form" class="admin-form" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="tournaments">Tournaments</label>
+                            <input type="number" id="tournaments" name="tournaments" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="match-wins">International Match Wins</label>
+                            <input type="number" id="match-wins" name="match_wins" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="intl-ranking">International Ranking</label>
+                            <input type="number" id="intl-ranking" name="intl_ranking" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="swiss-ranking">Swiss Ranking</label>
+                            <input type="number" id="swiss-ranking" name="swiss_ranking" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="max-serve-speed">Maximum Serve Speed (km/h)</label>
+                            <input type="number" id="max-serve-speed" name="max_serve_speed" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="countries-played">Countries Played In</label>
+                            <input type="number" id="countries-played" name="countries_played" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="stats-submit-btn" class="submit-button">
+                            <span>Update Statistics</span>
+                            <div class="button-fx"></div>
+                        </button>
+                    </div>
+                    
+                    <div id="stats-success-message" class="success-message" style="display: none;">
+                        Career statistics updated successfully!
+                    </div>
+                    
+                    <div id="stats-error-message" class="error-message" style="display: none;">
+                        Error updating career statistics. Please try again.
+                    </div>
+                </form>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Recent Updates</h2>
+                <div id="recent-updates" class="recent-items-list">
+                    <!-- Updates will be loaded here -->
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Recent Galleries</h2>
+                <div id="galleries-list" class="galleries-grid">
+                    <!-- Galleries will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal for displaying update details -->
+    <div id="update-modal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close">&times;</span>
+            <div class="modal-header">
+                <h3 id="modal-title"></h3>
+                <div id="modal-category" class="modal-category"></div>
+                <div id="modal-date" class="modal-date"></div>
+            </div>
+            <div class="modal-body">
+                <div class="modal-image-container">
+                    <img id="modal-image" src="" alt="">
+                </div>
+                <div id="modal-content" class="modal-text"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_KEY;
+        const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+        // Check authentication status
+        async function checkAuth() {
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            if (!user) {
+                window.location.href = 'admin.html';
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'admin.html';
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadInput = document.querySelector('.upload-input');
+        const mediaPreview = document.getElementById('mediaPreview');
+        let uploadedFiles = [];
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        uploadArea.addEventListener('drop', handleDrop, false);
+        uploadInput.addEventListener('change', handleFiles, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            uploadArea.classList.add('highlight');
+        }
+
+        function unhighlight(e) {
+            uploadArea.classList.remove('highlight');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles({ target: { files } });
+        }
+
+        function handleFiles(e) {
+            const files = [...e.target.files];
+            files.forEach(previewFile);
+            uploadedFiles = [...uploadedFiles, ...files];
+        }
+
+        function previewFile(file) {
+            const reader = new FileReader();
+                reader.readAsDataURL(file);
+            
+            reader.onload = function() {
+                const preview = document.createElement('div');
+                preview.className = 'preview-item';
+                
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = `
+                        <img src="${reader.result}" alt="${file.name}">
+                        <button class="remove-file" data-name="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                } else if (file.type.startsWith('video/')) {
+                    preview.innerHTML = `
+                        <video controls>
+                            <source src="${reader.result}" type="${file.type}">
+                        </video>
+                        <button class="remove-file" data-name="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                }
+                
+                mediaPreview.appendChild(preview);
+                
+                // Add remove functionality
+                const removeBtn = preview.querySelector('.remove-file');
+                removeBtn.addEventListener('click', function() {
+                    preview.remove();
+                    uploadedFiles = uploadedFiles.filter(f => f.name !== file.name);
+                });
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('updateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('title').value;
+            const content = document.getElementById('content').value;
+            const category = document.getElementById('category').value;
+            
+            try {
+                // Upload all media files
+                const mediaUrls = await Promise.all(uploadedFiles.map(async (file) => {
+                    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                    const { data, error } = await supabaseClient.storage
+                        .from('updates-media')
+                        .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                    if (error) throw error;
+
+                const { data: { publicUrl } } = supabaseClient.storage
+                        .from('updates-media')
+                    .getPublicUrl(fileName);
+
+                    return {
+                        url: publicUrl,
+                        type: file.type.startsWith('image/') ? 'image' : 'video'
+                    };
+                }));
+
+                // Create update with media
+                const { data, error } = await supabaseClient
+                    .from('updates')
+                    .insert([
+                        {
+                            title,
+                            content,
+                            category,
+                            media: mediaUrls,
+                            created_at: new Date()
+                        }
+                    ]);
+
+                if (error) throw error;
+
+                // Show success message
+                document.getElementById('createSuccess').style.display = 'block';
+                document.getElementById('createSuccess').textContent = 'Update created successfully!';
+                document.getElementById('createError').style.display = 'none';
+
+                // Reset form
+                e.target.reset();
+                mediaPreview.innerHTML = '';
+                uploadedFiles = [];
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('createError').style.display = 'block';
+                document.getElementById('createError').textContent = error.message;
+                document.getElementById('createSuccess').style.display = 'none';
+            }
+        });
+
+        // Load updates
+        async function loadUpdates() {
+            const { data: updates, error } = await supabaseClient
+                .from('updates')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading updates:', error);
+                return;
+            }
+
+            const updatesList = document.getElementById('recent-updates');
+            updatesList.innerHTML = '';
+
+            updates.forEach(update => {
+                const updateElement = document.createElement('div');
+                updateElement.className = 'update-item';
+                updateElement.innerHTML = `
+                    <div class="update-thumbnail">
+                        <img src="${update.image_url}" alt="${update.title}">
+                    </div>
+                    <div class="update-info">
+                        <div class="update-title">${update.title}</div>
+                        <div class="update-category">${update.category}</div>
+                        <div class="update-date">
+                            <i class="far fa-calendar"></i>
+                            ${new Date(update.created_at).toLocaleDateString()}
+                        </div>
+                    </div>
+                    <div class="update-actions">
+                        <button class="view-button" onclick="viewUpdateDetails('${update.id}')">
+                            <i class="fas fa-eye"></i>
+                            View
+                        </button>
+                        <button class="delete-button" onclick="deleteUpdate('${update.id}')">
+                            <i class="fas fa-trash"></i>
+                            Delete
+                        </button>
+                    </div>
+                `;
+                updatesList.appendChild(updateElement);
+            });
+        }
+
+        // Delete update
+        async function deleteUpdate(id) {
+            if (!confirm('Are you sure you want to delete this update?')) return;
+
+            try {
+                const { error } = await supabaseClient
+                    .from('updates')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                // Reload updates list
+                loadUpdates();
+
+            } catch (error) {
+                console.error('Error deleting update:', error);
+                alert('Error deleting update');
+            }
+        }
+
+        // Check auth and load updates on page load
+        checkAuth();
+        loadUpdates();
+
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Add these functions before the gallery form handling
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message';
+            successDiv.textContent = message;
+            document.querySelector('.dashboard-content').prepend(successDiv);
+            setTimeout(() => successDiv.remove(), 3000);
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.textContent = message;
+            document.querySelector('.dashboard-content').prepend(errorDiv);
+            setTimeout(() => errorDiv.remove(), 3000);
+        }
+
+        // Gallery form handling
+        const galleryForm = document.getElementById('gallery-form');
+        const galleryPreview = document.getElementById('gallery-preview');
+        const galleryImagesInput = document.getElementById('gallery-images');
+
+        // Gallery drag and drop
+        const galleryUploadArea = document.getElementById('galleryUploadArea');
+        
+        // Add the same drag and drop behavior to gallery upload
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, function() {
+                galleryUploadArea.classList.add('highlight');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, function() {
+                galleryUploadArea.classList.remove('highlight');
+            }, false);
+        });
+        
+        galleryUploadArea.addEventListener('drop', function(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleGalleryImagePreview({ target: { files } });
+        }, false);
+
+        // Preview gallery images
+        galleryImagesInput.addEventListener('change', handleGalleryImagePreview);
+
+        // Handle gallery form submission
+        function handleGallerySubmit(e) {
+            e.preventDefault();
+            
+            const title = document.getElementById('gallery-title').value;
+            const description = document.getElementById('gallery-description').value;
+            const eventDate = document.getElementById('gallery-date').value;
+            const files = document.getElementById('gallery-images').files;
+            
+            try {
+                // First, create the gallery record
+                supabaseClient
+                    .from('galleries')
+                    .insert([
+                        {
+                            title,
+                            description,
+                            event_date: eventDate,
+                            cover_image: '' // Will be updated after image upload
+                        }
+                    ])
+                    .select()
+                    .single()
+                    .then(({ data: gallery, error: galleryError }) => {
+                        if (galleryError) throw galleryError;
+
+                        // Upload images and create gallery image records
+                        const imageUrls = [];
+                        const uploadPromises = [];
+
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${gallery.id}/${i}.${fileExt}`;
+                            
+                            // Upload to storage
+                            const uploadPromise = supabaseClient.storage
+                                .from('gallery-images')
+                                .upload(fileName, file)
+                                .then(({ error: uploadError }) => {
+                                    if (uploadError) throw uploadError;
+
+                                    // Get public URL
+                                    const { data: { publicUrl } } = supabaseClient.storage
+                                        .from('gallery-images')
+                                        .getPublicUrl(fileName);
+
+                                    imageUrls.push(publicUrl);
+
+                                    // Create gallery image record
+                                    return supabaseClient
+                                        .from('gallery_images')
+                                        .insert([
+                                            {
+                                                gallery_id: gallery.id,
+                                                image_url: publicUrl,
+                                                order: i
+                                            }
+                                        ]);
+                                })
+                                .then(({ error: imageError }) => {
+                                    if (imageError) throw imageError;
+                                });
+
+                            uploadPromises.push(uploadPromise);
+                        }
+
+                        // Wait for all uploads to finish
+                        return Promise.all(uploadPromises)
+                            .then(() => {
+                                // Update gallery with cover image
+                                return supabaseClient
+                                    .from('galleries')
+                                    .update({ cover_image: imageUrls[0] })
+                                    .eq('id', gallery.id);
+                            });
+                    })
+                    .then(({ error: updateError }) => {
+                        if (updateError) throw updateError;
+
+                        // Reset form and show success message
+                        e.target.reset();
+                        document.getElementById('gallery-preview').innerHTML = '';
+                        showSuccessMessage('Gallery created successfully!');
+                        loadGalleries();
+                    })
+                    .catch(error => {
+                        console.error('Error creating gallery:', error);
+                        showErrorMessage('Failed to create gallery. Please try again.');
+                    });
+
+            } catch (error) {
+                console.error('Error creating gallery:', error);
+                showErrorMessage('Failed to create gallery. Please try again.');
+            }
+        }
+
+        // Load existing galleries
+        async function loadGalleries() {
+            const { data: galleries, error } = await supabaseClient
+                .from('galleries')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading galleries:', error);
+                return;
+            }
+
+            const galleriesList = document.getElementById('galleries-list');
+            galleriesList.innerHTML = '';
+
+            galleries.forEach(gallery => {
+                const galleryElement = document.createElement('div');
+                galleryElement.className = 'gallery-card';
+                galleryElement.innerHTML = `
+                    <img src="${gallery.cover_image}" alt="${gallery.title}" class="gallery-cover">
+                    <div class="gallery-info">
+                        <h3 class="gallery-title">${gallery.title}</h3>
+                        <p class="gallery-description">${gallery.description}</p>
+                        <div class="gallery-meta">
+                            <span>${new Date(gallery.event_date).toLocaleDateString()}</span>
+                            <span>${new Date(gallery.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="gallery-actions">
+                            <button class="delete-btn" onclick="deleteGallery('${gallery.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+                galleriesList.appendChild(galleryElement);
+            });
+        }
+
+        // Delete gallery function
+        window.deleteGallery = async function(galleryId) {
+            if (!confirm('Are you sure you want to delete this gallery?')) return;
+
+            try {
+                // Delete gallery images from storage
+                const { data: images, error: imagesError } = await supabaseClient
+                    .from('gallery_images')
+                    .select('image_url')
+                    .eq('gallery_id', galleryId);
+
+                if (imagesError) throw imagesError;
+
+                // Delete each image from storage
+                for (const image of images) {
+                    const fileName = image.image_url.split('/').pop();
+                    await supabaseClient.storage
+                        .from('gallery-images')
+                        .remove([`${galleryId}/${fileName}`]);
+                }
+
+                // Delete gallery images records
+                const { error: deleteImagesError } = await supabaseClient
+                    .from('gallery_images')
+                    .delete()
+                    .eq('gallery_id', galleryId);
+
+                if (deleteImagesError) throw deleteImagesError;
+
+                // Delete gallery record
+                const { error: deleteGalleryError } = await supabaseClient
+                    .from('galleries')
+                    .delete()
+                    .eq('id', galleryId);
+
+                if (deleteGalleryError) throw deleteGalleryError;
+
+                showSuccessMessage('Gallery deleted successfully!');
+                loadGalleries();
+
+            } catch (error) {
+                console.error('Error deleting gallery:', error);
+                showErrorMessage('Failed to delete gallery. Please try again.');
+            }
+        };
+
+        // Load galleries on page load
+        loadGalleries();
+
+        // Function to handle gallery image preview
+        function handleGalleryImagePreview(e) {
+            const galleryPreview = document.getElementById('gallery-preview');
+            galleryPreview.innerHTML = '';
+            const files = e.target.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const preview = document.createElement('div');
+                    preview.className = 'preview-item';
+                    
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <button class="remove-file" data-index="${i}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    galleryPreview.appendChild(preview);
+                    
+                    // Add remove functionality (note: this is more complex for FileList objects)
+                    const removeBtn = preview.querySelector('.remove-file');
+                    removeBtn.addEventListener('click', function() {
+                        preview.remove();
+                    });
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Update career stats
+        async function updateCareerStats(event) {
+            if (event) {
+                event.preventDefault(); // Ensure the default form action is prevented
+            }
+            console.clear(); // Clear any previous console logs
+            console.log("Career stats update initiated");
+            
+            // Get form data - simple and direct
+            const formData = {
+                tournaments: parseInt(document.getElementById('tournaments').value) || 0,
+                match_wins: parseInt(document.getElementById('match-wins').value) || 0,
+                intl_ranking: parseInt(document.getElementById('intl-ranking').value) || 0,
+                swiss_ranking: parseInt(document.getElementById('swiss-ranking').value) || 0,
+                max_serve_speed: parseInt(document.getElementById('max-serve-speed').value) || 0,
+                countries_played: parseInt(document.getElementById('countries-played').value) || 0,
+                updated_at: new Date().toISOString()
+            };
+            
+            console.log("Form data to be saved:", formData);
+            
+            // Show loading state
+            document.getElementById('stats-success-message').style.display = 'none';
+            document.getElementById('stats-error-message').style.display = 'none';
+            const submitButton = document.getElementById('stats-submit-btn');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Saving...';
+            submitButton.disabled = true;
+            
+            try {
+                // First, check if we have proper authentication 
+                const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+                if (authError || !user) {
+                    throw new Error('Authentication error. Please login again.');
+                }
+                
+                console.log("Authenticated as:", user.email);
+                
+                // Check if the career_stats table exists by trying to count records
+                const { count, error: countError } = await supabaseClient
+                    .from('career_stats')
+                    .select('*', { count: 'exact', head: true });
+                
+                if (countError) {
+                    console.error("Error accessing career_stats table:", countError);
+                    throw new Error(`Database error: ${countError.message}`);
+                }
+                
+                console.log(`Found ${count} records in career_stats table`);
+                
+                // Get existing record if any
+                let existingRecord = null;
+                
+                if (count > 0) {
+                    const { data: existing, error: getError } = await supabaseClient
+                        .from('career_stats')
+                        .select('*')
+                        .order('updated_at', { ascending: false })
+                        .limit(1)
+                        .single();
+                    
+                    if (!getError) {
+                        existingRecord = existing;
+                        console.log("Found existing record:", existingRecord);
+                    }
+                }
+                
+                // Save the data - either update or insert
+                let result;
+                if (existingRecord) {
+                    console.log(`Updating record with ID: ${existingRecord.id}`);
+                    result = await supabaseClient
+                        .from('career_stats')
+                        .update(formData)
+                        .eq('id', existingRecord.id)
+                        .select();
+                } else {
+                    console.log("Inserting new record");
+                    result = await supabaseClient
+                        .from('career_stats')
+                        .insert([formData])
+                        .select();
+                }
+                
+                if (result.error) {
+                    throw new Error(`Database error: ${result.error.message}`);
+                }
+                
+                console.log("Save successful:", result.data);
+                
+                // Update success message
+                document.getElementById('stats-success-message').textContent = 'Career statistics updated successfully!';
+                document.getElementById('stats-success-message').style.display = 'block';
+                
+                // Reset button state
+                submitButton.textContent = 'Update Statistics';
+                submitButton.disabled = false;
+                
+                // Immediately verify and update form values
+                verifyStats();
+            } catch (error) {
+                console.error("Error updating career stats:", error);
+                document.getElementById('stats-error-message').textContent = `Error: ${error.message}`;
+                document.getElementById('stats-error-message').style.display = 'block';
+                
+                // Reset button state
+                submitButton.textContent = 'Update Statistics';
+                submitButton.disabled = false;
+            }
+        }
+        
+        // Verify stats were saved correctly
+        async function verifyStats() {
+            console.log("Verifying saved stats...");
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('career_stats')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                
+                if (error) {
+                    console.error("Error verifying stats:", error);
+                    return;
+                }
+                
+                console.log("Verification result:", data);
+                
+                // Update form with verified values
+                document.getElementById('tournaments').value = data.tournaments;
+                document.getElementById('match-wins').value = data.match_wins;
+                document.getElementById('intl-ranking').value = data.intl_ranking;
+                document.getElementById('swiss-ranking').value = data.swiss_ranking;
+                document.getElementById('max-serve-speed').value = data.max_serve_speed;
+                document.getElementById('countries-played').value = data.countries_played;
+                
+                // Also update any stats on the page if they exist
+                const statsElements = document.querySelectorAll('[data-stat]');
+                statsElements.forEach(el => {
+                    const stat = el.getAttribute('data-stat');
+                    if (data[stat] !== undefined) {
+                        el.textContent = data[stat];
+                        if (el.getAttribute('data-count') !== undefined) {
+                            el.setAttribute('data-count', data[stat]);
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error("Error in verifyStats:", error);
+            }
+        }
+
+        // Load career stats
+        async function loadCareerStats() {
+            console.log("Loading career stats...");
+            
+            // Remove any query parameters influence
+            const urlParams = new URLSearchParams(window.location.search);
+            const hasQueryParams = urlParams.toString().length > 0;
+            
+            if (hasQueryParams) {
+                console.log("Query parameters detected in URL - these will be ignored");
+            }
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('career_stats')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        console.log("No stats found - this is normal for a new setup");
+                    } else {
+                        console.error("Error loading stats:", error);
+                    }
+                    return;
+                }
+                
+                if (!data) {
+                    console.log("No stats data returned");
+                    return;
+                }
+                
+                console.log("Loaded stats:", data);
+                
+                // Update form values
+                document.getElementById('tournaments').value = data.tournaments || 0;
+                document.getElementById('match-wins').value = data.match_wins || 0;
+                document.getElementById('intl-ranking').value = data.intl_ranking || 0;
+                document.getElementById('swiss-ranking').value = data.swiss_ranking || 0;
+                document.getElementById('max-serve-speed').value = data.max_serve_speed || 0;
+                document.getElementById('countries-played').value = data.countries_played || 0;
+            } catch (error) {
+                console.error("Error in loadCareerStats:", error);
+            }
+        }
+        
+        // Make sure form is not accidentally submitted or reset
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log("DOM loaded - setting up career stats");
+            
+            // Check if user is authenticated
+            checkAuth();
+            
+            // Clear any query parameters from URL without refreshing the page
+            const currentUrl = window.location.href.split('?')[0];
+            window.history.replaceState({}, document.title, currentUrl);
+            
+            // Set up forms event listeners
+            const galleryForm = document.getElementById('gallery-form');
+            if (galleryForm) {
+                galleryForm.addEventListener('submit', handleGallerySubmit);
+            }
+            
+            const statsForm = document.getElementById('career-stats-form');
+            const statsButton = document.getElementById('stats-submit-btn');
+            if (statsForm && statsButton) {
+                console.log("Setting up stats form with button click handler");
+                statsButton.addEventListener('click', function() {
+                    console.log("Stats button clicked");
+                    updateCareerStats();
+                });
+                
+                // Also prevent traditional form submission as backup
+                statsForm.addEventListener('submit', function(e) {
+                    console.log("Form submit event caught and prevented");
+                    e.preventDefault();
+                    return false;
+                });
+            }
+            
+            // Load data
+            loadUpdates();
+            loadGalleries();
+            loadCareerStats();
+        });
+
+        // Add the viewUpdateDetails function to handle the modal
+        window.viewUpdateDetails = async function(updateId) {
+            try {
+                // Fetch the update details
+                const { data: update, error } = await supabaseClient
+                    .from('updates')
+                    .select('*')
+                    .eq('id', updateId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Populate the modal
+                document.getElementById('modal-title').textContent = update.title;
+                document.getElementById('modal-category').textContent = update.category;
+                document.getElementById('modal-date').textContent = new Date(update.created_at).toLocaleString();
+                document.getElementById('modal-image').src = update.image_url;
+                document.getElementById('modal-image').alt = update.title;
+                document.getElementById('modal-content').textContent = update.content;
+                
+                // Show the modal
+                const modal = document.getElementById('update-modal');
+                modal.classList.add('show');
+                
+                // Prevent scrolling on the body
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('Error fetching update details:', error);
+                alert('Failed to load update details');
+            }
+        }
+        
+        // Close the modal when clicking the X
+        document.querySelector('.modal-close').addEventListener('click', function() {
+            document.getElementById('update-modal').classList.remove('show');
+            document.body.style.overflow = '';
+        });
+        
+        // Close the modal when clicking outside the content
+        document.getElementById('update-modal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                this.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
+        
+        // Close the modal with escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('update-modal').classList.contains('show')) {
+                document.getElementById('update-modal').classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+    <div class="cutstudios-badge">
+        <a href="https://cutstudios.pt" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/NICOLA logo.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
+    </div>
+</body>
+</html> 
