@@ -1805,224 +1805,75 @@
         // Initialize Supabase client
         const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
-        // Load latest updates with the view buttons included
-        async function loadLatestUpdates() {
+        // Debug: Verify Supabase connection and table
+        async function verifySupabaseConnection() {
+            console.log('Verifying Supabase connection...');
+            console.log('Supabase URL:', config.supabaseUrl);
+            
             try {
-                const { data: updates, error } = await supabaseClient
-                    .from('updates')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(3);
+                // Check if we can access the career_stats table
+                const { data, error } = await supabaseClient
+                    .from('career_stats')
+                    .select('*', { count: 'exact', head: true });
                 
-                if (error) throw error;
-                
-                const updatesContainer = document.getElementById('latest-updates');
-                updatesContainer.innerHTML = '';
-                
-                updates.forEach(update => {
-                    const date = new Date(update.created_at);
-                    const formattedDate = date.toLocaleDateString('de-CH', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    
-                    const card = document.createElement('div');
-                    card.className = 'update-card';
-                    
-                    // Use touchstart for mobile devices
-                    if ('ontouchstart' in window) {
-                        let touchStartX = 0;
-                        let touchStartY = 0;
-                        let touchEndX = 0;
-                        let touchEndY = 0;
-                        let hasMoved = false;
-                        
-                        card.addEventListener('touchstart', (e) => {
-                            touchStartX = e.touches[0].clientX;
-                            touchStartY = e.touches[0].clientY;
-                            hasMoved = false;
-                        }, { passive: true });
-                        
-                        card.addEventListener('touchmove', (e) => {
-                            touchEndX = e.touches[0].clientX;
-                            touchEndY = e.touches[0].clientY;
-                            
-                            // Check if the touch has moved more than a threshold
-                            const diffX = Math.abs(touchStartX - touchEndX);
-                            const diffY = Math.abs(touchStartY - touchEndY);
-                            
-                            if (diffX > 5 || diffY > 5) {
-                                hasMoved = true;
-                            }
-                        }, { passive: true });
-                        
-                        card.addEventListener('touchend', (e) => {
-                            if (!hasMoved) {
-                                viewUpdateDetails(update.id);
-                            }
-                        }, { passive: true });
-                    } else {
-                        card.onclick = () => viewUpdateDetails(update.id);
-                    }
-                    
-                    card.innerHTML = `
-                        <img src="${update.image_url}" alt="${update.title}" class="update-image">
-                        <div class="update-content">
-                            <h3 class="update-title">${update.title}</h3>
-                            <span class="update-category">${update.category}</span>
-                            <p class="update-excerpt">${update.content.substring(0, 100)}...</p>
-                            <div class="update-date">
-                                <i class="far fa-calendar"></i> ${formattedDate}
-                            </div>
-                        </div>
-                    `;
-                    
-                    updatesContainer.appendChild(card);
-                });
-                
-                const savedLang = localStorage.getItem('language') || 'de';
-                if (typeof setLanguage === 'function') {
-                    setLanguage(savedLang);
+                if (error) {
+                    console.error('Error accessing career_stats table:', error);
+                    return false;
                 }
                 
+                console.log('Successfully connected to Supabase');
+                console.log('Career stats table exists');
+                return true;
             } catch (error) {
-                console.error('Error loading updates:', error);
+                console.error('Error verifying Supabase connection:', error);
+                return false;
             }
         }
-        
-        // View update details function
-        async function viewUpdateDetails(updateId) {
-            try {
-                // Fetch the update details
-                const { data: update, error } = await supabaseClient
-                    .from('updates')
-                    .select('*')
-                    .eq('id', updateId)
-                    .single();
-                
-                if (error) throw error;
-                
-                // Format the date
-                const date = new Date(update.created_at);
-                const formattedDate = date.toLocaleDateString('de-CH', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-                
-                // Populate the modal
-                document.getElementById('modal-title').textContent = update.title;
-                document.getElementById('modal-category').textContent = update.category;
-                document.getElementById('modal-date').querySelector('span').textContent = formattedDate;
-                document.getElementById('modal-image').src = update.image_url;
-                document.getElementById('modal-image').alt = update.title;
-                document.getElementById('modal-content').textContent = update.content;
-                
-                // Show the modal
-                const modal = document.getElementById('update-modal');
-                modal.classList.add('show');
-                
-                // Prevent scrolling on the body
-                document.body.style.overflow = 'hidden';
-                
-            } catch (error) {
-                console.error('Error fetching update details:', error);
-            }
-        }
-        
-        // Close modal function
-        function closeUpdateModal() {
-            const modal = document.getElementById('update-modal');
-            modal.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-        
-        // Add event listeners for modal
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load data
-            loadLatestUpdates();
-            
-            // Close the modal when clicking the X
-            const closeButton = document.querySelector('.glass-modal-close');
-            if (closeButton) {
-                closeButton.addEventListener('click', closeUpdateModal);
-            }
-            
-            // Close the modal when clicking outside the content
-            const modal = document.getElementById('update-modal');
-            if (modal) {
-                modal.addEventListener('click', function(event) {
-                    if (event.target === this) {
-                        closeUpdateModal();
-                    }
-                });
-            }
-            
-            // Close the modal with escape key
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape' && document.getElementById('update-modal')?.classList.contains('show')) {
-                    closeUpdateModal();
-                }
-            });
-            
-            // Load career stats
-            loadCareerStats();
-            
-            // Handle stats animation
-            const stats = document.querySelectorAll('.stat-number');
-            const statsSection = document.querySelector('.featured-stats');
-            
-            if (statsSection && stats.length) {
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            stats.forEach(stat => {
-                                animateNumberCounter(stat, parseInt(stat.getAttribute('data-count') || '0'));
-                            });
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, { threshold: 0.1 });
-                
-                observer.observe(statsSection);
+
+        // Call the verification function
+        verifySupabaseConnection().then(isConnected => {
+            if (!isConnected) {
+                console.error('Failed to connect to Supabase. Please check your configuration.');
             }
         });
 
-        // Initialize stats with default values
-        const defaultStats = {
-            tournaments: 0,
-            match_wins: 0,
-            intl_ranking: 0,
-            swiss_ranking: 0,
-            max_serve_speed: 0,
-            countries_played: 0
-        };
-
         // Load career stats from Supabase
         async function loadCareerStats() {
+            console.log("Loading career stats for home page...");
+            
             try {
-            const { data: stats, error } = await supabaseClient
-                .from('career_stats')
-                .select('*')
-                .order('updated_at', { ascending: false })
-                .limit(1)
-                .single();
-
-            if (error) {
-                console.error('Error loading career stats:', error);
-                    return defaultStats;
-            }
-
-            if (!stats) {
-                console.warn('No career stats found');
-                    return defaultStats;
-            }
-
-                return stats;
+                const { data, error } = await supabaseClient
+                    .from('career_stats')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        console.log("No stats found - this is normal for a new setup");
+                    } else {
+                        console.error("Error loading stats:", error);
+                    }
+                    return;
+                }
+                
+                if (!data) {
+                    console.log("No stats data returned");
+                    return;
+                }
+                
+                console.log("Loaded stats:", data);
+                
+                // Update the stats elements
+                document.getElementById('tournaments-count').textContent = data.tournaments || 0;
+                document.getElementById('match-wins-count').textContent = data.match_wins || 0;
+                document.getElementById('intl-ranking-count').textContent = data.intl_ranking || 0;
+                document.getElementById('swiss-ranking-count').textContent = data.swiss_ranking || 0;
+                document.getElementById('max-serve-speed-count').textContent = data.max_serve_speed || 0;
+                document.getElementById('countries-played-count').textContent = data.countries_played || 0;
             } catch (error) {
-                console.error('Error in loadCareerStats:', error);
-                return defaultStats;
+                console.error("Error in loadCareerStats:", error);
             }
         }
 

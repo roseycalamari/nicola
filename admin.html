@@ -347,6 +347,9 @@
                         <span>Login</span>
                         <div class="button-fx"></div>
                     </button>
+                    <div class="reset-password">
+                        <a href="#" id="resetPasswordLink">Forgot your password?</a>
+                    </div>
                 </form>
                 <div class="error-message" id="errorMessage"></div>
                 <div class="success-message" id="successMessage"></div>
@@ -355,8 +358,64 @@
     </main>
 
     <script>
-        // Initialize Supabase client
-        const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
+        // Initialize Supabase client with correct v2 syntax
+        const supabaseClient = supabase.createClient(
+            config.supabaseUrl,
+            config.supabaseKey,
+            {
+                auth: {
+                    autoRefreshToken: true,
+                    persistSession: true,
+                    detectSessionInUrl: true
+                }
+            }
+        );
+
+        // Debug: Check user status
+        async function checkUserStatus() {
+            const email = 'nicolasenn.contact@gmail.com';
+            try {
+                const { data, error } = await supabaseClient
+                    .from('auth.users')
+                    .select('*')
+                    .eq('email', email)
+                    .single();
+                
+                console.log('User status:', data, error);
+            } catch (error) {
+                console.error('Error checking user status:', error);
+            }
+        }
+
+        // Call the debug function
+        checkUserStatus();
+
+        // Handle password reset
+        document.getElementById('resetPasswordLink').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            if (!email) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = 'Please enter your email address';
+                return;
+            }
+
+            try {
+                const { error } = await supabaseClient.auth.resetPasswordForEmail(email);
+                if (error) throw error;
+
+                successMessage.style.display = 'block';
+                successMessage.textContent = 'Password reset email sent! Please check your inbox.';
+                errorMessage.style.display = 'none';
+            } catch (error) {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = error.message || 'Failed to send reset email';
+                successMessage.style.display = 'none';
+            }
+        });
 
         // Handle login form submission
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -367,16 +426,36 @@
             const errorMessage = document.getElementById('errorMessage');
             const successMessage = document.getElementById('successMessage');
             
+            // Clear previous messages
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+            
             try {
+                console.log('Attempting login with email:', email);
+                
                 const { data, error } = await supabaseClient.auth.signInWithPassword({
                     email: email,
                     password: password
                 });
 
-                if (error) throw error;
+                if (error) {
+                    console.error('Login error details:', error);
+                    if (error.message.includes('Email not confirmed')) {
+                        throw new Error('Please verify your email address first');
+                    } else if (error.message.includes('Invalid login credentials')) {
+                        throw new Error('Invalid email or password. Please check your credentials.');
+                    } else {
+                        throw error;
+                    }
+                }
 
+                if (!data?.user) {
+                    throw new Error('No user data returned');
+                }
+
+                console.log('Login successful, user:', data.user);
+                
                 // Show success message
-                errorMessage.style.display = 'none';
                 successMessage.style.display = 'block';
                 successMessage.textContent = 'Login successful!';
 
@@ -386,10 +465,10 @@
                 }, 1000);
 
             } catch (error) {
-                // Show error message
-                successMessage.style.display = 'none';
+                // Show error message with more details
                 errorMessage.style.display = 'block';
-                errorMessage.textContent = 'Invalid email or password';
+                errorMessage.textContent = error.message || 'An error occurred during login';
+                console.error('Login failed:', error);
             }
         });
 

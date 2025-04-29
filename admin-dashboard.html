@@ -2289,14 +2289,6 @@
         async function loadCareerStats() {
             console.log("Loading career stats...");
             
-            // Remove any query parameters influence
-            const urlParams = new URLSearchParams(window.location.search);
-            const hasQueryParams = urlParams.toString().length > 0;
-            
-            if (hasQueryParams) {
-                console.log("Query parameters detected in URL - these will be ignored");
-            }
-            
             try {
                 const { data, error } = await supabaseClient
                     .from('career_stats')
