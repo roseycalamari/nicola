@@ -1,0 +1,3578 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Nicola Senn | Professioneller Tennisspieler</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="public/css/admin.css">
+    <link rel="icon" type="image/png" href="public/images/NICOLA logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="public/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public/js/config.js"></script>
+    <script src="public/js/translations.js"></script>
+    <style>
+        :root {
+            --spacing-xs: 0.25rem;
+            --spacing-sm: 0.5rem;
+            --spacing-md: 1rem;
+            --spacing-lg: 1.5rem;
+            --spacing-xl: 2rem;
+            --spacing-xxl: 3rem;
+            
+            --border-radius-sm: 8px;
+            --border-radius-md: 12px;
+            --border-radius-lg: 20px;
+            --border-radius-round: 30px;
+            
+            --transition-speed: 300ms;
+            
+            --color-dark-elevation-1: rgba(30, 30, 30, 0.9);
+            --color-dark-elevation-2: rgba(40, 40, 40, 0.8);
+            --color-dark-elevation-3: rgba(50, 50, 50, 0.7);
+        }
+        
+        /* Base styles */
+        body.admin-page {
+            background: var(--color-darker);
+            color: var(--color-light);
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+        }
+        
+        /* Dashboard layout */
+        .dashboard {
+            min-height: 100vh;
+            padding: var(--spacing-md);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* Dashboard header */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-xl);
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--color-dark-elevation-1);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            position: sticky;
+            top: var(--spacing-md);
+            z-index: 10;
+        }
+        
+        .dashboard-logo {
+            font-size: 1.75rem;
+            color: var(--color-primary);
+            font-weight: 700;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+        
+        .admin-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: none; /* Ensures logo is not black and white */
+        }
+        
+        .cut-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: none; /* Ensures logo is not black and white */
+        }
+        
+        .dashboard-logo::before {
+            content: '';
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: var(--color-primary);
+            border-radius: 50%;
+            margin-right: 8px;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 0.6; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+            100% { opacity: 0.6; transform: scale(1); }
+        }
+        
+        .logout-button {
+            background: transparent;
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-radius: var(--border-radius-round);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+        }
+        
+        .logout-button:hover {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        /* Dashboard content */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-xl);
+        }
+        
+        /* Dashboard sections */
+        .dashboard-section {
+            background: var(--color-dark-elevation-1);
+            padding: var(--spacing-xl);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .dashboard-section:hover {
+            transform: translateY(-3px);
+        }
+        
+        .dashboard-section h2 {
+            color: var(--color-light);
+            margin-bottom: var(--spacing-lg);
+            font-size: 1.5rem;
+            font-weight: 600;
+            border-bottom: 1px solid var(--color-dark-elevation-3);
+            padding-bottom: var(--spacing-sm);
+            display: flex;
+            align-items: center;
+        }
+        
+        .dashboard-section h2::before {
+            content: '';
+            display: inline-block;
+            width: 4px;
+            height: 20px;
+            background: var(--color-primary);
+            margin-right: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .dashboard-section p {
+            color: var(--color-gray);
+            margin-bottom: var(--spacing-lg);
+        }
+        
+        /* Form styles */
+        .admin-form,
+        .update-form {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+        }
+        
+        .form-group label {
+            color: var(--color-light);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            padding: var(--spacing-md) var(--spacing-lg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--border-radius-sm);
+            background: var(--color-dark-elevation-2);
+            color: var(--color-light);
+            font-size: 1rem;
+            transition: border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+        }
+        
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(var(--color-primary-rgb), 0.2);
+        }
+        
+        .form-group textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .form-group input[type="file"] {
+            background: none;
+            padding: var(--spacing-sm) 0;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .form-actions {
+            margin-top: var(--spacing-lg);
+        }
+        
+        .submit-button,
+        .admin-button,
+        .cta-button {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: var(--spacing-md) var(--spacing-xl);
+            border-radius: var(--border-radius-round);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            min-width: 150px;
+        }
+        
+        .submit-button:hover,
+        .admin-button:hover,
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        .submit-button:disabled,
+        .admin-button:disabled,
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        /* Image preview */
+        .image-preview {
+            width: 100%;
+            max-width: 300px;
+            height: 200px;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            display: none;
+            margin-top: var(--spacing-md);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .image-preview:hover img {
+            transform: scale(1.05);
+        }
+        
+        /* Updates list */
+        .recent-items-list,
+        .updates-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-md);
+        }
+        
+        .update-item {
+            display: grid;
+            grid-template-columns: 80px 1fr auto;
+            gap: var(--spacing-md);
+            padding: var(--spacing-md);
+            background: var(--color-dark-elevation-2);
+            border-radius: var(--border-radius-sm);
+            align-items: center;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .update-item:hover {
+            transform: translateY(-2px);
+        }
+        
+        .update-thumbnail {
+            width: 80px;
+            height: 80px;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+        }
+        
+        .update-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .update-item:hover .update-thumbnail img {
+            transform: scale(1.1);
+        }
+        
+        .update-info {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+        }
+        
+        .update-title {
+            color: var(--color-light);
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        
+        .update-category {
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .update-date {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .update-date i {
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        .update-actions {
+            display: flex;
+            gap: var(--spacing-sm);
+        }
+        
+        .delete-button {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-round);
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        .delete-button:hover {
+            background: #cc0000;
+            transform: translateY(-2px);
+        }
+        
+        /* Success and error messages */
+        .success-message,
+        .error-message {
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            margin-top: var(--spacing-md);
+            display: none;
+            font-weight: 500;
+            animation: fadeIn var(--transition-speed) ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .success-message {
+            background: rgba(0, 200, 81, 0.1);
+            color: #00C851;
+            border-left: 4px solid #00C851;
+        }
+        
+        .error-message {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        /* Galleries grid */
+        .galleries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--spacing-lg);
+        }
+        
+        .gallery-card {
+            background: var(--color-dark-elevation-2);
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .gallery-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+        }
+        
+        .gallery-cover {
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .gallery-card:hover .gallery-cover {
+            transform: scale(1.05);
+        }
+        
+        .gallery-info {
+            padding: var(--spacing-lg);
+        }
+        
+        .gallery-title {
+            color: var(--color-light);
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .gallery-description {
+            color: var(--color-gray);
+            margin-bottom: var(--spacing-md);
+            line-height: 1.6;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+        
+        .gallery-actions {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .gallery-actions button {
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            border: none;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-xs);
+        }
+        
+        .gallery-actions .delete-btn {
+            background-color: #ff4444;
+            color: white;
+        }
+        
+        .gallery-actions .delete-btn:hover {
+            background-color: #cc0000;
+            transform: translateY(-2px);
+        }
+        
+        #gallery-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+        }
+        
+        .preview-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: var(--border-radius-sm);
+            transition: transform var(--transition-speed) ease;
+        }
+        
+        .preview-image:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Diagnostic section styling */
+        #diagnosticResults {
+            background: var(--color-dark-elevation-2);
+            padding: var(--spacing-md);
+            border-radius: var(--border-radius-sm);
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow: auto;
+        }
+        
+        /* Cursor */
+        .cursor {
+            pointer-events: none;
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--color-primary);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 9999;
+            mix-blend-mode: difference;
+            transition: width 0.2s, height 0.2s;
+        }
+        
+        /* Responsive styles */
+        /* Mobile first - these are the base styles */
+        
+        /* Medium screens */
+        @media (min-width: 768px) {
+            .dashboard {
+                padding: var(--spacing-lg);
+            }
+            
+            .dashboard-header {
+                padding: var(--spacing-lg) var(--spacing-xl);
+            }
+            
+            .update-item {
+                grid-template-columns: 100px 1fr auto;
+            }
+            
+            .update-thumbnail {
+                width: 100px;
+                height: 100px;
+            }
+        }
+        
+        /* Large screens */
+        @media (min-width: 1024px) {
+            .dashboard {
+                padding: var(--spacing-xl);
+            }
+            
+            .dashboard-content {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .dashboard-section {
+                padding: var(--spacing-xl);
+            }
+            
+            .dashboard-section:first-child,
+            .dashboard-section:nth-child(2),
+            .dashboard-section:nth-child(3) {
+                grid-column: span 1;
+            }
+            
+            .dashboard-section:nth-child(4),
+            .dashboard-section:nth-child(5) {
+                grid-column: span 2;
+            }
+        }
+        
+        /* Extra large screens */
+        @media (min-width: 1400px) {
+            .dashboard-content {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .dashboard-section:first-child,
+            .dashboard-section:nth-child(2),
+            .dashboard-section:nth-child(3) {
+                grid-column: span 1;
+            }
+            
+            .dashboard-section:nth-child(4),
+            .dashboard-section:nth-child(5) {
+                grid-column: span 3;
+            }
+        }
+        
+        /* Improved mobile responsiveness */
+        @media (max-width: 768px) {
+            .dashboard {
+                padding: var(--spacing-sm);
+                overflow-x: hidden;
+                width: 100%;
+            }
+            
+            .dashboard-header {
+                padding: var(--spacing-md);
+                flex-wrap: wrap;
+                gap: var(--spacing-md);
+            }
+            
+            .dashboard-logo {
+                margin-right: auto;
+            }
+            
+            .admin-logo, .cut-logo {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .dashboard-content {
+                gap: var(--spacing-md);
+            }
+            
+            .dashboard-section {
+                padding: var(--spacing-md);
+                overflow-x: auto;
+            }
+            
+            .form-group input, 
+            .form-group textarea, 
+            .form-group select {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .update-item {
+                grid-template-columns: 60px 1fr;
+            }
+            
+            .update-actions {
+                grid-column: span 2;
+                justify-content: flex-end;
+                margin-top: var(--spacing-sm);
+            }
+            
+            .update-thumbnail {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+            .admin-logo, .cut-logo {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .dashboard-section h2 {
+                font-size: 1.2rem;
+            }
+            
+            .update-item {
+                gap: var(--spacing-sm);
+            }
+            
+            .galleries-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+            backdrop-filter: blur(5px);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 1;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-content {
+            background: var(--color-dark-elevation-1);
+            width: 100%;
+            max-width: 800px;
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: var(--spacing-md);
+            right: var(--spacing-md);
+            font-size: 1.5rem;
+            color: var(--color-light);
+            cursor: pointer;
+            z-index: 10;
+            width: 32px;
+            height: 32px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .modal-header {
+            padding: var(--spacing-xl);
+            border-bottom: 1px solid var(--color-dark-elevation-3);
+        }
+        
+        .modal-header h3 {
+            font-size: 1.8rem;
+            margin-bottom: var(--spacing-sm);
+            color: var(--color-light);
+        }
+        
+        .modal-category {
+            display: inline-block;
+            padding: var(--spacing-xs) var(--spacing-sm);
+            background-color: rgba(var(--color-primary-rgb), 0.2);
+            color: var(--color-primary);
+            border-radius: var(--border-radius-round);
+            font-size: 0.9rem;
+            margin-bottom: var(--spacing-sm);
+            text-transform: capitalize;
+        }
+        
+        .modal-date {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+        
+        .modal-body {
+            padding: 0 var(--spacing-xl) var(--spacing-xl);
+        }
+        
+        .modal-image-container {
+            width: 100%;
+            margin: var(--spacing-lg) 0;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal-image-container img {
+            width: 100%;
+            display: block;
+            transition: transform 0.5s ease;
+        }
+        
+        .modal-image-container:hover img {
+            transform: scale(1.02);
+        }
+        
+        .modal-text {
+            color: var(--color-light);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-wrap;
+        }
+        
+        @media (max-width: 768px) {
+            .modal-content {
+                margin-top: var(--spacing-lg);
+            }
+            
+            .modal-header {
+                padding: var(--spacing-lg);
+            }
+            
+            .modal-body {
+                padding: 0 var(--spacing-lg) var(--spacing-lg);
+            }
+            
+            .modal-header h3 {
+                font-size: 1.5rem;
+            }
+        }
+
+        .cutstudios-badge {
+            position: fixed;
+            right: 0;
+            bottom: 30%;
+            z-index: 990;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 14px 10px;
+            border-radius: 0 4px 4px 0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            opacity: 0.8;
+            font-family: 'Poppins', sans-serif;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
+            display: flex;
+            align-items: center;
+        }
+
+        .cutstudios-badge:hover {
+            transform: translateX(-3px) rotate(180deg);
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+            opacity: 1;
+        }
+
+        .cutstudios-badge a {
+            text-decoration: none;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+            position: relative;
+        }
+
+        .cutstudios-badge span {
+            color: #888;
+            font-size: 0.75rem;
+            font-weight: 400;
+            white-space: nowrap;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cut-logo {
+            width: 28px;
+            height: auto;
+            object-fit: contain;
+            transform: rotate(90deg);
+            margin-bottom: 2px;
+            position: relative;
+            z-index: 2;
+            opacity: 1 !important;
+            filter: none !important;
+        }
+
+        @media (max-width: 768px) {
+            .cutstudios-badge {
+                padding: 8px 6px;
+                bottom: 25%;
+            }
+
+            .cut-logo {
+                width: 18px;
+                opacity: 1 !important;
+                filter: none !important;
+            }
+
+            .cutstudios-badge span {
+                font-size: 0.6rem;
+            }
+        }
+
+        /* Redesigned update cards to match website theme */
+        .update-card-admin {
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .update-card-admin:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            border-color: rgba(var(--color-primary-rgb), 0.3);
+        }
+
+        .update-info {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.5rem;
+            flex: 1;
+            position: relative;
+        }
+
+        .update-thumbnail {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+        }
+
+        .update-thumbnail img,
+        .update-thumbnail video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            filter: none !important; /* Remove any black and white filter */
+        }
+
+        .update-card-admin:hover .update-thumbnail img,
+        .update-card-admin:hover .update-thumbnail video {
+            transform: scale(1.08);
+            filter: none !important; /* Ensure no filter on hover */
+        }
+
+        .update-details {
+            flex: 1;
+        }
+
+        .update-details h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.35rem;
+            color: var(--color-light);
+            font-weight: 600;
+            line-height: 1.3;
+            transition: color 0.3s ease;
+        }
+        
+        .update-card-admin:hover .update-details h3 {
+            color: #ffffff;
+        }
+
+        .update-category {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background-color: rgba(var(--color-primary-rgb), 0.2);
+            color: var(--color-primary);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            margin-bottom: 0.75rem;
+            text-transform: capitalize;
+            transition: all 0.3s ease;
+        }
+        
+        .update-card-admin:hover .update-category {
+            background-color: rgba(var(--color-primary-rgb), 0.3);
+        }
+
+        .update-date {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .update-date i {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .update-actions {
+            padding: 0 1.5rem 1.5rem;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+        }
+
+        .update-button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 500;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .update-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .update-button:hover::before {
+            transform: translateX(0);
+        }
+
+        .edit-button {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            box-shadow: 0 4px 15px rgba(var(--color-primary-rgb), 0.3);
+        }
+
+        .edit-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(var(--color-primary-rgb), 0.4);
+        }
+
+        .delete-button {
+            background: transparent;
+            color: var(--color-light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .delete-button:hover {
+            background: rgba(255, 68, 68, 0.1);
+            color: #ff4444;
+            border-color: rgba(255, 68, 68, 0.3);
+            transform: translateY(-3px);
+        }
+
+        .delete-button i {
+            color: #ff4444;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            background: rgba(26, 26, 26, 0.6);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .empty-state h3 {
+            margin: 0.5rem 0;
+            color: var(--color-light);
+            font-size: 1.4rem;
+        }
+
+        .empty-state p {
+            color: var(--color-gray);
+            max-width: 300px;
+            margin: 0.5rem auto 0;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .update-card-admin {
+                margin-bottom: 1.25rem;
+            }
+
+            .update-info {
+                padding: 1.25rem 1.25rem 0.75rem;
+                gap: 1.25rem;
+            }
+
+            .update-thumbnail {
+                width: 100px;
+                height: 100px;
+            }
+
+            .update-details h3 {
+                font-size: 1.2rem;
+            }
+
+            .update-actions {
+                padding: 0 1.25rem 1.25rem;
+            }
+
+            .update-button {
+                padding: 0.6rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .update-info {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .update-thumbnail {
+                width: 100%;
+                height: 180px;
+            }
+
+            .update-details {
+                width: 100%;
+            }
+
+            .update-actions {
+                justify-content: space-between;
+            }
+
+            .update-button {
+                flex: 1;
+                justify-content: center;
+            }
+        }
+
+        /* Close button styling */
+        .close-button {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--color-light);
+            font-size: 1.2rem;
+            z-index: 10;
+        }
+
+        .close-button:hover {
+            background: rgba(255, 68, 68, 0.2);
+            border-color: rgba(255, 68, 68, 0.4);
+            transform: rotate(90deg);
+            color: #ff4444;
+        }
+
+        /* Image removal button styling */
+        .remove-media,
+        .remove-file {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            width: 32px;
+            height: 32px;
+            background: rgba(26, 26, 26, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: var(--color-light);
+            font-size: 0.9rem;
+            z-index: 2;
+            opacity: 0;
+            transform: scale(0.9);
+        }
+
+        .media-item:hover .remove-media,
+        .preview-item:hover .remove-file {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .remove-media:hover,
+        .remove-file:hover {
+            background: rgba(255, 68, 68, 0.2);
+            border-color: rgba(255, 68, 68, 0.4);
+            color: #ff4444;
+            transform: scale(1.1);
+        }
+
+        /* Media item container */
+        .media-item,
+        .preview-item {
+            position: relative;
+            border-radius: var(--border-radius-sm);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .media-item img,
+        .preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .media-item:hover img,
+        .preview-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .tier-label {
+            margin-top: 1rem;
+            margin-bottom: var(--spacing-md);
+            font-weight: 600;
+        }
+
+        /* Custom radio for tier selection */
+        .tier-options {
+            display: flex;
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-sm);
+        }
+
+        /* Gallery Edit Styles */
+        .current-images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: var(--spacing-md);
+            margin-top: var(--spacing-md);
+            max-height: 300px;
+            overflow-y: auto;
+            padding: var(--spacing-md);
+            background: var(--color-dark-elevation-2);
+            border-radius: var(--border-radius-sm);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .current-image-item {
+            position: relative;
+            aspect-ratio: 1;
+            overflow: hidden;
+            border-radius: var(--border-radius-sm);
+            border: 2px solid transparent;
+            transition: all var(--transition-speed) ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .current-image-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .current-image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform var(--transition-speed) ease;
+        }
+
+        .current-image-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .current-image-item .image-actions {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .remove-image-btn {
+            background: rgba(255, 0, 0, 0.7);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+        }
+
+        .remove-image-btn:hover {
+            background: rgba(255, 0, 0, 0.9);
+            transform: scale(1.1);
+        }
+
+        .current-image-item.marked-for-deletion {
+            opacity: 0.5;
+            border-color: red;
+            position: relative;
+        }
+
+        .current-image-item.marked-for-deletion::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 0, 0, 0.2);
+            z-index: 1;
+        }
+
+        .undo-delete-btn {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 2px 8px;
+            font-size: 12px;
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .no-images {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: var(--spacing-md);
+            color: var(--color-gray);
+            font-style: italic;
+        }
+
+        .edit-btn {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: 5px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all var(--transition-speed) ease;
+            margin-right: 8px;
+        }
+
+        .edit-btn:hover {
+            background: var(--color-primary-dark, var(--color-primary));
+            transform: translateY(-2px);
+        }
+
+        #editGalleryUploadArea {
+            border: 2px dashed rgba(var(--color-primary-rgb), 0.4);
+            background: rgba(var(--color-primary-rgb), 0.05);
+        }
+
+        #editGalleryUploadArea:hover {
+            border-color: rgba(var(--color-primary-rgb), 0.8);
+            background: rgba(var(--color-primary-rgb), 0.1);
+        }
+
+        #editUploadArea {
+            border: 2px dashed rgba(var(--color-primary-rgb), 0.4);
+            background: rgba(var(--color-primary-rgb), 0.05);
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 1rem;
+        }
+
+        #editUploadArea:hover {
+            border-color: rgba(var(--color-primary-rgb), 0.8);
+            background: rgba(var(--color-primary-rgb), 0.1);
+        }
+
+        #editUploadArea .upload-icon {
+            font-size: 2rem;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+        }
+
+        #editUploadArea p {
+            margin: 0.5rem 0;
+            color: var(--color-text);
+        }
+
+        #editUploadArea .or {
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+
+        #editUploadArea .upload-btn {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        #editUploadArea .upload-btn:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+        }
+
+        #editUploadArea input[type="file"] {
+            display: none;
+        }
+
+        .current-images-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .current-images-preview .image-container {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .current-images-preview .image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .current-images-preview .image-container .remove-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 0, 0, 0.8);
+            color: white;
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .current-images-preview .image-container .remove-btn:hover {
+            background: rgba(255, 0, 0, 1);
+            transform: scale(1.1);
+        }
+
+        .current-images-preview .image-container.marked-for-deletion {
+            opacity: 0.5;
+        }
+
+        .current-images-preview .image-container .undo-delete-btn {
+            position: absolute;
+            bottom: 0.5rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .current-images-preview .image-container .undo-delete-btn:hover {
+            background: var(--color-primary-dark);
+        }
+
+        /* Enhanced Updates Management Section */
+        .updates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
+        .update-item {
+            background: var(--color-dark-elevation-2);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(var(--color-primary-rgb), 0.1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .update-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        .update-thumbnail {
+            width: 100%;
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .update-thumbnail img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .update-item:hover .update-thumbnail img {
+            transform: scale(1.05);
+        }
+        
+        .update-no-image {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.1), rgba(var(--color-primary-rgb), 0.2));
+        }
+        
+        .update-no-image i {
+            font-size: 3rem;
+            color: rgba(var(--color-primary-rgb), 0.6);
+        }
+        
+        .update-item-header {
+            padding: 1.25rem 1.25rem 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .update-content {
+            padding: 0 1.25rem 1.25rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .update-category {
+            display: inline-block;
+            padding: 0.35rem 0.75rem;
+            background: rgba(var(--color-primary-rgb), 0.15);
+            color: var(--color-primary);
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+        
+        .update-date {
+            color: var(--color-gray);
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .update-date i {
+            font-size: 0.8rem;
+        }
+        
+        .update-title {
+            margin: 1rem 0 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-light);
+            line-height: 1.4;
+        }
+        
+        .update-excerpt {
+            color: var(--color-gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+            flex: 1;
+        }
+        
+        .update-actions {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: auto;
+        }
+        
+        .edit-update-btn,
+        .delete-update-btn {
+            padding: 0.6rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .edit-update-btn {
+            background: var(--color-primary);
+            color: var(--color-darker);
+        }
+        
+        .edit-update-btn:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        .delete-update-btn {
+            background: rgba(255, 59, 59, 0.15);
+            color: #ff5b5b;
+        }
+        
+        .delete-update-btn:hover {
+            background: rgba(255, 59, 59, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(255, 59, 59, 0.2);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(26, 26, 26, 0.5);
+            border-radius: 12px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            margin-top: 1.5rem;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--color-gray);
+            margin-bottom: 1rem;
+        }
+        
+        .empty-state p {
+            color: var(--color-gray);
+            font-size: 1.1rem;
+        }
+        
+        .action-button {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .action-button .add-update-btn {
+            background: var(--color-primary);
+            color: var(--color-darker);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        
+        .action-button .add-update-btn:hover {
+            background: var(--color-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(var(--color-primary-rgb), 0.3);
+        }
+        
+        /* Media queries */
+        @media (max-width: 1024px) {
+            .updates-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .updates-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .updates-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body class="admin-page">
+    <div class="cursor"></div>
+    <div class="noise-overlay"></div>
+
+    <main class="dashboard">
+        <header class="dashboard-header">
+            <div class="dashboard-logo">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn" class="admin-logo">
+            </div>
+            <button class="logout-button" id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i>
+                Logout
+            </button>
+        </header>
+
+        <div class="dashboard-content">
+            <div class="dashboard-section">
+                <h2>Create New Update</h2>
+                <form class="update-form" id="updateForm">
+                    <div class="form-group">
+                        <label for="title">Title</label>
+                        <input type="text" id="title" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="category">Category</label>
+                        <select id="category" required>
+                            <option value="matches">Matches</option>
+                            <option value="training">Training</option>
+                            <option value="behind-scenes">Behind the Scenes</option>
+                            <option value="achievements">Achievements</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="update-date">Date</label>
+                        <input type="date" id="update-date" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="content">Content</label>
+                        <textarea id="content" required></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Media Upload</label>
+                        <div class="upload-area" id="uploadArea">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag & drop photos and videos here</p>
+                                <p class="upload-hint">or click to browse files</p>
+                        </div>
+                            <input type="file" id="media" multiple accept="image/*,video/*" class="upload-input">
+                        </div>
+                        <div class="media-preview" id="mediaPreview"></div>
+                    </div>
+
+                    <button type="submit" class="submit-button">
+                        <span>Create Update</span>
+                        <div class="button-fx"></div>
+                    </button>
+                </form>
+                <div class="success-message" id="createSuccess"></div>
+                <div class="error-message" id="createError"></div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Create New Gallery</h2>
+                <form id="gallery-form" class="admin-form">
+                    <div class="form-group">
+                        <label for="gallery-title">Gallery Title</label>
+                        <input type="text" id="gallery-title" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-description">Description</label>
+                        <textarea id="gallery-description" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-date">Event Date</label>
+                        <input type="date" id="gallery-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="gallery-images">Gallery Images</label>
+                        <div class="upload-area" id="galleryUploadArea">
+                            <div class="upload-placeholder">
+                                <i class="fas fa-images"></i>
+                                <p>Drag & drop gallery images here</p>
+                                <p class="upload-hint">or click to browse files</p>
+                    </div>
+                            <input type="file" id="gallery-images" multiple accept="image/*" required class="upload-input">
+                        </div>
+                        <div id="gallery-preview" class="media-preview"></div>
+                    </div>
+                    <button type="submit" class="submit-button">
+                        <span>Create Gallery</span>
+                        <div class="button-fx"></div>
+                    </button>
+                </form>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Update Career Statistics</h2>
+                <p>Update your career numbers that appear on the homepage.</p>
+                
+                <form id="career-stats-form" class="admin-form" onsubmit="return false;">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="tournaments">Tournaments</label>
+                            <input type="number" id="tournaments" name="tournaments" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="match-wins">International Match Wins</label>
+                            <input type="number" id="match-wins" name="match_wins" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="intl-ranking">International Ranking</label>
+                            <input type="number" id="intl-ranking" name="intl_ranking" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="swiss-ranking">Swiss Ranking</label>
+                            <input type="number" id="swiss-ranking" name="swiss_ranking" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="max-serve-speed">Maximum Serve Speed (km/h)</label>
+                            <input type="number" id="max-serve-speed" name="max_serve_speed" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="countries-played">Countries Played In</label>
+                            <input type="number" id="countries-played" name="countries_played" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" id="stats-submit-btn" class="submit-button">
+                            <span>Update Statistics</span>
+                            <div class="button-fx"></div>
+                        </button>
+                    </div>
+                    
+                    <div id="stats-success-message" class="success-message" style="display: none;">
+                        Career statistics updated successfully!
+                    </div>
+                    
+                    <div id="stats-error-message" class="error-message" style="display: none;">
+                        Error updating career statistics. Please try again.
+                    </div>
+                </form>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Updates Management</h2>
+                <div class="action-button">
+                    <button class="add-update-btn" onclick="document.querySelector('#create-update-tab').click()">
+                        <i class="fas fa-plus"></i> Create New Update
+                    </button>
+                </div>
+                <div id="updatesList">
+                    <!-- Updates will be loaded here -->
+                </div>
+            </div>
+
+            <div class="dashboard-section">
+                <h2>Recent Galleries</h2>
+                <div id="galleries-list" class="galleries-grid">
+                    <!-- Galleries will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Edit Update Modal -->
+    <div class="modal" id="editUpdateModal">
+        <div class="modal-content">
+            <button class="close-button">&times;</button>
+            <h2>Edit Update</h2>
+            <form id="editUpdateForm" class="update-form">
+                <input type="hidden" id="editUpdateId">
+                <div class="form-group">
+                    <label for="editTitle">Title</label>
+                    <input type="text" id="editTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="editCategory">Category</label>
+                    <select id="editCategory" name="category" required>
+                        <option value="Matches">Matches</option>
+                        <option value="Training">Training</option>
+                        <option value="Behind the Scenes">Behind the Scenes</option>
+                        <option value="Achievements">Achievements</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editContent">Content</label>
+                    <textarea id="editContent" name="content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Current Image</label>
+                    <div id="editCurrentImage" class="current-images-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="editMedia">New Image (Optional)</label>
+                    <div class="upload-area" id="editUploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <p>Drag & drop new image here</p>
+                        <p class="or">- or -</p>
+                        <button type="button" class="upload-btn">Browse Files</button>
+                        <input type="file" id="editMedia" name="media" accept="image/*" class="upload-input">
+                    </div>
+                    <div id="editMediaPreview" class="media-preview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="admin-button">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Gallery Edit Modal -->
+    <div class="modal" id="editGalleryModal">
+        <div class="modal-content">
+            <button class="close-button edit-gallery-close">&times;</button>
+            <h2>Edit Gallery</h2>
+            <form id="editGalleryForm" class="update-form">
+                <input type="hidden" id="editGalleryId">
+                <div class="form-group">
+                    <label for="editGalleryTitle">Gallery Title</label>
+                    <input type="text" id="editGalleryTitle" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGalleryDescription">Description</label>
+                    <textarea id="editGalleryDescription" name="description" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="editGalleryDate">Event Date</label>
+                    <input type="date" id="editGalleryDate" name="event_date" required>
+                </div>
+                <div class="form-group">
+                    <label for="editGalleryCover">New Cover Image (Optional)</label>
+                    <input type="file" id="editGalleryCover" name="cover_image" accept="image/*">
+                </div>
+                <div class="form-group">
+                    <label>Current Images</label>
+                    <div id="editGalleryCurrentImages" class="current-images-preview"></div>
+                </div>
+                <div class="form-group">
+                    <label for="editGalleryImages">Add New Images (Optional)</label>
+                    <div class="upload-area" id="editGalleryUploadArea">
+                        <div class="upload-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <p>Drag & drop new gallery images here</p>
+                        <p class="or">- or -</p>
+                        <button type="button" class="upload-btn">Browse Files</button>
+                        <input type="file" id="editGalleryImages" multiple accept="image/*" class="upload-input">
+                    </div>
+                    <div id="editGalleryPreview" class="media-preview"></div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="admin-button">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Initialize Supabase client
+        const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
+
+        // Check authentication status
+        async function checkAuth() {
+            const { data: { user }, error } = await supabaseClient.auth.getUser();
+            if (!user) {
+                window.location.href = 'admin.html';
+            }
+        }
+
+        // Handle logout
+        document.getElementById('logoutButton').addEventListener('click', async () => {
+            await supabaseClient.auth.signOut();
+            window.location.href = 'admin.html';
+        });
+
+        // Drag and drop functionality
+        const uploadArea = document.getElementById('uploadArea');
+        const uploadInput = document.querySelector('.upload-input');
+        const mediaPreview = document.getElementById('mediaPreview');
+        let uploadedFiles = [];
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        // Highlight drop zone when item is dragged over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            uploadArea.addEventListener(eventName, unhighlight, false);
+        });
+
+        // Handle dropped files
+        uploadArea.addEventListener('drop', handleDrop, false);
+        uploadInput.addEventListener('change', handleFiles, false);
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function highlight(e) {
+            uploadArea.classList.add('highlight');
+        }
+
+        function unhighlight(e) {
+            uploadArea.classList.remove('highlight');
+        }
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleFiles({ target: { files } });
+        }
+
+        function handleFiles(e) {
+            const files = [...e.target.files];
+            files.forEach(previewFile);
+            uploadedFiles = [...uploadedFiles, ...files];
+        }
+
+        function previewFile(file) {
+            const reader = new FileReader();
+                reader.readAsDataURL(file);
+            
+            reader.onload = function() {
+                const preview = document.createElement('div');
+                preview.className = 'preview-item';
+                
+                if (file.type.startsWith('image/')) {
+                    preview.innerHTML = `
+                        <img src="${reader.result}" alt="${file.name}">
+                        <button class="remove-file" data-name="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                } else if (file.type.startsWith('video/')) {
+                    preview.innerHTML = `
+                        <video controls>
+                            <source src="${reader.result}" type="${file.type}">
+                        </video>
+                        <button class="remove-file" data-name="${file.name}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                }
+                
+                mediaPreview.appendChild(preview);
+                
+                // Add remove functionality
+                const removeBtn = preview.querySelector('.remove-file');
+                removeBtn.addEventListener('click', function() {
+                    preview.remove();
+                    uploadedFiles = uploadedFiles.filter(f => f.name !== file.name);
+                });
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('updateForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Get form elements
+            const form = e.target;
+            const title = form.querySelector('#title').value;
+            const content = form.querySelector('#content').value;
+            const category = form.querySelector('#category').value;
+            const dateInput = form.querySelector('#update-date');
+            
+            // Create or get success/error message containers
+            let successMessage = document.getElementById('createSuccess');
+            let errorMessage = document.getElementById('createError');
+            
+            if (!successMessage) {
+                successMessage = document.createElement('div');
+                successMessage.id = 'createSuccess';
+                successMessage.className = 'success-message';
+                form.insertBefore(successMessage, form.firstChild);
+            }
+            
+            if (!errorMessage) {
+                errorMessage = document.createElement('div');
+                errorMessage.id = 'createError';
+                errorMessage.className = 'error-message';
+                form.insertBefore(errorMessage, form.firstChild);
+            }
+            
+            try {
+                // Validate required fields
+                if (!title || !content || !category || !dateInput.value) {
+                    throw new Error('Please fill in all required fields');
+                }
+
+                // Upload all media files
+                const mediaUrls = await Promise.all(uploadedFiles.map(async (file) => {
+                    const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                    const { data, error } = await supabaseClient.storage
+                        .from('updates-images')
+                        .upload(fileName, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                    if (error) throw error;
+
+                const { data: { publicUrl } } = supabaseClient.storage
+                        .from('updates-images')
+                    .getPublicUrl(fileName);
+
+                    return {
+                        url: publicUrl,
+                        type: file.type.startsWith('image/') ? 'image' : 'video'
+                    };
+                }));
+
+                // Create update with media
+                const { data, error } = await supabaseClient
+                    .from('updates')
+                    .insert([
+                        {
+                            title,
+                            content,
+                            category,
+                            image_url: mediaUrls.length > 0 ? mediaUrls[0].url : null,
+                            date: dateInput.value
+                        }
+                    ]);
+
+                if (error) throw error;
+
+                // Show success message
+                successMessage.style.display = 'block';
+                successMessage.textContent = 'Update created successfully!';
+                errorMessage.style.display = 'none';
+
+                // Reset form
+                form.reset();
+                if (mediaPreview) {
+                mediaPreview.innerHTML = '';
+                }
+                uploadedFiles = [];
+
+                // Reload updates list
+                await loadUpdates();
+
+            } catch (error) {
+                console.error('Error:', error);
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = error.message || 'Failed to create update. Please try again.';
+                successMessage.style.display = 'none';
+            }
+        });
+
+        // Make functions globally accessible
+        window.openEditModal = async function(updateId) {
+            try {
+                // First close any open modals
+                closeEditModal();
+                closeEditGalleryModal();
+
+                const { data: update, error } = await supabaseClient
+                    .from('updates')
+                    .select('*')
+                    .eq('id', updateId)
+                    .single();
+
+                if (error) {
+                    console.error('Error loading update:', error);
+                    alert('Failed to load update details. Please try again.');
+                    return;
+                }
+
+                // Reset the form
+                const editForm = document.getElementById('editUpdateForm');
+                if (editForm) {
+                    editForm.reset();
+                }
+
+                // Set form values
+                document.getElementById('editUpdateId').value = update.id;
+                document.getElementById('editTitle').value = update.title;
+                document.getElementById('editCategory').value = update.category;
+                document.getElementById('editContent').value = update.content;
+
+                // Display current image
+                const currentImageContainer = document.getElementById('editCurrentImage');
+                if (currentImageContainer) {
+                    if (update.image_url) {
+                        const imageContainer = document.createElement('div');
+                        imageContainer.className = 'image-container';
+                        imageContainer.innerHTML = `
+                            <img src="${update.image_url}" alt="${update.title}">
+                            <button type="button" class="remove-btn" title="Remove image">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        `;
+
+                        // Add remove button functionality
+                        const removeBtn = imageContainer.querySelector('.remove-btn');
+                        removeBtn.addEventListener('click', () => {
+                            imageContainer.classList.add('marked-for-deletion');
+                            imageContainer.setAttribute('data-delete', 'true');
+                            
+                            const undoBtn = document.createElement('button');
+                            undoBtn.className = 'undo-delete-btn';
+                            undoBtn.innerHTML = '<i class="fas fa-undo"></i> Undo';
+                            undoBtn.addEventListener('click', (e) => {
+                                e.preventDefault();
+                                imageContainer.classList.remove('marked-for-deletion');
+                                imageContainer.removeAttribute('data-delete');
+                                undoBtn.remove();
+                            });
+                            
+                            imageContainer.appendChild(undoBtn);
+                        });
+
+                        currentImageContainer.innerHTML = '';
+                        currentImageContainer.appendChild(imageContainer);
+                    } else {
+                        currentImageContainer.innerHTML = '<p class="no-images">No image for this update</p>';
+                    }
+                }
+
+                // Clear file input and preview
+                document.getElementById('editMedia').value = '';
+                const previewContainer = document.getElementById('editMediaPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
+
+                // Show modal
+                const modal = document.getElementById('editUpdateModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    modal.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error opening edit modal:', error);
+                alert('Failed to open edit modal. Please try again.');
+            }
+        };
+
+        window.closeEditModal = function() {
+            const modal = document.getElementById('editUpdateModal');
+            if (modal) {
+            modal.style.display = 'none';
+            modal.classList.remove('show');
+            }
+        };
+
+        window.deleteUpdate = async function(updateId) {
+            if (!confirm('Are you sure you want to delete this update?')) {
+                return;
+            }
+
+            const { error } = await supabaseClient
+                .from('updates')
+                .delete()
+                .eq('id', updateId);
+
+            if (error) {
+                console.error('Error deleting update:', error);
+                alert('Failed to delete the update. Please try again.');
+                return;
+            }
+
+            loadUpdates();
+        };
+
+        // Function to load updates
+        async function loadUpdates() {
+            try {
+                console.log("Loading updates...");
+                
+                const { data: updates, error } = await supabaseClient
+                    .from('updates')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                const updatesList = document.getElementById('updatesList');
+                if (!updatesList) return;
+                
+                if (!updates || updates.length === 0) {
+                    updatesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-newspaper"></i>
+                            <p>No updates yet. Create your first update!</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                updatesList.innerHTML = '<div class="updates-grid"></div>';
+                const updatesGrid = updatesList.querySelector('.updates-grid');
+
+                updates.forEach(update => {
+                    const updateItem = document.createElement('div');
+                    updateItem.className = 'update-item';
+                
+                    // Format date
+                    const date = new Date(update.created_at || update.date);
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    
+                    // Prepare thumbnail section
+                    let thumbnailHTML = '';
+                    if (update.image_url) {
+                        thumbnailHTML = `
+                            <div class="update-thumbnail">
+                                <img src="${update.image_url}" alt="${update.title}">
+                            </div>
+                        `;
+                    } else {
+                        thumbnailHTML = `
+                            <div class="update-thumbnail update-no-image">
+                                <i class="fas fa-image"></i>
+                            </div>
+                        `;
+                    }
+                    
+                    // Create the update HTML
+                    updateItem.innerHTML = `
+                        ${thumbnailHTML}
+                        <div class="update-item-header">
+                            <span class="update-category">${update.category}</span>
+                            <span class="update-date"><i class="far fa-calendar-alt"></i> ${formattedDate}</span>
+                        </div>
+                        <div class="update-content">
+                            <h3 class="update-title">${update.title}</h3>
+                            <p class="update-excerpt">${update.content.substring(0, 120)}${update.content.length > 120 ? '...' : ''}</p>
+                            <div class="update-actions">
+                                <button class="edit-update-btn" data-id="${update.id}">
+                                    <i class="fas fa-edit"></i> Edit
+                                </button>
+                                <button class="delete-update-btn" data-id="${update.id}">
+                                    <i class="fas fa-trash-alt"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Add edit button event
+                    const editBtn = updateItem.querySelector('.edit-update-btn');
+                    editBtn.addEventListener('click', () => openEditModal(update.id));
+                    
+                    // Add delete button event
+                    const deleteBtn = updateItem.querySelector('.delete-update-btn');
+                    deleteBtn.addEventListener('click', () => {
+                        if (confirm('Are you sure you want to delete this update?')) {
+                            deleteUpdate(update.id);
+                        }
+                    });
+                    
+                    updatesGrid.appendChild(updateItem);
+                });
+            } catch (error) {
+                console.error("Error loading updates:", error);
+                const updatesList = document.getElementById('updatesList');
+                if (updatesList) {
+                    updatesList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <p>Error loading updates. Please try again later.</p>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        // Function to handle update edit
+        async function handleEditUpdate(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            const updateId = document.getElementById('editUpdateId').value;
+            const title = document.getElementById('editTitle').value;
+            const category = document.getElementById('editCategory').value;
+            const content = document.getElementById('editContent').value;
+            const newMediaFile = document.getElementById('editMedia').files[0];
+            const currentImageContainer = document.querySelector('#editCurrentImage .image-container');
+            const shouldDeleteImage = currentImageContainer && currentImageContainer.getAttribute('data-delete') === 'true';
+
+            try {
+                let image_url = null;
+
+                // Handle image deletion if marked for deletion
+                if (shouldDeleteImage) {
+                    // Get the current image URL from the database
+                    const { data: currentUpdate } = await supabaseClient
+                        .from('updates')
+                        .select('image_url')
+                        .eq('id', updateId)
+                        .single();
+
+                    if (currentUpdate && currentUpdate.image_url) {
+                        // Extract the file path from the URL
+                        const filePath = currentUpdate.image_url.split('/').slice(-2).join('/');
+                        
+                        // Delete the file from storage
+                        await supabaseClient.storage
+                            .from('updates-images')
+                            .remove([filePath]);
+                    }
+                }
+
+                // Handle new image upload
+                if (newMediaFile) {
+                    const fileName = `${Date.now()}-${newMediaFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('updates-images')
+                        .upload(fileName, newMediaFile);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from('updates-images')
+                        .getPublicUrl(fileName);
+
+                    image_url = publicUrl;
+                }
+
+                // Update the update
+                const updateData = {
+                    title,
+                    category,
+                    content,
+                    date: new Date().toISOString()
+                };
+
+                // Handle image URL updates
+                if (shouldDeleteImage && !newMediaFile) {
+                    // If image was deleted and no new image uploaded, set image_url to null
+                    updateData.image_url = null;
+                } else if (image_url) {
+                    // If new image was uploaded, use the new URL
+                    updateData.image_url = image_url;
+                }
+                // If neither condition is true, the image_url remains unchanged
+
+                const { error: updateError } = await supabaseClient
+                    .from('updates')
+                    .update(updateData)
+                    .eq('id', updateId);
+
+                if (updateError) throw updateError;
+
+                closeEditModal();
+                loadUpdates();
+                showSuccessMessage('Update edited successfully!');
+            } catch (error) {
+                console.error('Error updating update:', error);
+                showErrorMessage('Failed to update the update. Please try again.');
+            }
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is authenticated
+            checkAuth();
+            
+            // Load initial data
+            loadUpdates();
+            loadGalleries();
+            loadCareerStats();
+
+            // Add event listeners for the edit modal
+            const closeButton = document.querySelector('.close-button');
+            if (closeButton) {
+                closeButton.addEventListener('click', closeEditModal);
+            }
+
+            const editForm = document.getElementById('editUpdateForm');
+            if (editForm) {
+                editForm.addEventListener('submit', handleEditUpdate);
+            }
+
+            // Close modal when clicking outside
+            const modal = document.getElementById('editUpdateModal');
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === modal) {
+                        closeEditModal();
+                    }
+                });
+            }
+
+            // Gallery edit modal event listeners
+            const galleryCloseButton = document.querySelector('.edit-gallery-close');
+            if (galleryCloseButton) {
+                galleryCloseButton.addEventListener('click', closeEditGalleryModal);
+            }
+
+            const editGalleryForm = document.getElementById('editGalleryForm');
+            if (editGalleryForm) {
+                editGalleryForm.addEventListener('submit', handleEditGallery);
+            }
+
+            // Close gallery modal when clicking outside
+            const galleryModal = document.getElementById('editGalleryModal');
+            if (galleryModal) {
+                galleryModal.addEventListener('click', function(e) {
+                    if (e.target === galleryModal) {
+                        closeEditGalleryModal();
+                    }
+                });
+            }
+
+            // Event listener for edit gallery image uploads
+            const editGalleryImagesInput = document.getElementById('editGalleryImages');
+            if (editGalleryImagesInput) {
+                editGalleryImagesInput.addEventListener('change', function(e) {
+                    handleGalleryImagePreview(e, 'editGalleryPreview');
+                });
+            }
+
+            // Add drag and drop for edit gallery upload area
+            const editGalleryUploadArea = document.getElementById('editGalleryUploadArea');
+            if (editGalleryUploadArea) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    editGalleryUploadArea.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    editGalleryUploadArea.addEventListener(eventName, function() {
+                        editGalleryUploadArea.classList.add('highlight');
+                    }, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    editGalleryUploadArea.addEventListener(eventName, function() {
+                        editGalleryUploadArea.classList.remove('highlight');
+                    }, false);
+                });
+                
+                editGalleryUploadArea.addEventListener('drop', function(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    handleGalleryImagePreview({ target: { files } }, 'editGalleryPreview');
+                }, false);
+            }
+
+            // Close modals with escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    if (modal && modal.style.display === 'block') {
+                    closeEditModal();
+                }
+                    if (galleryModal && galleryModal.style.display === 'block') {
+                        closeEditGalleryModal();
+                    }
+                }
+            });
+
+            // Gallery form submission
+            const galleryForm = document.getElementById('gallery-form');
+            if (galleryForm) {
+                galleryForm.addEventListener('submit', handleGallerySubmit);
+            }
+
+            // Add drag and drop for edit update upload area
+            const editUploadArea = document.getElementById('editUploadArea');
+            const editMediaInput = document.getElementById('editMedia');
+            const editMediaPreview = document.getElementById('editMediaPreview');
+
+            if (editUploadArea && editMediaInput) {
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    editUploadArea.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    editUploadArea.addEventListener(eventName, function() {
+                        editUploadArea.classList.add('highlight');
+                    }, false);
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    editUploadArea.addEventListener(eventName, function() {
+                        editUploadArea.classList.remove('highlight');
+                    }, false);
+                });
+                
+                editUploadArea.addEventListener('drop', function(e) {
+                    const dt = e.dataTransfer;
+                    const files = dt.files;
+                    if (files.length > 0) {
+                        editMediaInput.files = files;
+                        previewEditMedia(files[0]);
+                    }
+                }, false);
+
+                // Add click handler for the browse button
+                const uploadBtn = editUploadArea.querySelector('.upload-btn');
+                if (uploadBtn) {
+                    uploadBtn.addEventListener('click', () => {
+                        editMediaInput.click();
+                    });
+                }
+
+                // Add change handler for the file input
+                editMediaInput.addEventListener('change', function(e) {
+                    if (this.files.length > 0) {
+                        previewEditMedia(this.files[0]);
+                    }
+                });
+            }
+        });
+
+        // Custom cursor
+        const cursor = document.querySelector('.cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+
+        // Add these functions before the gallery form handling
+        function showSuccessMessage(message) {
+            const successDiv = document.createElement('div');
+            successDiv.className = 'success-message floating';
+            successDiv.textContent = message;
+            document.body.appendChild(successDiv);
+            
+            setTimeout(() => {
+                successDiv.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                successDiv.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(successDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        function showErrorMessage(message) {
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message floating';
+            errorDiv.textContent = message;
+            document.body.appendChild(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                errorDiv.classList.remove('show');
+                setTimeout(() => {
+                    document.body.removeChild(errorDiv);
+                }, 300);
+            }, 3000);
+        }
+
+        // Gallery form handling
+        const galleryForm = document.getElementById('gallery-form');
+        const galleryPreview = document.getElementById('gallery-preview');
+        const galleryImagesInput = document.getElementById('gallery-images');
+
+        // Gallery drag and drop
+        const galleryUploadArea = document.getElementById('galleryUploadArea');
+        
+        // Add the same drag and drop behavior to gallery upload
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        ['dragenter', 'dragover'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, function() {
+                galleryUploadArea.classList.add('highlight');
+            }, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            galleryUploadArea.addEventListener(eventName, function() {
+                galleryUploadArea.classList.remove('highlight');
+            }, false);
+        });
+        
+        galleryUploadArea.addEventListener('drop', function(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            handleGalleryImagePreview({ target: { files } });
+        }, false);
+
+        // Preview gallery images
+        galleryImagesInput.addEventListener('change', handleGalleryImagePreview);
+
+        // Function to show messages
+        function showMessage(type, message) {
+            // Remove any existing messages first
+            const existingMessages = document.querySelectorAll('.success-message, .error-message');
+            existingMessages.forEach(msg => msg.remove());
+
+            // Create new message element
+            const messageDiv = document.createElement('div');
+            messageDiv.className = type === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = message;
+            
+            // Add smooth animation classes
+            messageDiv.style.opacity = '0';
+            messageDiv.style.transform = 'translateY(-20px)';
+            messageDiv.style.transition = 'all 0.3s ease';
+            
+            // Insert at the top of dashboard content
+            const dashboardContent = document.querySelector('.dashboard-content');
+            dashboardContent.insertBefore(messageDiv, dashboardContent.firstChild);
+            
+            // Trigger animation
+            setTimeout(() => {
+                messageDiv.style.opacity = '1';
+                messageDiv.style.transform = 'translateY(0)';
+            }, 10);
+            
+            // Remove after delay
+            setTimeout(() => {
+                messageDiv.style.opacity = '0';
+                messageDiv.style.transform = 'translateY(-20px)';
+                setTimeout(() => messageDiv.remove(), 300);
+            }, 3000);
+        }
+
+        // Update gallery form submission
+        function handleGallerySubmit(e) {
+            e.preventDefault();
+            
+            const submitButton = e.target.querySelector('button[type="submit"]');
+            const originalButtonText = submitButton.textContent;
+            submitButton.textContent = 'Creating Gallery...';
+            submitButton.disabled = true;
+            
+            const title = document.getElementById('gallery-title').value;
+            const description = document.getElementById('gallery-description').value;
+            const eventDate = document.getElementById('gallery-date').value;
+            const files = document.getElementById('gallery-images').files;
+            
+            if (files.length === 0) {
+                showMessage('error', 'Please select at least one image for the gallery');
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+                return;
+            }
+            
+            try {
+                // First, create the gallery record
+                supabaseClient
+                    .from('galleries')
+                    .insert([
+                        {
+                            title,
+                            description,
+                            event_date: eventDate,
+                            cover_image: '' // Will be updated after image upload
+                        }
+                    ])
+                    .select()
+                    .single()
+                    .then(({ data: gallery, error: galleryError }) => {
+                        if (galleryError) throw galleryError;
+
+                        // Show progress message
+                        showMessage('success', 'Gallery created, uploading images...');
+
+                        // Upload images and create gallery image records
+                        const imageUrls = [];
+                        const uploadPromises = [];
+
+                        for (let i = 0; i < files.length; i++) {
+                            const file = files[i];
+                            const fileExt = file.name.split('.').pop();
+                            const fileName = `${gallery.id}/${i}.${fileExt}`;
+                            
+                            const uploadPromise = supabaseClient.storage
+                                .from('gallery-images')
+                                .upload(fileName, file)
+                                .then(({ error: uploadError }) => {
+                                    if (uploadError) throw uploadError;
+
+                                    const { data: { publicUrl } } = supabaseClient.storage
+                                        .from('gallery-images')
+                                        .getPublicUrl(fileName);
+
+                                    imageUrls.push(publicUrl);
+
+                                    return supabaseClient
+                                        .from('gallery_images')
+                                        .insert([{
+                                                gallery_id: gallery.id,
+                                                image_url: publicUrl,
+                                                order: i
+                                        }]);
+                                });
+
+                            uploadPromises.push(uploadPromise);
+                        }
+
+                        return Promise.all(uploadPromises)
+                            .then(() => {
+                                return supabaseClient
+                                    .from('galleries')
+                                    .update({ cover_image: imageUrls[0] })
+                                    .eq('id', gallery.id);
+                            });
+                    })
+                    .then(() => {
+                        // Reset form
+                        e.target.reset();
+                        document.getElementById('gallery-preview').innerHTML = '';
+                        
+                        // Show success message
+                        showMessage('success', 'Gallery created successfully!');
+                        
+                        // Reset button
+                        submitButton.textContent = originalButtonText;
+                        submitButton.disabled = false;
+                        
+                        // Reload galleries
+                        loadGalleries();
+                    })
+                    .catch(error => {
+                        console.error('Error creating gallery:', error);
+                        showMessage('error', 'Failed to create gallery. Please try again.');
+                        submitButton.textContent = originalButtonText;
+                        submitButton.disabled = false;
+                    });
+
+            } catch (error) {
+                console.error('Error creating gallery:', error);
+                showMessage('error', 'Failed to create gallery. Please try again.');
+                submitButton.textContent = originalButtonText;
+                submitButton.disabled = false;
+            }
+        }
+
+        // Load existing galleries
+        async function loadGalleries() {
+            const { data: galleries, error } = await supabaseClient
+                .from('galleries')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error('Error loading galleries:', error);
+                return;
+            }
+
+            const galleriesList = document.getElementById('galleries-list');
+            galleriesList.innerHTML = '';
+
+            galleries.forEach(gallery => {
+                const galleryElement = document.createElement('div');
+                galleryElement.className = 'gallery-card';
+                galleryElement.innerHTML = `
+                    <img src="${gallery.cover_image}" alt="${gallery.title}" class="gallery-cover">
+                    <div class="gallery-info">
+                        <h3 class="gallery-title">${gallery.title}</h3>
+                        <p class="gallery-description">${gallery.description}</p>
+                        <div class="gallery-meta">
+                            <span>${new Date(gallery.event_date).toLocaleDateString()}</span>
+                            <span>${new Date(gallery.created_at).toLocaleDateString()}</span>
+                        </div>
+                        <div class="gallery-actions">
+                            <button class="edit-btn" onclick="openEditGalleryModal('${gallery.id}')">Edit</button>
+                            <button class="delete-btn" onclick="deleteGallery('${gallery.id}')">Delete</button>
+                        </div>
+                    </div>
+                `;
+                galleriesList.appendChild(galleryElement);
+            });
+        }
+
+        // Delete gallery function
+        window.deleteGallery = async function(galleryId) {
+            if (!confirm('Are you sure you want to delete this gallery?')) return;
+
+            try {
+                // Show loading message
+                showMessage('info', 'Deleting gallery...');
+
+                // Delete gallery images from storage
+                const { data: images, error: imagesError } = await supabaseClient
+                    .from('gallery_images')
+                    .select('image_url')
+                    .eq('gallery_id', galleryId);
+
+                if (imagesError) throw imagesError;
+
+                // Delete each image from storage
+                for (const image of images) {
+                    const fileName = image.image_url.split('/').pop();
+                    await supabaseClient.storage
+                        .from('gallery-images')
+                        .remove([`${galleryId}/${fileName}`]);
+                }
+
+                // Delete gallery images records
+                const { error: deleteImagesError } = await supabaseClient
+                    .from('gallery_images')
+                    .delete()
+                    .eq('gallery_id', galleryId);
+
+                if (deleteImagesError) throw deleteImagesError;
+
+                // Delete gallery record
+                const { error: deleteGalleryError } = await supabaseClient
+                    .from('galleries')
+                    .delete()
+                    .eq('id', galleryId);
+
+                if (deleteGalleryError) throw deleteGalleryError;
+
+                showMessage('success', 'Gallery deleted successfully!');
+                loadGalleries();
+
+            } catch (error) {
+                console.error('Error deleting gallery:', error);
+                showMessage('error', 'Failed to delete gallery. Please try again.');
+            }
+        };
+
+        // Load galleries on page load
+        loadGalleries();
+
+        // Function to handle gallery image preview
+        function handleGalleryImagePreview(e, containerId = 'gallery-preview') {
+            const galleryPreview = document.getElementById(containerId);
+            galleryPreview.innerHTML = '';
+            const files = e.target.files;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const preview = document.createElement('div');
+                    preview.className = 'preview-item';
+                    
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="${file.name}">
+                        <button class="remove-file" data-index="${i}">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    `;
+                    
+                    galleryPreview.appendChild(preview);
+                    
+                    // Add remove functionality (note: this is more complex for FileList objects)
+                    const removeBtn = preview.querySelector('.remove-file');
+                    removeBtn.addEventListener('click', function() {
+                        preview.remove();
+                    });
+                }
+                
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Update career stats
+        async function updateCareerStats(event) {
+            if (event) {
+                event.preventDefault();
+            }
+
+            // Get all required elements
+            const elements = {
+                tournaments: document.getElementById('tournaments'),
+                matchWins: document.getElementById('match-wins'),
+                intlRanking: document.getElementById('intl-ranking'),
+                swissRanking: document.getElementById('swiss-ranking'),
+                maxServeSpeed: document.getElementById('max-serve-speed'),
+                countriesPlayed: document.getElementById('countries-played'),
+                submitButton: document.getElementById('stats-submit-btn'),
+                successMessage: document.getElementById('stats-success-message'),
+                errorMessage: document.getElementById('stats-error-message')
+            };
+
+            // Check if all elements exist
+            const missingElements = Object.entries(elements)
+                .filter(([key, element]) => !element)
+                .map(([key]) => key);
+
+            if (missingElements.length > 0) {
+                console.error('Missing required elements:', missingElements);
+                return;
+            }
+
+            // Get form data
+            const formData = {
+                tournaments: parseInt(elements.tournaments.value) || 0,
+                match_wins: parseInt(elements.matchWins.value) || 0,
+                intl_ranking: parseInt(elements.intlRanking.value) || 0,
+                swiss_ranking: parseInt(elements.swissRanking.value) || 0,
+                max_serve_speed: parseInt(elements.maxServeSpeed.value) || 0,
+                countries_played: parseInt(elements.countriesPlayed.value) || 0,
+                updated_at: new Date().toISOString()
+            };
+
+            // Show loading state
+            elements.submitButton.textContent = 'Saving...';
+            elements.submitButton.disabled = true;
+            elements.successMessage.style.display = 'none';
+            elements.errorMessage.style.display = 'none';
+
+            try {
+                // Get existing record if any
+                    const { data: existing, error: getError } = await supabaseClient
+                        .from('career_stats')
+                    .select('id')
+                        .limit(1)
+                        .single();
+                    
+                if (getError && getError.code !== 'PGRST116') {
+                    throw getError;
+                    }
+
+                let result;
+                if (existing) {
+                    // Update existing record
+                    const { data, error } = await supabaseClient
+                        .from('career_stats')
+                        .update(formData)
+                        .eq('id', existing.id)
+                        .select();
+
+                    if (error) throw error;
+                    result = data;
+                } else {
+                    // Insert new record
+                    const { data, error } = await supabaseClient
+                        .from('career_stats')
+                        .insert([formData])
+                        .select();
+                
+                    if (error) throw error;
+                    result = data;
+                }
+                
+                // Show success message
+                elements.successMessage.textContent = 'Career statistics updated successfully!';
+                elements.successMessage.style.display = 'block';
+                elements.errorMessage.style.display = 'none';
+                
+                // Reset button state
+                elements.submitButton.textContent = 'Update Statistics';
+                elements.submitButton.disabled = false;
+                
+                // Update the stats display immediately with the new data
+                if (result && result[0]) {
+                    updateStatsDisplay(result[0]);
+                }
+
+                // Reload stats to ensure everything is in sync
+                await loadCareerStats();
+
+            } catch (error) {
+                console.error('Error updating career stats:', error);
+                elements.errorMessage.textContent = `Error: ${error.message || 'Failed to update statistics'}`;
+                elements.errorMessage.style.display = 'block';
+                elements.successMessage.style.display = 'none';
+                
+                // Reset button state
+                elements.submitButton.textContent = 'Update Statistics';
+                elements.submitButton.disabled = false;
+            }
+        }
+        
+        // Function to update stats display
+        function updateStatsDisplay(data) {
+            if (!data) return;
+            
+            // Update form inputs with proper IDs
+            const formElements = {
+                'tournaments': data.tournaments,
+                'match-wins': data.match_wins,
+                'intl-ranking': data.intl_ranking,
+                'swiss-ranking': data.swiss_ranking,
+                'max-serve-speed': data.max_serve_speed,
+                'countries-played': data.countries_played
+            };
+
+            for (const [id, value] of Object.entries(formElements)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = value || '';
+                }
+            }
+            
+            // Update display elements by ID
+            const displayElements = {
+                'tournaments-display': data.tournaments,
+                'match-wins-display': data.match_wins,
+                'intl-ranking-display': data.intl_ranking,
+                'swiss-ranking-display': data.swiss_ranking,
+                'max-serve-speed-display': data.max_serve_speed,
+                'countries-played-display': data.countries_played
+            };
+                
+            // Update display elements
+            for (const [id, value] of Object.entries(displayElements)) {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.textContent = value || '0';
+                }
+            }
+            
+            // Additional processing for data-stat attributes
+            // This is used for the redesigned stats section on the homepage
+                const statsElements = document.querySelectorAll('[data-stat]');
+                statsElements.forEach(el => {
+                    const stat = el.getAttribute('data-stat');
+                    if (data[stat] !== undefined) {
+                    // Special handling for specific cases
+                    if (el.id === 'max-serve-speed') {
+                        el.textContent = `${data[stat]} km/h`;
+                    } 
+                    else if (el.id === 'countries-played') {
+                        const langAttribute = document.documentElement.lang || 'de';
+                        const text = langAttribute === 'en' ? 
+                            `Played in ${data[stat]}` : 
+                            `In ${data[stat]} gespielt`;
+                        el.textContent = text;
+                        el.setAttribute('data-en', `Played in ${data[stat]}`);
+                        el.setAttribute('data-de', `In ${data[stat]} gespielt`);
+                    }
+                    // Default handling
+                    else {
+                        el.textContent = data[stat];
+                        if (el.getAttribute('data-count') !== undefined) {
+                            el.setAttribute('data-count', data[stat]);
+                        }
+                        }
+                    }
+                });
+        }
+
+        // Load career stats
+        async function loadCareerStats() {
+            console.log("Loading career stats...");
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('career_stats')
+                    .select('*')
+                    .order('updated_at', { ascending: false })
+                    .limit(1)
+                    .single();
+                
+                if (error) {
+                    if (error.code === 'PGRST116') {
+                        console.log("No stats found - this is normal for a new setup");
+                        return null;
+                    } else {
+                        console.error("Error loading stats:", error);
+                        throw error;
+                    }
+                }
+                
+                if (!data) {
+                    console.log("No stats data returned");
+                    return null;
+                }
+                
+                console.log("Loaded stats:", data);
+                
+                // Update both the form and display
+                updateStatsDisplay(data);
+                return data;
+            } catch (error) {
+                console.error("Error in loadCareerStats:", error);
+                return null;
+            }
+        }
+
+        // Function to remove media
+        const removeMedia = async (mediaId, mediaType) => {
+            if (!mediaId) return;
+            
+            try {
+                console.log(`Removing ${mediaType} with ID: ${mediaId}`);
+                
+                // Get media information first to get the storage path
+                const { data, error } = await supabaseClient
+                    .from(mediaType === 'image' ? 'gallery_images' : 'media')
+                    .select('*')
+                    .eq('id', mediaId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Delete from database
+                const { error: deleteError } = await supabaseClient
+                    .from(mediaType === 'image' ? 'gallery_images' : 'media')
+                    .delete()
+                    .eq('id', mediaId);
+                
+                if (deleteError) throw deleteError;
+                
+                // Delete from storage if applicable
+                if (data.url || data.image_url) {
+                    const storageUrl = data.url || data.image_url;
+                    const bucketPath = storageUrl.split('/').slice(-2).join('/');
+                    
+                    await supabaseClient.storage
+                        .from(mediaType === 'image' ? 'gallery-images' : 'media')
+                        .remove([bucketPath]);
+                }
+                
+                return true;
+            } catch (error) {
+                console.error(`Error removing ${mediaType}:`, error);
+                return false;
+            }
+        };
+
+        // Function to open the gallery edit modal
+        window.openEditGalleryModal = async function(galleryId) {
+            try {
+                // First close any open modals
+                closeEditModal();
+                closeEditGalleryModal();
+
+                // Fetch gallery data
+                const { data: gallery, error: galleryError } = await supabaseClient
+                    .from('galleries')
+                    .select('*')
+                    .eq('id', galleryId)
+                    .single();
+
+                if (galleryError) throw galleryError;
+
+                // Fetch gallery images
+                const { data: images, error: imagesError } = await supabaseClient
+                    .from('gallery_images')
+                    .select('*')
+                    .eq('gallery_id', galleryId)
+                    .order('order');
+
+                if (imagesError) throw imagesError;
+
+                // Reset the form
+                const editForm = document.getElementById('editGalleryForm');
+                if (editForm) {
+                    editForm.reset();
+                }
+
+                // Populate the edit form
+                document.getElementById('editGalleryId').value = gallery.id;
+                document.getElementById('editGalleryTitle').value = gallery.title;
+                document.getElementById('editGalleryDescription').value = gallery.description;
+                
+                // Format date for input (YYYY-MM-DD)
+                const eventDate = new Date(gallery.event_date);
+                const formattedDate = eventDate.toISOString().split('T')[0];
+                document.getElementById('editGalleryDate').value = formattedDate;
+                
+                // Display current images
+                const currentImagesContainer = document.getElementById('editGalleryCurrentImages');
+                if (currentImagesContainer) {
+                    currentImagesContainer.innerHTML = '';
+                    
+                    if (images && images.length > 0) {
+                        images.forEach((image, index) => {
+                            const imageContainer = document.createElement('div');
+                            imageContainer.className = 'current-image-item';
+                            imageContainer.innerHTML = `
+                                <img src="${image.image_url}" alt="Gallery image ${index + 1}">
+                                <div class="image-actions">
+                                    <button type="button" class="remove-image-btn" data-id="${image.id}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                            currentImagesContainer.appendChild(imageContainer);
+                            
+                            // Add event listener to remove button
+                            const removeBtn = imageContainer.querySelector('.remove-image-btn');
+                            removeBtn.addEventListener('click', () => {
+                                imageContainer.classList.add('marked-for-deletion');
+                                imageContainer.setAttribute('data-delete', 'true');
+                                
+                                const undoBtn = document.createElement('button');
+                                undoBtn.className = 'undo-delete-btn';
+                                undoBtn.innerHTML = '<i class="fas fa-undo"></i> Undo';
+                                undoBtn.addEventListener('click', (e) => {
+                                    e.preventDefault();
+                                    imageContainer.classList.remove('marked-for-deletion');
+                                    imageContainer.removeAttribute('data-delete');
+                                    undoBtn.remove();
+                                });
+                                
+                                imageContainer.appendChild(undoBtn);
+                            });
+                        });
+                    } else {
+                        currentImagesContainer.innerHTML = '<p class="no-images">No images in this gallery</p>';
+                    }
+                }
+                
+                // Clear file inputs and preview
+                document.getElementById('editGalleryCover').value = '';
+                document.getElementById('editGalleryImages').value = '';
+                const previewContainer = document.getElementById('editGalleryPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
+                
+                // Show the modal
+                const modal = document.getElementById('editGalleryModal');
+                if (modal) {
+                    modal.style.display = 'block';
+                    modal.classList.add('show');
+                }
+            } catch (error) {
+                console.error('Error opening edit gallery modal:', error);
+                showErrorMessage('Failed to load gallery data. Please try again.');
+            }
+        };
+
+        // Function to close the gallery edit modal
+        function closeEditGalleryModal() {
+            const modal = document.getElementById('editGalleryModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+            }
+        }
+
+        // Function to handle gallery edit form submission
+        async function handleEditGallery(e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            try {
+                const galleryId = document.getElementById('editGalleryId').value;
+                const title = document.getElementById('editGalleryTitle').value;
+                const description = document.getElementById('editGalleryDescription').value;
+                const eventDate = document.getElementById('editGalleryDate').value;
+                
+                // 1. Process cover image if selected
+                const coverFile = document.getElementById('editGalleryCover').files[0];
+                let newCoverUrl = null;
+                
+                if (coverFile) {
+                    const fileName = `${galleryId}/cover-${Date.now()}.${coverFile.name.split('.').pop()}`;
+                    
+                    // Upload to storage
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('gallery-images')
+                        .upload(fileName, coverFile);
+                        
+                    if (uploadError) throw uploadError;
+                    
+                    // Get public URL
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from('gallery-images')
+                        .getPublicUrl(fileName);
+                        
+                    newCoverUrl = publicUrl;
+                }
+                
+                // 2. Process images to delete
+                const imagesToDelete = [];
+                document.querySelectorAll('.current-image-item[data-delete="true"]').forEach(item => {
+                    const imageId = item.querySelector('.remove-image-btn').getAttribute('data-id');
+                    if (imageId) {
+                        imagesToDelete.push(imageId);
+                    }
+                });
+                
+                // Delete images marked for deletion
+                for (const imageId of imagesToDelete) {
+                    // First get the image URL to delete from storage
+                    const { data: image, error: getImageError } = await supabaseClient
+                        .from('gallery_images')
+                        .select('image_url')
+                        .eq('id', imageId)
+                        .single();
+                        
+                    if (getImageError) throw getImageError;
+                    
+                    // Delete from database
+                    const { error: deleteImageError } = await supabaseClient
+                        .from('gallery_images')
+                        .delete()
+                        .eq('id', imageId);
+                        
+                    if (deleteImageError) throw deleteImageError;
+                    
+                    // Extract storage path and delete from storage
+                    const fileName = image.image_url.split('/').pop();
+                    await supabaseClient.storage
+                        .from('gallery-images')
+                        .remove([`${galleryId}/${fileName}`]);
+                }
+                
+                // 3. Process new images to add
+                const newFiles = document.getElementById('editGalleryImages').files;
+                const newImageUrls = [];
+                
+                for (let i = 0; i < newFiles.length; i++) {
+                    const file = newFiles[i];
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${galleryId}/${Date.now()}-${i}.${fileExt}`;
+                    
+                    // Upload to storage
+                    const { error: uploadError } = await supabaseClient.storage
+                        .from('gallery-images')
+                        .upload(fileName, file);
+                        
+                    if (uploadError) throw uploadError;
+                    
+                    // Get public URL
+                    const { data: { publicUrl } } = supabaseClient.storage
+                        .from('gallery-images')
+                        .getPublicUrl(fileName);
+                        
+                    // Insert new gallery image record
+                    const { data: newImage, error: insertError } = await supabaseClient
+                        .from('gallery_images')
+                        .insert({
+                            gallery_id: galleryId,
+                            image_url: publicUrl,
+                            order: i + 1000 // Add a high order number to ensure they appear at the end
+                        })
+                        .select()
+                        .single();
+                        
+                    if (insertError) throw insertError;
+                    
+                    newImageUrls.push(publicUrl);
+                }
+                
+                // 4. Update the gallery record
+                const updateData = {
+                    title,
+                    description,
+                    event_date: eventDate,
+                    updated_at: new Date().toISOString()
+                };
+                
+                // Add cover image if a new one was uploaded
+                if (newCoverUrl) {
+                    updateData.cover_image = newCoverUrl;
+                }
+                
+                // Update gallery record
+                const { error: updateError } = await supabaseClient
+                    .from('galleries')
+                    .update(updateData)
+                    .eq('id', galleryId);
+
+                if (updateError) throw updateError;
+
+                // Close modal and reload galleries
+                closeEditGalleryModal();
+                loadGalleries();
+                showSuccessMessage('Gallery updated successfully!');
+                
+            } catch (error) {
+                console.error('Error updating gallery:', error);
+                showErrorMessage('Failed to update gallery. Please try again.');
+            }
+        }
+
+        // Note: Secondary updateStatsDisplay function removed to prevent duplication
+
+        // Initialize page when DOM is loaded
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Load initial career stats
+            await loadCareerStats();
+
+            // Add event listener for stats form submission
+            const statsForm = document.getElementById('career-stats-form');
+            if (statsForm) {
+                statsForm.addEventListener('submit', updateCareerStats);
+            }
+
+            // Add event listener for stats submit button as a backup
+            const statsSubmitBtn = document.getElementById('stats-submit-btn');
+            if (statsSubmitBtn) {
+                statsSubmitBtn.addEventListener('click', updateCareerStats);
+            }
+
+            // Load galleries if they exist
+            loadGalleries();
+        });
+
+        // Function to preview edit media
+        function previewEditMedia(file) {
+            if (!file.type.startsWith('image/')) {
+                showErrorMessage('Please select an image file.');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const previewContainer = document.getElementById('editMediaPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = `
+                        <div class="preview-item">
+                            <img src="${e.target.result}" alt="Preview">
+                            <button type="button" class="remove-btn" onclick="clearEditMediaPreview()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    `;
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Function to clear edit media preview
+        function clearEditMediaPreview() {
+            const previewContainer = document.getElementById('editMediaPreview');
+            const input = document.getElementById('editMedia');
+            if (previewContainer) {
+                previewContainer.innerHTML = '';
+            }
+            if (input) {
+                input.value = '';
+            }
+        }
+    </script>
+    <div class="cutstudios-badge">
+        <a href="https://www.instagram.com/cutstudios.pt/" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
+    </div>
+</body>
+</html> 

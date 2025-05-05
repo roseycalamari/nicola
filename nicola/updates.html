@@ -1,0 +1,1858 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neuigkeiten | Nicola Senn</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="icon" type="image/png" href="public/images/NICOLA logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public/js/config.js"></script>
+    <script src="public/js/translations.js"></script>
+    <script src="public/js/script.js"></script>
+    <style>
+        .updates-section {
+            padding: 4rem 0;
+            background: var(--color-darker);
+        }
+
+        .updates-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .updates-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--color-light);
+        }
+
+        .updates-header p {
+            color: var(--color-gray);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .updates-feed {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 0 auto;
+            max-width: 1200px;
+            padding: 0 2rem;
+        }
+
+        .update-card {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(26, 26, 26, 0.9);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .update-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(30, 30, 30, 0.95);
+        }
+
+        .update-card .update-title,
+        .update-card h3.update-title {
+            color: #ffffff !important;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .update-card .update-text,
+        .update-card p.update-text {
+            color: #ffffff !important;
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .update-image {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+        }
+
+        .update-content {
+            padding: 1.5rem;
+        }
+
+        .update-category {
+            color: var(--color-primary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .update-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--color-gray);
+            font-size: 0.9rem;
+        }
+
+        .update-date {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .updates-filters {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--color-light);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--color-primary);
+            color: var(--color-darker);
+        }
+
+        @media (max-width: 768px) {
+            .updates-feed {
+                grid-template-columns: 1fr;
+                padding: 0 1rem;
+            }
+        }
+
+        .galleries-section {
+            padding: 4rem 0;
+            background: var(--color-darker);
+        }
+
+        .galleries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .gallery-card {
+            background: rgba(26, 26, 26, 0.9);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .gallery-card::before {
+            display: none;
+        }
+
+        .gallery-cover {
+            width: 100%;
+            aspect-ratio: 3/4;
+            object-fit: cover;
+            transition: transform 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+            filter: none;
+        }
+
+        .gallery-card:hover .gallery-cover {
+            transform: scale(1.08);
+        }
+
+        .gallery-info {
+            padding: 1.5rem;
+            position: relative;
+            z-index: 2;
+            background: linear-gradient(to top, rgba(26, 26, 26, 1), rgba(26, 26, 26, 0.9));
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .gallery-title {
+            color: var(--color-light);
+            font-size: 1.2rem;
+            margin-bottom: 0.8rem;
+            transition: color 0.3s ease;
+        }
+
+        .gallery-card:hover .gallery-title {
+            color: #ffffff;
+        }
+
+        .gallery-description {
+            color: var(--color-gray);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            transition: color 0.3s ease;
+            flex-grow: 1;
+        }
+
+        .gallery-card:hover .gallery-description {
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: var(--color-gray);
+            font-size: 0.9rem;
+            margin-top: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 1rem;
+        }
+        
+        .gallery-meta span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .gallery-view-btn {
+            background: var(--color-primary);
+            color: white;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-view-btn:hover {
+            background: var(--color-primary-dark, var(--color-primary));
+            transform: translateY(-2px);
+        }
+
+        /* Enhanced Modal Styles */
+        .gallery-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(10, 10, 15, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s cubic-bezier(0.33, 1, 0.68, 1);
+        }
+
+        .gallery-modal.active {
+            opacity: 1;
+            animation: modalReveal 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalReveal {
+            0% { opacity: 0; backdrop-filter: blur(0px); }
+            100% { opacity: 1; backdrop-filter: blur(20px); }
+        }
+
+        .modal-content {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 100%;
+        }
+
+        .close-modal {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--color-primary);
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s cubic-bezier(0.33, 1, 0.68, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .close-modal:hover {
+            background: var(--color-primary-dark, var(--color-primary));
+            transform: rotate(90deg) scale(1.1);
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-gallery-info {
+            color: white;
+            text-align: center;
+            padding: 0 2rem;
+            max-width: 1000px;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .modal-gallery-info h3 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--color-light);
+            font-weight: 600;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-gallery-info p {
+            color: rgba(255, 255, 255, 0.8);
+            margin: 0 auto;
+            line-height: 1.6;
+            font-size: 1.1rem;
+            max-width: 800px;
+        }
+
+        /* Completely redesigned carousel for better image display */
+        .carousel-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .carousel {
+            position: relative;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+
+        .carousel-slide.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .carousel-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--color-primary) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5rem;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .carousel-button:hover {
+            background: var(--color-primary-dark, var(--color-primary)) !important;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        .carousel-button.prev {
+            left: 20px;
+        }
+
+        .carousel-button.next {
+            right: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .carousel-container {
+                height: 60vh;
+            }
+            
+            .carousel-button {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+            
+            .carousel-button.prev {
+                left: 10px;
+            }
+            
+            .carousel-button.next {
+                right: 10px;
+            }
+        }
+
+        .carousel-thumbnails {
+            display: flex;
+            gap: 1rem;
+            padding: 1.5rem 2rem;
+            overflow-x: auto;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            margin: 0 auto;
+        }
+
+        .carousel-thumbnails::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .carousel-thumbnails::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .carousel-thumbnails::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            opacity: 0.7;
+            filter: none;
+            margin: 0 5px;
+        }
+
+        .thumbnail:hover {
+            opacity: 1;
+            transform: translateY(-2px);
+        }
+
+        .thumbnail.active {
+            border-color: var(--color-primary);
+            opacity: 1;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-counter {
+            position: fixed;
+            bottom: 8rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1001;
+        }
+
+        @media (max-width: 768px) {
+            .modal-content {
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .close-modal {
+                top: 1rem;
+                right: 1rem;
+                width: 40px;
+                height: 40px;
+            }
+
+            .modal-gallery-info h3 {
+                font-size: 1.6rem;
+            }
+
+            .modal-gallery-info p {
+                font-size: 0.9rem;
+            }
+
+            .carousel-button {
+                width: 40px;
+                height: 40px;
+                font-size: 1.2rem;
+            }
+
+            .carousel-button.prev {
+                left: 10px;
+            }
+
+            .carousel-button.next {
+                right: 10px;
+            }
+
+            .thumbnail {
+                width: 80px;
+                height: 50px;
+            }
+
+            .carousel-thumbnails {
+                padding: 1rem;
+                max-width: 95%;
+            }
+
+            .carousel-counter {
+                bottom: 6rem;
+            }
+
+            .carousel-slide img {
+                max-width: 95%;
+                max-height: 70vh;
+            }
+
+            .galleries-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                padding: 0 1rem;
+            }
+            
+            .gallery-meta {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .gallery-view-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        /* Update Card Enhancement */
+        .update-card {
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        
+        .update-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            background: rgba(30, 30, 30, 0.95);
+        }
+        
+        .update-view-btn {
+            position: absolute;
+            right: 1rem;
+            bottom: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 0.85rem;
+            padding: 0.5rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 5;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        
+        .update-card:hover .update-view-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .update-view-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* Glassmorphism Modal */
+        .glass-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            padding: 2rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow-y: auto;
+        }
+        
+        .glass-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            animation: modalFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes modalFadeIn {
+            0% { opacity: 0; transform: scale(0.95); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .glass-modal-content {
+            background: rgba(20, 20, 20, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            width: 90%;
+            max-width: 1000px;
+            max-height: 90vh;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .glass-modal-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 10;
+            transition: all 0.3s ease;
+        }
+        
+        .glass-modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .glass-modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 80vh;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        .glass-modal-image img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 80vh;
+            object-fit: contain;
+            filter: none !important;
+        }
+        
+        .glass-modal-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(to top, rgba(20, 20, 20, 0.8), transparent);
+            pointer-events: none;
+        }
+        
+        .glass-modal-info {
+            padding: 2rem;
+            overflow-y: auto;
+            max-height: 50vh;
+        }
+        
+        .glass-modal-header {
+            margin-bottom: 1.5rem;
+        }
+        
+        .glass-modal-title {
+            font-size: 2.5rem;
+            color: white;
+            margin: 0.5rem 0 1rem;
+            line-height: 1.2;
+        }
+        
+        .glass-modal-date {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .glass-modal-body {
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-wrap;
+        }
+        
+        @media (min-width: 768px) {
+            .glass-modal-content {
+                flex-direction: row;
+                max-height: 90vh;
+            }
+            
+            .glass-modal-image {
+                width: 60%;
+                height: auto;
+                max-height: 90vh;
+            }
+            
+            .glass-modal-image::after {
+                height: 0;
+                width: 150px;
+                top: 0;
+                bottom: 0;
+                right: 0;
+                left: auto;
+                background: linear-gradient(to left, rgba(20, 20, 20, 0.8), transparent);
+            }
+            
+            .glass-modal-info {
+                width: 40%;
+                max-height: 90vh;
+            }
+        }
+        
+        @media (max-width: 767px) {
+            .glass-modal {
+                padding: 1rem;
+            }
+            
+            .glass-modal-content {
+                width: 95%;
+            }
+            
+            .glass-modal-title {
+                font-size: 1.8rem;
+            }
+            
+            .glass-modal-info {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Ensure all images load with full color */
+        img {
+            image-rendering: auto;
+            filter: none;
+        }
+
+        /* Make the service card title and description white in the Latest Updates section */
+        .updates-section .service-card .title,
+        .updates-section .service-card .description,
+        .updates-section .update-card .title,
+        .updates-section .update-card .description {
+            color: white;
+        }
+
+        .logo-image {
+            height: 70px; /* Standardized header logo size */
+            width: auto;
+            transition: transform 0.3s ease;
+            margin: 0;
+            padding: 0;
+            filter: drop-shadow(0 0 10px rgba(160, 235, 255, 0.2));
+        }
+
+        .logo {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .logo:hover .logo-image {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 15px rgba(160, 235, 255, 0.3));
+        }
+
+        .footer-logo {
+            margin: 0;
+            padding: 3rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .footer-logo .logo-image {
+            height: 100px; /* Standardized footer logo size */
+            width: auto;
+            margin: 0;
+            padding: 0;
+            filter: drop-shadow(0 0 10px rgba(160, 235, 255, 0.2));
+        }
+
+        .footer-logo:hover .logo-image {
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 15px rgba(160, 235, 255, 0.3));
+        }
+
+        /* Gallery Loading Indicator */
+        .gallery-loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white;
+            z-index: 100;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--color-primary);
+            margin: 0 auto 15px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Remove vertical/horizontal specific styles that weren't working */
+        .vertical-container, .horizontal-container, 
+        .vertical-image, .horizontal-image,
+        .vertical-slide {
+            all: unset;
+        }
+
+        .newsletter-button {
+            padding: 0.8rem 1.5rem;
+            background: linear-gradient(135deg, #00a8ff, #0097e6);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 151, 230, 0.3);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .newsletter-button:hover {
+            background: linear-gradient(135deg, #0097e6, #0088cc);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 151, 230, 0.4);
+        }
+
+        .newsletter-button:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 10px rgba(0, 151, 230, 0.3);
+        }
+
+        .newsletter-button i {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+
+        .newsletter-button:hover i {
+            transform: translateX(3px);
+        }
+
+        #newsletter-email {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: none;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #newsletter-email:focus {
+            outline: none;
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(0, 168, 255, 0.5);
+            box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.25), inset 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .close-update {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .close-update:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .update-card.expanded .update-text {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+
+        .update-card.expanded .update-view-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Ensure expanded cards show properly on mobile */
+        .update-card.expanded {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: auto;
+            width: 90%;
+            max-width: 800px;
+            height: 90vh;
+            z-index: 1000;
+            background: rgba(26, 26, 26, 0.95);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            transform: none;
+            overflow-y: auto;
+        }
+        
+        /* Close button styling */
+        .close-update {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1001;
+            border: none;
+        }
+        
+        .update-card.expanded .close-update {
+            display: flex;
+        }
+        
+        /* Only apply hover effect on devices that support hover */
+        @media (hover: hover) {
+            .update-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+            }
+        }
+        
+        /* Mobile-specific styles */
+        @media (max-width: 768px) {
+            .update-card {
+                transition: none;
+            }
+            
+            .update-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+            
+            .update-card:active {
+                background: rgba(26, 26, 26, 0.95);
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+
+            .update-view-btn {
+                opacity: 1;
+                transform: translateY(0);
+                background: rgba(255, 255, 255, 0.3);
+            }
+        }
+    </style>
+</head>
+<body class="updates-page">
+    <div class="cursor"></div>
+    <div class="noise-overlay"></div>
+    
+    <header>
+        <nav>
+            <a href="index.html" class="logo">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn Logo" class="logo-image">
+            </a>
+            <div class="nav-toggle">
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" data-en="Home" data-de="Startseite">Startseite</a></li>
+                <li><a href="about.html" data-en="About" data-de="Über mich">Über mich</a></li>
+                <li><a href="team.html" data-en="Team" data-de="Team">Team</a></li>
+                <li><a href="updates.html" class="active" data-en="Updates" data-de="Updates">Updates</a></li>
+                <li><a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a></li>
+                <li><a href="about.html#contact" class="contact-btn" data-en="Contact" data-de="Kontakt">Kontakt</a></li>
+            </ul>
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="de">CH</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+        </nav>
+        <div class="header-gradient"></div>
+    </header>
+
+    <main>
+        <section class="hero fullscreen-hero preserve-hero-layout">
+            <div class="hero-bg">
+                <img src="./public/images/updatesnew3.jpg" alt="Nicola Senn Updates" class="hero-bg-image">
+                <div class="hero-overlay" style="background: linear-gradient(to bottom, rgba(26, 26, 26, 0.4) 0%, rgba(26, 26, 26, 0.5) 100%) !important;"></div>
+            </div>
+            <div class="hero-content">
+                <h1>UPDATES</h1>
+                <p class="subtitle" data-en="Check out my latest updates" data-de="Schau dir meine neuesten Updates an">Check out my latest updates</p>
+            </div>
+        </section>
+
+        <section class="updates-section">
+            <div class="updates-header">
+                <h2 data-en="Latest Updates" data-de="Neueste Updates">Neueste Updates</h2>
+                <p data-en="Follow my journey through matches, training, and achievements" data-de="Folge meiner Reise durch Matches, Training und Erfolge">Folge meiner Reise durch Matches, Training und Erfolge</p>
+            </div>
+
+            <div class="updates-filters">
+                <button class="filter-btn active" data-filter="all" data-en="All Updates" data-de="Alle Updates">Alle Updates</button>
+                <button class="filter-btn" data-filter="matches" data-en="Matches" data-de="Matches">Matches</button>
+                <button class="filter-btn" data-filter="training" data-en="Training" data-de="Training">Training</button>
+                <button class="filter-btn" data-filter="behind-scenes" data-en="Behind the Scenes" data-de="Hinter den Kulissen">Hinter den Kulissen</button>
+                <button class="filter-btn" data-filter="achievements" data-en="Achievements" data-de="Erfolge">Erfolge</button>
+            </div>
+
+            <div class="updates-feed" id="updatesFeed">
+                <!-- Updates will be loaded here dynamically -->
+            </div>
+        </section>
+
+        <section class="galleries-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-en="Photo Galleries" data-de="Fotogalerien">Fotogalerien</h2>
+                    <p data-en="Explore my journey through photos" data-de="Entdecke meine Reise durch Fotos">Entdecke meine Reise durch Fotos</p>
+                </div>
+                <div id="galleries-grid" class="galleries-grid">
+                    <!-- Galleries will be loaded here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Photo Carousel Modal -->
+        <div id="gallery-modal" class="gallery-modal">
+            <div class="modal-content">
+                <button class="close-modal">&times;</button>
+                <div class="modal-gallery-info">
+                    <h3 id="modal-gallery-title"></h3>
+                    <p id="modal-gallery-description"></p>
+                </div>
+                <div class="carousel-container">
+                    <button class="carousel-button prev">&lt;</button>
+                    <div class="carousel">
+                        <!-- Slides will be loaded here -->
+                    </div>
+                    <button class="carousel-button next">&gt;</button>
+                </div>
+                <div class="carousel-thumbnails" id="carousel-thumbnails">
+                    <!-- Thumbnails will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-logo">
+            <a href="index.html">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn Logo" class="logo-image">
+            </a>
+        </div>
+        
+        <div class="social-icons">
+            <a href="https://www.instagram.com/nicola_senn/" target="_blank" class="social-icon" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/nicola.senn.33" target="_blank" class="social-icon" aria-label="Facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://whatsapp.com/channel/0029VadmV4t6xCSSIpPQFn14" target="_blank" class="social-icon" aria-label="WhatsApp Channel">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+
+        <nav class="footer-nav">
+            <a href="index.html" data-en="Home" data-de="Startseite">Startseite</a>
+            <a href="about.html" data-en="About" data-de="Über mich">Über mich</a>
+            <a href="team.html" data-en="Team" data-de="Team">Team</a>
+            <a href="updates.html" data-en="Updates" data-de="Updates">Updates</a>
+            <a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a>
+            <a href="about.html#contact" data-en="Contact" data-de="Kontakt">Kontakt</a>
+        </nav>
+
+        <div class="copyright">
+            © 2025 Nicola Senn. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- Glassmorphism Update Modal -->
+    <div id="update-modal" class="glass-modal">
+        <div class="glass-modal-content">
+            <button class="glass-modal-close"><i class="fas fa-times"></i></button>
+            <div class="glass-modal-image">
+                <img id="modal-image" src="" alt="">
+            </div>
+            <div class="glass-modal-info">
+                <div class="glass-modal-header">
+                    <span id="modal-category" class="update-category"></span>
+                    <h2 id="modal-title" class="glass-modal-title"></h2>
+                    <div id="modal-date" class="glass-modal-date"><i class="far fa-calendar"></i> <span></span></div>
+                </div>
+                <div id="modal-content" class="glass-modal-body"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Newsletter functionality removed
+        
+        // Initialize Supabase client
+        const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
+
+        // Initialize language
+        let currentLanguage = localStorage.getItem('language') || 'de';
+
+        // Load updates
+        async function loadUpdates() {
+            try {
+                const { data: updates, error } = await supabaseClient
+                    .from('updates')
+                    .select('id, title, content, category, image_url, date')
+                    .order('date', { ascending: false });
+                
+                if (error) throw error;
+                
+                const updatesFeed = document.getElementById('updatesFeed');
+                if (!updatesFeed) {
+                    console.error('Updates feed container not found');
+                    return;
+                }
+
+                updatesFeed.innerHTML = '';
+
+                if (!updates || updates.length === 0) {
+                    updatesFeed.innerHTML = '<div class="no-updates" data-en="No updates available yet." data-de="Noch keine Updates verfügbar.">Noch keine Updates verfügbar.</div>';
+                    return;
+                }
+                
+                updates.forEach(update => {
+                    const updateDate = new Date(update.date);
+                    const formattedDate = updateDate.toLocaleDateString(currentLanguage === 'de' ? 'de-DE' : 'en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                    
+                    const updateElement = document.createElement('div');
+                    updateElement.className = 'update-card';
+                    updateElement.setAttribute('data-category', update.category.toLowerCase());
+                    updateElement.innerHTML = `
+                        ${update.image_url ? `<img src="${update.image_url}" alt="${update.title}" class="update-image">` : ''}
+                        <div class="update-content">
+                            <span class="update-category">${update.category}</span>
+                            <h3 class="update-title">${update.title}</h3>
+                            <p class="update-text">${update.content}</p>
+                            <div class="update-meta">
+                                <span class="update-date"><i class="far fa-calendar"></i> ${formattedDate}</span>
+                            </div>
+                            <button class="update-view-btn">
+                                <i class="fas fa-arrow-right"></i>
+                                <span data-en="Read More" data-de="Mehr lesen">Mehr lesen</span>
+                            </button>
+                        </div>
+                    `;
+                    
+                    // Add click handler for the update card
+                    updateElement.addEventListener('click', () => viewUpdateDetails(update.id));
+                    updatesFeed.appendChild(updateElement);
+                });
+                
+                // Initialize filter functionality
+                initializeFilters();
+            } catch (error) {
+                console.error('Error loading updates:', error);
+                document.getElementById('updatesFeed').innerHTML = '<div class="error-message" data-en="Failed to load updates. Please try again later." data-de="Updates konnten nicht geladen werden. Bitte versuche es später erneut.">Updates konnten nicht geladen werden. Bitte versuche es später erneut.</div>';
+            }
+        }
+
+        // Filter updates
+        function filterUpdates(category) {
+            const updates = document.querySelectorAll('.update-card');
+            updates.forEach(update => {
+                if (category === 'all' || update.getAttribute('data-category') === category.toLowerCase()) {
+                    update.style.display = 'block';
+                    } else {
+                    update.style.display = 'none';
+                }
+                        });
+                    }
+                    
+        // Initialize filters
+        function initializeFilters() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    filterUpdates(button.getAttribute('data-filter'));
+                });
+            });
+                }
+                
+        // Initialize page - Add image optimization
+        document.addEventListener('DOMContentLoaded', async function() {
+            // Wait for translations to load
+            if (typeof initializeTranslations === 'function') {
+                await initializeTranslations();
+            }
+            
+            // Load updates and galleries
+            loadUpdates();
+            loadGalleries();
+
+            // Initialize language buttons
+            const langButtons = document.querySelectorAll('.lang-btn');
+            langButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    currentLanguage = this.getAttribute('data-lang');
+                    localStorage.setItem('language', currentLanguage);
+                    loadUpdates(); // Reload updates with new language
+                });
+            });
+            
+            // Add intersection observer for lazy loading images
+            if ('IntersectionObserver' in window) {
+                const imageObserver = new IntersectionObserver((entries, observer) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            const img = entry.target;
+                            if (img.dataset.src) {
+                                img.src = img.dataset.src;
+                                img.removeAttribute('data-src');
+                            }
+                            observer.unobserve(img);
+                        }
+                    });
+                });
+                
+                // Observe all images with data-src attribute
+                document.querySelectorAll('img[data-src]').forEach(img => {
+                    imageObserver.observe(img);
+                });
+            }
+        });
+        
+        // View update details function
+        async function viewUpdateDetails(updateId) {
+            try {
+                // Fetch the update details
+                const { data: update, error } = await supabaseClient
+                    .from('updates')
+                    .select('*')
+                    .eq('id', updateId)
+                    .single();
+                
+                if (error) throw error;
+                
+                // Format the date using the date field
+                const date = new Date(update.date);
+                const formattedDate = date.toLocaleDateString(currentLanguage === 'de' ? 'de-DE' : 'en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+                
+                // Optimize modal image to medium resolution
+                const optimizedModalImage = optimizeImageUrl(update.image_url, 1000);
+                
+                // Populate the modal
+                document.getElementById('modal-title').textContent = update.title;
+                document.getElementById('modal-category').textContent = update.category;
+                document.getElementById('modal-date').querySelector('span').textContent = formattedDate;
+                document.getElementById('modal-image').src = optimizedModalImage;
+                document.getElementById('modal-image').alt = update.title;
+                document.getElementById('modal-content').textContent = update.content;
+                
+                // Show the modal
+                const modal = document.getElementById('update-modal');
+                modal.classList.add('show');
+                
+                // Prevent scrolling on the body
+                document.body.style.overflow = 'hidden';
+                
+            } catch (error) {
+                console.error('Error fetching update details:', error);
+            }
+        }
+        
+        // Close modal function
+        function closeUpdateModal() {
+            const modal = document.getElementById('update-modal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+        }
+        
+        // Event listeners for modal and page initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            // Close the modal when clicking the X
+            document.querySelector('.glass-modal-close').addEventListener('click', closeUpdateModal);
+            
+            // Close the modal when clicking outside the content
+            document.getElementById('update-modal').addEventListener('click', function(event) {
+                if (event.target === this) {
+                    closeUpdateModal();
+                }
+            });
+            
+            // Close the modal with escape key
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && document.getElementById('update-modal').classList.contains('show')) {
+                    closeUpdateModal();
+                }
+            });
+            
+            // Load updates
+            loadUpdates();
+            
+            // Load galleries
+            loadGalleries();
+            
+            // Add filter functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    button.classList.add('active');
+                    
+                    const filter = button.getAttribute('data-filter');
+                    filterUpdates(filter);
+                });
+            });
+        });
+
+        // Load galleries function
+        async function loadGalleries() {
+            try {
+                const { data: galleries, error } = await supabaseClient
+                    .from('galleries')
+                    .select('*')
+                    .order('event_date', { ascending: false });
+                
+                if (error) throw error;
+                
+                const galleriesGrid = document.getElementById('galleries-grid');
+                if (!galleriesGrid) return;
+                
+                galleriesGrid.innerHTML = '';
+                
+                if (galleries && galleries.length > 0) {
+                    galleries.forEach(gallery => {
+                        const galleryElement = document.createElement('div');
+                        galleryElement.className = 'gallery-card';
+                        galleryElement.setAttribute('data-id', gallery.id);
+                        
+                        // Format the date
+                        const date = gallery.event_date ? new Date(gallery.event_date) : null;
+                        const formattedDate = date ? date.toLocaleDateString('de-CH', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric'
+                        }) : '';
+                        
+                        // Optimize image URL for thumbnails
+                        const optimizedCoverImage = optimizeImageUrl(gallery.cover_image, 600); // Lower resolution for card cover
+                        
+                        galleryElement.innerHTML = `
+                            <img src="${optimizedCoverImage || 'https://via.placeholder.com/300x400'}" alt="${gallery.title}" class="gallery-cover" loading="lazy">
+                            <div class="gallery-info">
+                                <h3 class="gallery-title">${gallery.title}</h3>
+                                <p class="gallery-description">${gallery.description || ''}</p>
+                                <div class="gallery-meta">
+                                    <span><i class="far fa-calendar-alt"></i> ${formattedDate}</span>
+                                    <button class="gallery-view-btn" data-en="View Photos" data-de="Fotos ansehen">Fotos ansehen</button>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Add click handler
+                        galleryElement.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            openGallery(gallery.id);
+                        });
+                        
+                        galleriesGrid.appendChild(galleryElement);
+                    });
+                } else {
+                    // Show placeholder if no galleries
+                    galleriesGrid.innerHTML = `
+                        <div class="no-galleries">
+                            <p data-en="No galleries available yet." data-de="Noch keine Galerien verfügbar.">Noch keine Galerien verfügbar.</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading galleries:', error);
+            }
+        }
+
+        // Open gallery modal function - optimize image loading
+        async function openGallery(galleryId) {
+            if (!galleryId) {
+                console.error('No gallery ID provided');
+                return;
+            }
+            
+            const modal = document.getElementById('gallery-modal');
+            if (!modal) {
+                console.error('Gallery modal element not found');
+                return;
+            }
+            
+            try {
+                // Show loading state
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.className = 'gallery-loading';
+                loadingIndicator.innerHTML = '<div class="spinner"></div><p data-en="Loading gallery..." data-de="Galerie wird geladen...">Galerie wird geladen...</p>';
+                modal.appendChild(loadingIndicator);
+                
+                // Show modal with loading state first
+                modal.style.display = 'block';
+                setTimeout(() => modal.classList.add('active'), 10);
+                document.body.style.overflow = 'hidden';
+                
+                // Fetch gallery data
+                const { data: gallery, error: galleryError } = await supabaseClient
+                    .from('galleries')
+                    .select('*')
+                    .eq('id', galleryId)
+                    .single();
+                
+                if (galleryError) throw galleryError;
+                if (!gallery) throw new Error('Gallery not found');
+                
+                // Fetch gallery images
+                const { data: images, error: imagesError } = await supabaseClient
+                    .from('gallery_images')
+                    .select('*')
+                    .eq('gallery_id', galleryId)
+                    .order('order');
+                
+                if (imagesError) throw imagesError;
+                
+                // Update modal content
+                const titleEl = document.getElementById('modal-gallery-title');
+                const descEl = document.getElementById('modal-gallery-description');
+                
+                if (titleEl) titleEl.textContent = gallery.title || '';
+                if (descEl) descEl.textContent = gallery.description || '';
+                
+                const carousel = document.querySelector('.carousel');
+                const thumbnails = document.getElementById('carousel-thumbnails');
+                
+                if (!carousel || !thumbnails) {
+                    console.error('Carousel or thumbnails container not found');
+                    return;
+                }
+                
+                // Clear existing content
+                carousel.innerHTML = '';
+                thumbnails.innerHTML = '';
+                
+                // Remove loading indicator
+                if (loadingIndicator) {
+                    loadingIndicator.remove();
+                }
+                
+                // Clear any existing counter
+                const existingCounter = document.querySelector('.carousel-counter');
+                if (existingCounter) {
+                    existingCounter.remove();
+                }
+                
+                // Check if we have images
+                if (!images || images.length === 0) {
+                    carousel.innerHTML = '<div class="no-images" data-en="No images available" data-de="Keine Bilder verfügbar">Keine Bilder verfügbar</div>';
+                    modal.style.display = 'block';
+                    setTimeout(() => modal.classList.add('active'), 10);
+                    return;
+                }
+                
+                // Create counter element
+                const counter = document.createElement('div');
+                counter.className = 'carousel-counter';
+                counter.textContent = `1 / ${images.length}`;
+                document.querySelector('.modal-content').appendChild(counter);
+                
+                let currentIndex = 0;
+                
+                // Create slides and thumbnails
+                images.forEach((image, index) => {
+                    // Optimize image URLs for better performance
+                    const optimizedSlideImage = optimizeImageUrl(image.image_url, 1200); // Medium resolution for slides
+                    const optimizedThumbImage = optimizeImageUrl(image.image_url, 160); // Low resolution for thumbnails
+                    
+                    // Create slide
+                    const slide = document.createElement('div');
+                    slide.className = 'carousel-slide';
+                    if (index === 0) slide.classList.add('active');
+                    
+                    const img = document.createElement('img');
+                    img.src = optimizedSlideImage;
+                    img.alt = gallery.title;
+                    img.loading = "lazy"; // Lazy load images
+                    
+                    slide.appendChild(img);
+                    carousel.appendChild(slide);
+                    
+                    // Create thumbnail
+                    const thumbnail = document.createElement('img');
+                    thumbnail.src = optimizedThumbImage;
+                    thumbnail.className = 'thumbnail' + (index === 0 ? ' active' : '');
+                    thumbnail.loading = "lazy"; // Lazy load thumbnails
+                    thumbnail.onclick = () => showImage(index);
+                    thumbnails.appendChild(thumbnail);
+                });
+                
+                // Show modal
+                modal.style.display = 'block';
+                setTimeout(() => {
+                    modal.classList.add('active');
+                }, 10);
+                
+                // Navigation function
+                function showImage(index) {
+                    if (index < 0 || index >= images.length) return;
+                    
+                    // Get all slides and find the active one
+                    const slides = document.querySelectorAll('.carousel-slide');
+                    const thumbnails = document.querySelectorAll('.thumbnail');
+                    
+                    // Remove active class from all slides and thumbnails
+                    slides.forEach(slide => slide.classList.remove('active'));
+                    thumbnails.forEach(thumb => thumb.classList.remove('active'));
+                    
+                    // Add active class to current slide and thumbnail
+                    slides[index].classList.add('active');
+                    thumbnails[index].classList.add('active');
+                    
+                    // Scroll the thumbnail into view
+                    thumbnails[index].scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'nearest', 
+                        inline: 'center' 
+                    });
+                    
+                    // Update counter
+                    counter.textContent = `${index + 1} / ${images.length}`;
+                    
+                    // Update current index
+                    currentIndex = index;
+                }
+                
+                // Setup navigation
+                const prevBtn = modal.querySelector('.prev');
+                const nextBtn = modal.querySelector('.next');
+                
+                if (prevBtn) {
+                    prevBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        showImage((currentIndex - 1 + images.length) % images.length);
+                    };
+                }
+                
+                if (nextBtn) {
+                    nextBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        showImage((currentIndex + 1) % images.length);
+                    };
+                }
+                
+                // Keyboard navigation
+                const keyHandler = (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        showImage((currentIndex - 1 + images.length) % images.length);
+                    } else if (e.key === 'ArrowRight') {
+                        showImage((currentIndex + 1) % images.length);
+                    } else if (e.key === 'Escape') {
+                        closeGalleryModal();
+                    }
+                };
+                
+                document.addEventListener('keydown', keyHandler);
+                
+                // Touch navigation
+                let touchStartX = 0;
+                carousel.addEventListener('touchstart', (e) => {
+                    touchStartX = e.changedTouches[0].screenX;
+                });
+                
+                carousel.addEventListener('touchend', (e) => {
+                    const touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchEndX - touchStartX;
+                    
+                    if (Math.abs(diff) > 50) {
+                        if (diff > 0) {
+                            // Swipe right, go to previous
+                            showImage((currentIndex - 1 + images.length) % images.length);
+                        } else {
+                            // Swipe left, go to next
+                            showImage((currentIndex + 1) % images.length);
+                        }
+                    }
+                });
+                
+                // Close modal function
+                function closeGalleryModal() {
+                    modal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        document.removeEventListener('keydown', keyHandler);
+                    }, 500);
+                }
+                
+                // Setup close button
+                const closeBtn = modal.querySelector('.close-modal');
+                if (closeBtn) {
+                    closeBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        closeGalleryModal();
+                    };
+                }
+                
+                // Close when clicking outside content
+                const modalContent = modal.querySelector('.modal-content');
+                if (modalContent) {
+                    modalContent.onclick = (e) => {
+                        e.stopPropagation();
+                    };
+                }
+                
+                modal.onclick = closeGalleryModal;
+                
+                // Lock body scrolling
+                document.body.style.overflow = 'hidden';
+            } catch (error) {
+                console.error('Error opening gallery:', error);
+            }
+        }
+
+        // Now add the code to add the view button to each gallery card:
+        const addViewButtons = function() {
+            const galleryCards = document.querySelectorAll('.gallery-card');
+            galleryCards.forEach(card => {
+                if (!card.querySelector('.gallery-view-btn')) {
+                    const viewBtn = document.createElement('button');
+                    viewBtn.className = 'gallery-view-btn';
+                    viewBtn.innerHTML = '<i class="fas fa-images"></i> <span data-en="View Photos" data-de="Fotos ansehen">Fotos ansehen</span>';
+                    card.appendChild(viewBtn);
+                }
+            });
+        };
+
+        // Call the function to add view buttons after loading galleries
+        const originalLoadGalleries = window.loadGalleries;
+        if (typeof originalLoadGalleries === 'function') {
+            window.loadGalleries = async function() {
+                await originalLoadGalleries.apply(this, arguments);
+                addViewButtons();
+            };
+        }
+        
+        // Add buttons to any existing gallery cards
+        setTimeout(addViewButtons, 1000);
+
+        // Helper function to optimize image URLs - improved version
+        function optimizeImageUrl(url, maxWidth) {
+            if (!url) return url;
+            
+            try {
+                // Handle Supabase storage URLs
+                if (url.includes('storage.googleapis.com') || url.includes('supabase.co/storage')) {
+                    // Currently return as is - Supabase doesn't have built-in transformations
+                    return url;
+                } 
+                // Handle Cloudinary URLs
+                else if (url.includes('cloudinary.com')) {
+                    return url.replace('/upload/', `/upload/w_${maxWidth},q_auto,f_auto/`);
+                } 
+                // Handle ImageKit URLs
+                else if (url.includes('imagekit.io')) {
+                    return `${url}?tr=w-${maxWidth},q-70`;
+                } 
+                // Handle Imgix URLs
+                else if (url.includes('imgix.net')) {
+                    return `${url}?w=${maxWidth}&q=70&auto=format,compress`;
+                }
+                // Handle direct image URLs
+                else if (url.match(/\.(jpeg|jpg|png|webp)$/i)) {
+                    // For direct image URLs, we can't transform them directly
+                    // Could use a proxy service like images.weserv.nl if needed
+                    return url;
+                }
+                
+                // If we can't optimize it, return the original URL
+                return url;
+            } catch (error) {
+                console.error('Error optimizing image URL:', error);
+                return url;
+            }
+        }
+        
+        // Helper function to preload critical images
+        function preloadCriticalImages() {
+            // Preload first few gallery covers
+            const galleryCovers = document.querySelectorAll('.gallery-cover');
+            if (galleryCovers.length > 0) {
+                // Only preload the first 3 visible gallery covers
+                for (let i = 0; i < Math.min(3, galleryCovers.length); i++) {
+                    const img = new Image();
+                    img.src = galleryCovers[i].src;
+                }
+            }
+        }
+        
+        // Call preload after galleries are loaded
+        window.addEventListener('load', preloadCriticalImages);
+
+        // Helper function to adjust carousel container based on image orientation
+        function adjustCarouselForImage(img) {
+            const carousel = document.querySelector('.carousel-container');
+            if (!carousel || !img) return;
+            
+            // Reset any previous adjustments
+            carousel.classList.remove('vertical-container', 'horizontal-container');
+            
+            // Apply appropriate class based on image orientation
+            if (img.naturalHeight > img.naturalWidth) {
+                carousel.classList.add('vertical-container');
+            } else {
+                carousel.classList.add('horizontal-container');
+            }
+        }
+    </script>
+    <div class="cutstudios-badge">
+        <a href="https://www.instagram.com/cutstudios.pt/" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
+    </div>
+</body>
+</html>
