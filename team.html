@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mein Tennisteam | Nicola Senn | Professioneller Tennisspieler</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="public/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public/js/config.js"></script>
+    <script src="public/js/translations.js"></script>
+    <script src="public/js/brevo-integration.js"></script>
+    <link rel="icon" type="image/png" href="public/images/NICOLA logo.png">
+    <style>
+        /* Override the grayscale filter for team member images */
+        .member-image img {
+            filter: none !important;
+        }
+        
+        /* No need to change on hover since they're already in color */
+        .team-member-card:hover .member-image img {
+            transform: scale(1.05);
+            filter: none !important;
+        }
+    </style>
+</head>
+<body class="team-page">
+    <div class="cursor"></div>
+    <div class="noise-overlay"></div>
+    
+    <header>
+        <nav>
+            <a href="index.html" class="logo animated-logo">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn Logo" class="logo-image">
+            </a>
+            <div class="nav-toggle">
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" data-en="Home" data-de="Startseite">Startseite</a></li>
+                <li><a href="about.html" data-en="About" data-de="Über mich">Über mich</a></li>
+                <li><a href="team.html" class="active" data-en="Team" data-de="Team">Team</a></li>
+                <li><a href="updates.html" data-en="Updates" data-de="Updates">Updates</a></li>
+                <li><a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a></li>
+                <li><a href="about.html#contact" class="contact-btn" data-en="Contact" data-de="Kontakt">Kontakt</a></li>
+            </ul>
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="de">CH</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+        </nav>
+        <div class="header-gradient"></div>
+    </header>
+
+    <main>
+        <section class="hero fullscreen-hero preserve-hero-layout">
+            <div class="hero-bg">
+                <img src="public/images/NET VOLLEY TEAM.jpg" alt="Nicola Senn Team" class="hero-bg-image">
+                <div class="hero-overlay" style="background: linear-gradient(to bottom, rgba(26, 26, 26, 0.4) 0%, rgba(26, 26, 26, 0.5) 100%) !important;"></div>
+            </div>
+            <div class="hero-content">
+                <h1 data-en="MY TENNIS TEAM" data-de="MEIN TENNISTEAM">MEIN TENNISTEAM</h1>
+                <p class="subtitle" data-en="The professionals who support my journey" data-de="Die Profis, die meine Reise unterstützen">Die Profis, die meine Reise unterstützen</p>
+            </div>
+        </section>
+
+        <!-- Nicola's Quote Section -->
+        <section class="quote-section">
+            <div class="container">
+                <div class="quote-content">
+                    <div class="quote-icon"><i class="fas fa-quote-left"></i></div>
+                    <blockquote>
+                        <p data-en="Behind every successful athlete stands a dedicated team that makes excellence possible. I'm incredibly fortunate to work with professionals who believe in my potential and push me to reach new heights every day." data-de="Hinter jedem erfolgreichen Athleten steht ein engagiertes Team, das Exzellenz ermöglicht. Ich bin unglaublich glücklich, mit Profis zu arbeiten, die an mein Potenzial glauben und mich jeden Tag anspornen, neue Höhen zu erreichen.">Hinter jedem erfolgreichen Athleten steht ein engagiertes Team, das Exzellenz ermöglicht. Ich bin unglaublich glücklich, mit Profis zu arbeiten, die an mein Potenzial glauben und mich jeden Tag anspornen, neue Höhen zu erreichen.</p>
+                        <cite>— Nicola Senn</cite>
+                    </blockquote>
+                </div>
+            </div>
+        </section>
+
+        <!-- Core Team Section -->
+        <section id="core-team" class="core-team-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-en="Core Team" data-de="Kernteam">Kernteam</h2>
+                    <p data-en="The essential members who guide my daily progress" data-de="Die wesentlichen Mitglieder, die meinen täglichen Fortschritt leiten">Die wesentlichen Mitglieder, die meinen täglichen Fortschritt leiten</p>
+                </div>
+                
+                <style>
+                    /* Team Member Styling */
+                    .team-members {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                        gap: 2.5rem;
+                        margin-top: 2.5rem;
+                    }
+                    
+                    .team-member-card {
+                        background: rgba(30, 30, 30, 0.5);
+                        border-radius: 12px;
+                        overflow: hidden;
+                        border: 1px solid rgba(255, 255, 255, 0.05);
+                        transition: all 0.3s ease;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .team-member-card:hover {
+                        transform: translateY(-8px);
+                        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+                        background: rgba(35, 35, 35, 0.6);
+                    }
+                    
+                    .member-image {
+                        height: 300px;
+                        overflow: hidden;
+                        position: relative;
+                    }
+                    
+                    .member-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: transform 0.5s ease;
+                    }
+                    
+                    .team-member-card:hover .member-image img {
+                        transform: scale(1.05);
+                    }
+                    
+                    .member-content {
+                        padding: 1.5rem;
+                        position: relative;
+                        display: flex;
+                        flex-direction: column;
+                        flex: 1;
+                    }
+                    
+                    .member-badge {
+                        position: absolute;
+                        top: -20px;
+                        right: 20px;
+                        background: var(--color-primary);
+                        color: var(--color-darker);
+                        font-size: 0.85rem;
+                        font-weight: 600;
+                        padding: 6px 15px;
+                        border-radius: 30px;
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .member-name {
+                        font-size: 1.5rem;
+                        margin-bottom: 0.5rem;
+                        color: #fff;
+                    }
+                    
+                    .member-org {
+                        font-size: 0.95rem;
+                        color: var(--color-primary);
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .member-bio {
+                        color: #ccc;
+                        font-size: 0.95rem;
+                        line-height: 1.6;
+                        margin-bottom: 1.5rem;
+                    }
+                    
+                    .member-expertise {
+                        display: flex;
+                        flex-wrap: wrap;
+                        gap: 1rem;
+                        margin-top: auto;
+                    }
+                    
+                    .expertise-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 0.5rem;
+                    }
+                    
+                    .expertise-icon {
+                        width: 32px;
+                        height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(var(--color-primary-rgb), 0.1);
+                        border-radius: 50%;
+                        color: var(--color-primary);
+                        font-size: 0.9rem;
+                    }
+                    
+                    .expertise-text {
+                        font-size: 0.9rem;
+                        color: #eee;
+                    }
+                    
+                    /* Section Styling */
+                    .core-team-section, .support-team-section {
+                        background: var(--color-darker);
+                        padding: 5rem 0;
+                    }
+                    
+                    .support-team-section {
+                        background: rgba(20, 20, 20, 0.95);
+                    }
+                    
+                    .section-header {
+                        text-align: center;
+                        margin-bottom: 1rem;
+                    }
+                    
+                    .section-header h2 {
+                        font-size: 2.5rem;
+                        margin-bottom: 1rem;
+                        color: var(--color-light);
+                    }
+                    
+                    .section-header p {
+                        color: var(--color-gray);
+                        max-width: 600px;
+                        margin: 0 auto;
+                    }
+                    
+                    .quote-section {
+                        background: var(--color-darker);
+                        padding: 3rem 0;
+                        text-align: center;
+                    }
+                    
+                    .quote-content {
+                        max-width: 800px;
+                        margin: 0 auto;
+                        padding: 2rem;
+                    }
+                    
+                    .quote-icon {
+                        color: var(--color-primary);
+                        font-size: 2rem;
+                        margin-bottom: 1rem;
+                        opacity: 0.7;
+                    }
+                    
+                    blockquote {
+                        font-style: italic;
+                        font-size: 1.3rem;
+                        line-height: 1.7;
+                        color: #fff;
+                    }
+                    
+                    blockquote p {
+                        margin-bottom: 1rem;
+                    }
+                    
+                    blockquote cite {
+                        font-style: normal;
+                        color: var(--color-gray);
+                        font-size: 1rem;
+                    }
+                    
+                    /* Responsive adjustments */
+                    @media (max-width: 992px) {
+                        .team-members {
+                            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                        }
+                        
+                        blockquote {
+                            font-size: 1.2rem;
+                        }
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .team-members {
+                            grid-template-columns: 1fr;
+                            max-width: 400px;
+                            margin-left: auto;
+                            margin-right: auto;
+                        }
+                        
+                        .member-image {
+                            height: 250px;
+                        }
+                        
+                        blockquote {
+                            font-size: 1.1rem;
+                        }
+                    }
+                </style>
+                
+                <div class="team-members">
+                    <!-- Jürgen Strehlau - Head Coach -->
+                    <div class="team-member-card">
+                        <div class="member-image">
+                            <img src="public/images/Imagem WhatsApp 2025-04-30 às 13.09.46_e9ee9f68.jpg" alt="Jürgen Strehlau">
+                        </div>
+                        <div class="member-content">
+                            <div class="member-badge" data-en="Head Coach" data-de="Cheftrainer">Cheftrainer</div>
+                            <h3 class="member-name">Jürgen Strehlau</h3>
+                            <p class="member-bio" data-en="My head coach who brings decades of experience to my development. His strategic guidance and match tactics have been instrumental in shaping my technical skills and competitive mindset." data-de="Mein Cheftrainer, der jahrzehntelange Erfahrung in meine Entwicklung einbringt. Seine strategische Anleitung und Matchtaktik waren maßgeblich für die Gestaltung meiner technischen Fähigkeiten und meiner Wettkampfmentalität.">Mein Cheftrainer, der jahrzehntelange Erfahrung in meine Entwicklung einbringt. Seine strategische Anleitung und Matchtaktik waren maßgeblich für die Gestaltung meiner technischen Fähigkeiten und meiner Wettkampfmentalität.</p>
+                            
+                            <div class="member-expertise">
+                                <div class="expertise-item">
+                                    <div class="expertise-icon"><i class="fas fa-bullseye"></i></div>
+                                    <div class="expertise-text" data-en="Strategic Planning" data-de="Strategische Planung">Strategische Planung</div>
+                                </div>
+                                <div class="expertise-item">
+                                    <div class="expertise-icon"><i class="fas fa-graduation-cap"></i></div>
+                                    <div class="expertise-text" data-en="Technical Development" data-de="Technische Entwicklung">Technische Entwicklung</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lars Wellmann - Assistant Coach -->
+                    <div class="team-member-card">
+                        <div class="member-image">
+                            <img src="public/images/Imagem WhatsApp 2025-04-30 às 13.10.17_15ae5f76.jpg" alt="Lars Wellmann">
+                        </div>
+                        <div class="member-content">
+                            <div class="member-badge" data-en="Assistant Coach" data-de="Assistenztrainer">Assistenztrainer</div>
+                            <h3 class="member-name">Lars Wellmann</h3>
+                            <p class="member-bio" data-en="Lars focuses on the finer details of my technique and brings fresh, innovative approaches to training. His enthusiasm keeps my practice sessions varied and engaging." data-de="Lars konzentriert sich auf die feineren Details meiner Technik und bringt frische, innovative Trainingsansätze ein. Seine Begeisterung hält meine Trainingseinheiten abwechslungsreich und fesselnd.">Lars konzentriert sich auf die feineren Details meiner Technik und bringt frische, innovative Trainingsansätze ein. Seine Begeisterung hält meine Trainingseinheiten abwechslungsreich und fesselnd.</p>
+                            
+                            <div class="member-expertise">
+                                <div class="expertise-item">
+                                    <div class="expertise-icon"><i class="fas fa-lightbulb"></i></div>
+                                    <div class="expertise-text" data-en="Innovative Drills" data-de="Innovative Übungen">Innovative Übungen</div>
+                                </div>
+                                <div class="expertise-item">
+                                    <div class="expertise-icon"><i class="fas fa-video"></i></div>
+                                    <div class="expertise-text" data-en="Video Analysis" data-de="Videoanalyse">Videoanalyse</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Patricia Leuenberger - Physical/mental coach -->
+                    <div class="team-member-card">
+                        <div class="member-image">
+                            <img src="public/images/Imagem WhatsApp 2025-04-30 às 13.11.07_98a54b23.jpg" alt="Patricia Leuenberger">
+                        </div>
+                        <div class="member-content">
+                            <div class="member-badge" data-en="Physical/mental coach" data-de="Körperlicher/mentaler Coach">Körperlicher/mentaler Coach</div>
+                            <h3 class="member-name">Patricia Leuenberger</h3>
+                            <div class="member-org">WiddeWitt</div>
+                            <p class="member-role" data-en="Physical/mental coach" data-de="Körperlicher/mentaler Coach">Körperlicher/mentaler Coach</p>
+                            <p class="member-bio" data-en="Patricia designs specialized fitness programs that enhance my strength, speed, and endurance. Her holistic approach to physical conditioning is key to my performance and injury prevention." data-de="Patricia entwickelt spezialisierte Fitnessprogramme, die meine Kraft, Geschwindigkeit und Ausdauer verbessern. Ihr ganzheitlicher Ansatz zum Konditionstraining ist entscheidend für meine Leistung und Verletzungsprävention.">Patricia entwickelt spezialisierte Fitnessprogramme, die meine Kraft, Geschwindigkeit und Ausdauer verbessern. Ihr ganzheitlicher Ansatz zum Konditionstraining ist entscheidend für meine Leistung und Verletzungsprävention.</p>
+                            
+                            <div class="member-expertise">
+                                <div class="expertise-item">
+                                    <div class="expertise-icon"><i class="fas fa-dumbbell"></i></div>
+                                    <div class="expertise-text" data-en="Strength Training" data-de="Krafttraining">Krafttraining</div>
+                                </div>
+                                <div class="expertise-item">
+                                    <div class="expertise-icon"><i class="fas fa-running"></i></div>
+                                    <div class="expertise-text" data-en="Agility & Speed" data-de="Agilität & Geschwindigkeit">Agilität & Geschwindigkeit</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <div class="cutstudios-badge">
+        <a href="https://www.instagram.com/cutstudios.pt/" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-logo">
+            <a href="index.html">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn Logo" class="logo-image">
+            </a>
+        </div>
+        
+        <div class="social-icons">
+            <a href="https://www.instagram.com/nicola_senn/" target="_blank" class="social-icon" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/nicola.senn.33" target="_blank" class="social-icon" aria-label="Facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://whatsapp.com/channel/0029VadmV4t6xCSSIpPQFn14" target="_blank" class="social-icon" aria-label="WhatsApp Channel">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+
+        <nav class="footer-nav">
+            <a href="index.html" data-en="Home" data-de="Startseite">Startseite</a>
+            <a href="about.html" data-en="About" data-de="Über mich">Über mich</a>
+            <a href="team.html" data-en="Team" data-de="Team">Team</a>
+            <a href="updates.html" data-en="Updates" data-de="Updates">Updates</a>
+            <a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a>
+            <a href="about.html#contact" data-en="Contact" data-de="Kontakt">Kontakt</a>
+        </nav>
+
+        <div class="copyright">
+            © 2025 Nicola Senn. <span data-en="All rights reserved." data-de="Alle Rechte vorbehalten.">Alle Rechte vorbehalten.</span>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterMessage = document.getElementById('newsletter-message');
+
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const email = this.querySelector('input[type="email"]').value;
+                    
+                    try {
+                        const response = await fetch('https://api.brevo.com/v3/contacts', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'api-key': config.BREVO_API_KEY
+                            },
+                            body: JSON.stringify({ email, listIds: [7] })
+                        });
+
+                        if (response.ok) {
+                            newsletterMessage.textContent = 'Thank you for subscribing!';
+                            newsletterMessage.style.color = '#4CAF50';
+                            this.reset();
+                        } else {
+                            const data = await response.json();
+                            newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
+                            newsletterMessage.style.color = '#f44336';
+                        }
+                    } catch (error) {
+                        newsletterMessage.textContent = 'Error subscribing to newsletter';
+                        newsletterMessage.style.color = '#f44336';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
