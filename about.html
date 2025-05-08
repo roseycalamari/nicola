@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Über Mich | Nicola Senn | Professioneller Tennisspieler</title>
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.4/ScrollTrigger.min.js"></script>
+    <script src="public/js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="public/js/config.js"></script>
+    <script src="public/js/translations.js"></script>
+    <script src="public/js/brevo-integration.js"></script>
+    <link rel="icon" type="image/png" href="public/images/NICOLA logo.png">
+</head>
+<body class="about-page">
+    <div class="cursor"></div>
+    <div class="noise-overlay"></div>
+    
+    <header>
+        <nav>
+            <a href="index.html" class="logo animated-logo">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn Logo" class="logo-image">
+            </a>
+            <div class="nav-toggle">
+                <div class="bar"></div>
+                <div class="bar"></div>
+            </div>
+            <ul class="nav-links">
+                <li><a href="index.html" data-en="Home" data-de="Startseite">Startseite</a></li>
+                <li><a href="about.html" class="active" data-en="About" data-de="Über mich">Über mich</a></li>
+                <li><a href="team.html" data-en="Team" data-de="Team">Team</a></li>
+                <li><a href="updates.html" data-en="Updates" data-de="Updates">Updates</a></li>
+                <li><a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a></li>
+                <li><a href="about.html#contact" class="contact-btn" data-en="Contact" data-de="Kontakt">Kontakt</a></li>
+            </ul>
+            <div class="language-selector">
+                <button class="lang-btn active" data-lang="de">CH</button>
+                <button class="lang-btn" data-lang="en">EN</button>
+            </div>
+        </nav>
+        <div class="header-gradient"></div>
+    </header>
+
+    <main>
+        <section class="hero fullscreen-hero preserve-hero-layout">
+            <div class="hero-bg">
+                <img src="public/images/about.jpg" alt="Nicola Senn" class="hero-bg-image">
+                <div class="hero-overlay" style="background: linear-gradient(to bottom, rgba(26, 26, 26, 0.4) 0%, rgba(26, 26, 26, 0.5) 100%) !important;"></div>
+            </div>
+            <div class="hero-content">
+                <h1 data-en="ABOUT NICOLA" data-de="ÜBER NICOLA">ÜBER NICOLA</h1>
+                <p class="subtitle" data-en="Check out some interesting facts about me and more!" data-de="Entdecke interessante Fakten über mich und mehr!">Entdecke interessante Fakten über mich und mehr!</p>
+            </div>
+        </section>
+
+        <!-- Split Sections Layout: Tennis Journey and Life Outside Tennis -->
+        <section class="split-sections">
+            <style>
+                .split-sections {
+                    padding: 5rem 0;
+                    position: relative;
+                    background: var(--color-darker);
+                    --color-primary-rgb: 160, 235, 255; /* RGB values for primary color */
+                }
+                
+                .split-container {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 3rem;
+                }
+                
+                .section-column {
+                    display: flex;
+                    flex-direction: column;
+                }
+                
+                /* Tennis Journey Styling */
+                .tennis-journey {
+                    background: rgba(26, 26, 26, 0.3);
+                    border-radius: 20px;
+                    padding: 2.5rem;
+                    height: 100%;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                }
+                
+                .tennis-journey .section-header {
+                    margin-bottom: 2rem;
+                }
+                
+                .tennis-journey .section-header h2 {
+                    color: var(--color-primary);
+                    font-size: 2rem;
+                    margin-bottom: 0.8rem;
+                }
+                
+                .journey-highlight {
+                    display: flex;
+                    flex-direction: column;
+                    margin-bottom: 1.5rem;
+                }
+                
+                .journey-highlight-image {
+                    height: 250px;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    position: relative;
+                    margin-bottom: 1.5rem;
+                }
+                
+                .journey-highlight-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.5s ease;
+                }
+                
+                .journey-highlight:hover .journey-highlight-image img {
+                    transform: scale(1.05);
+                }
+                
+                .journey-milestones {
+                    display: flex;
+                    flex-direction: column;
+                    margin-bottom: 1.5rem;
+                }
+                
+                .journey-milestone {
+                    display: grid;
+                    grid-template-columns: auto 1fr;
+                    gap: 1rem;
+                    margin-bottom: 1.5rem;
+                    background: rgba(255, 255, 255, 0.03);
+                    border-radius: 10px;
+                    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    cursor: pointer;
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                }
+                
+                .journey-milestone:hover {
+                    background: rgba(255, 255, 255, 0.06);
+                    transform: translateX(5px) translateY(-2px);
+                    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+                }
+                
+                .milestone-left {
+                    padding: 1rem;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                }
+                
+                .milestone-year {
+                    background: var(--color-primary);
+                    color: var(--color-darker);
+                    padding: 0.5rem 1rem;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    text-align: center;
+                    display: inline-block;
+                    align-self: flex-start;
+                }
+                
+                .milestone-content {
+                    flex: 1;
+                }
+                
+                .milestone-content h4 {
+                    color: var(--color-light);
+                    margin-bottom: 0.5rem;
+                    font-size: 1.2rem;
+                }
+                
+                .milestone-content p {
+                    color: var(--color-gray);
+                    font-size: 0.95rem;
+                    line-height: 1.6;
+                }
+                
+                .milestone-image {
+                    width: 220px;
+                    height: 100%;
+                    overflow: hidden;
+                    border-left: 2px solid var(--color-primary);
+                    transition: all 0.3s ease;
+                    position: relative;
+                    z-index: 5;
+                }
+                
+                .milestone-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.7s cubic-bezier(0.33, 1, 0.68, 1);
+                }
+                
+                .journey-milestone:hover .milestone-image img {
+                    transform: scale(1.12);
+                }
+                
+                .milestone-image::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: linear-gradient(to right, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0) 100%);
+                    pointer-events: none;
+                }
+                
+                .milestone-image.expanded {
+                    position: fixed;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 90%;
+                    max-width: 900px;
+                    height: auto;
+                    aspect-ratio: 16/9;
+                    z-index: 1000;
+                    box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.8);
+                    border: none;
+                    border-radius: 10px;
+                }
+                
+                .milestone-image.expanded::after {
+                    display: none;
+                }
+                
+                .journey-cta {
+                    margin-top: 1.5rem;
+                    align-self: flex-start;
+                }
+                
+                /* Life Outside Tennis Styling */
+                .life-outside {
+                    background: rgba(26, 26, 26, 0.3);
+                    border-radius: 20px;
+                    padding: 2.5rem;
+                    height: 100%;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+                    --color-primary-rgb: 160, 235, 255;
+                }
+                
+                .life-outside .section-header {
+                    margin-bottom: 2rem;
+                }
+                
+                .life-outside .section-header h2 {
+                    color: var(--color-primary);
+                    font-size: 2rem;
+                    margin-bottom: 0.8rem;
+                }
+                
+                .life-intro {
+                    margin-bottom: 2rem;
+                    color: var(--color-gray);
+                    line-height: 1.7;
+                }
+                
+                .activities-container {
+                    display: grid;
+                    grid-template-columns: 1fr;
+                    gap: 2rem;
+                }
+                
+                .activity-card {
+                    display: flex;
+                    flex-direction: column;
+                    background: rgba(26, 26, 26, 0.5);
+                    border-radius: 16px;
+                    overflow: hidden;
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+                    border: 1px solid rgba(255, 255, 255, 0.05);
+                }
+                
+                .activity-card:hover {
+                    transform: translateY(-8px);
+                    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+                    border-color: rgba(var(--color-primary-rgb), 0.3);
+                }
+                
+                .activity-image {
+                    width: 100%;
+                    height: 220px;
+                    overflow: hidden;
+                    position: relative;
+                }
+                
+                .activity-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    transition: transform 0.5s ease;
+                    filter: brightness(1.05);
+                }
+                
+                .activity-image::after {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    bottom: 0;
+                    background: linear-gradient(to bottom, rgba(0,0,0,0) 60%, rgba(0,0,0,0.5) 100%);
+                    z-index: 1;
+                }
+                
+                .activity-card:hover .activity-image img {
+                    transform: scale(1.08);
+                }
+                
+                .activity-content {
+                    padding: 1.8rem;
+                    position: relative;
+                    z-index: 2;
+                }
+                
+                .activity-content h3 {
+                    font-size: 1.5rem;
+                    margin-bottom: 0.8rem;
+                    color: var(--color-primary);
+                    position: relative;
+                    display: inline-block;
+                }
+                
+                .activity-content h3::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -5px;
+                    left: 0;
+                    width: 40px;
+                    height: 2px;
+                    background-color: var(--color-primary);
+                }
+                
+                .activity-content p {
+                    color: var(--color-gray);
+                    font-size: 1rem;
+                    line-height: 1.7;
+                }
+                
+                /* Responsive Design */
+                @media (max-width: 1100px) {
+                    .split-container {
+                        grid-template-columns: 1fr;
+                        gap: 4rem;
+                    }
+                    
+                    .section-column {
+                        margin-bottom: 1rem;
+                    }
+                }
+                
+                @media (max-width: 768px) {
+                    .tennis-journey, .life-outside {
+                        padding: 2rem 1.5rem;
+                    }
+                    
+                    .journey-milestone {
+                        grid-template-columns: 1fr;
+                    }
+                    
+                    .milestone-image {
+                        width: 100%;
+                        height: 220px;
+                        border-left: none;
+                        border-top: 2px solid var(--color-primary);
+                    }
+                }
+
+                /* Remove grayscale filter from all images across the site */
+                img, .image, [class*="image"], [class*="img"] {
+                    filter: none !important;
+                }
+                
+                img:hover, .image:hover, [class*="image"]:hover, [class*="img"]:hover {
+                    filter: none !important;
+                }
+
+                /* Add a subtle pulse animation to encourage clicking */
+                @keyframes subtlePulse {
+                    0% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+                    50% { box-shadow: 0 5px 20px rgba(var(--color-primary-rgb), 0.2); }
+                    100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+                }
+                
+                .journey-milestone {
+                    animation: subtlePulse 4s infinite;
+                    animation-delay: var(--delay, 0s);
+                }
+                
+                .journey-milestone:nth-child(1) {
+                    --delay: 0s;
+                }
+                
+                .journey-milestone:nth-child(2) {
+                    --delay: 1s;
+                }
+                
+                .journey-milestone:nth-child(3) {
+                    --delay: 2s;
+                }
+                
+                .journey-milestone:nth-child(4) {
+                    --delay: 3s;
+                }
+
+                /* Logo Styling */
+                .logo-image {
+                    height: 70px; /* Increased from 60px */
+                    width: auto;
+                    transition: transform 0.3s ease;
+                    margin: 0;
+                    padding: 0;
+                    filter: none !important;
+                }
+
+                .logo {
+                    margin: 0;
+                    padding: 0;
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 1rem; /* Added margin below header logo */
+                }
+
+                .logo:hover .logo-image {
+                    transform: scale(1.1);
+                }
+
+                .footer-logo .logo-image {
+                    height: 100px; /* Standardized footer logo size */
+                    width: auto;
+                    margin: 0;
+                    padding: 0;
+                    filter: drop-shadow(0 0 10px rgba(160, 235, 255, 0.2));
+                }
+
+                .footer-logo:hover .logo-image {
+                    transform: scale(1.1);
+                    filter: drop-shadow(0 0 15px rgba(160, 235, 255, 0.3));
+                }
+
+                /* Ensure logo is visible on all pages */
+                header .logo {
+                    position: relative;
+                    z-index: 1000; /* Ensure logo stays above other elements */
+                }
+
+                /* Add subtle glow effect to logo */
+                .logo-image {
+                    filter: drop-shadow(0 0 10px rgba(160, 235, 255, 0.2));
+                }
+
+                .logo:hover .logo-image {
+                    filter: drop-shadow(0 0 15px rgba(160, 235, 255, 0.3));
+                }
+
+                /* Newsletter Section Styles */
+                .newsletter-section {
+                    text-align: center;
+                    padding: 2rem 0;
+                    max-width: 500px;
+                    margin: 0 auto;
+                }
+
+                .newsletter-section h3 {
+                    color: #fff;
+                    font-size: 1.5rem;
+                    margin-bottom: 0.5rem;
+                }
+
+                .newsletter-section p {
+                    color: rgba(255, 255, 255, 0.8);
+                    margin-bottom: 1.5rem;
+                }
+
+                .newsletter-form {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+
+                .form-group {
+                    display: flex;
+                    gap: 0.5rem;
+                }
+
+                #newsletter-email {
+                    flex: 1;
+                    padding: 0.8rem 1rem;
+                    border: none;
+                    border-radius: 4px;
+                    background: rgba(255, 255, 255, 0.1);
+                    color: #fff;
+                    font-size: 1rem;
+                    transition: all 0.3s ease;
+                    backdrop-filter: blur(5px);
+                    -webkit-backdrop-filter: blur(5px);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.1);
+                }
+
+                #newsletter-email:focus {
+                    outline: none;
+                    background: rgba(255, 255, 255, 0.15);
+                    border-color: rgba(0, 168, 255, 0.5);
+                    box-shadow: 0 0 0 3px rgba(0, 168, 255, 0.25), inset 0 2px 10px rgba(0, 0, 0, 0.1);
+                }
+
+                #newsletter-email::placeholder {
+                    color: rgba(255, 255, 255, 0.6);
+                }
+
+                .newsletter-button {
+                    padding: 0.8rem 1.5rem;
+                    background: linear-gradient(135deg, #00a8ff, #0097e6);
+                    color: white;
+                    border: none;
+                    border-radius: 4px;
+                    cursor: pointer;
+                    font-size: 1rem;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    transition: all 0.3s ease;
+                    box-shadow: 0 4px 15px rgba(0, 151, 230, 0.3);
+                    font-weight: 500;
+                    letter-spacing: 0.5px;
+                }
+
+                .newsletter-button:hover {
+                    background: linear-gradient(135deg, #0097e6, #0088cc);
+                    transform: translateY(-2px);
+                    box-shadow: 0 6px 18px rgba(0, 151, 230, 0.4);
+                }
+
+                .newsletter-button:active {
+                    transform: translateY(0);
+                    box-shadow: 0 2px 10px rgba(0, 151, 230, 0.3);
+                }
+
+                .newsletter-button i {
+                    font-size: 0.9rem;
+                    transition: transform 0.3s ease;
+                }
+
+                .newsletter-button:hover i {
+                    transform: translateX(3px);
+                }
+
+                .newsletter-message {
+                    color: #fff;
+                    font-size: 0.9rem;
+                    min-height: 1.5rem;
+                }
+
+                .newsletter-message.success {
+                    color: #4caf50;
+                }
+
+                .newsletter-message.error {
+                    color: #f44336;
+                }
+
+                @media (max-width: 768px) {
+                    .form-group {
+                        flex-direction: column;
+                    }
+
+                    .newsletter-button {
+                        width: 100%;
+                        justify-content: center;
+                    }
+                }
+            </style>
+            
+            <div class="container">
+                <div class="split-container">
+                    <!-- Tennis Journey Column -->
+                    <div class="section-column">
+                        <div class="tennis-journey">
+                            <div class="section-header">
+                                <h2 data-en="My Tennis Journey" data-de="Meine Tennis-Reise">Meine Tennis-Reise</h2>
+                                <p data-en="Key moments on my path to becoming a professional player" data-de="Wichtige Momente auf meinem Weg zum Profi-Spieler">Wichtige Momente auf meinem Weg zum Profi-Spieler</p>
+                            </div>
+                            
+                            <div class="journey-milestones">
+                                <div class="journey-milestone">
+                                    <div class="milestone-left">
+                                        <div class="milestone-year">2010</div>
+                                        <div class="milestone-content">
+                                            <h4 data-en="First Steps" data-de="Erste Schritte">Erste Schritte</h4>
+                                            <p data-en="Started playing tennis at the age of 6 years." data-de="Im Alter von 6 Jahren begann ich mit dem Tennisspielen.">Im Alter von 6 Jahren begann ich mit dem Tennisspielen.</p>
+                                            <p class="quote" data-en="I had so much fun playing tennis with my dad after his work or on the weekends in Seedorf (Uri)." data-de="Es hat mir so viel Spass gemacht, nach der Arbeit meines Vaters oder am Wochenende Tennis mit ihm in Seedorf (Uri) zu spielen.">"Es hat mir so viel Spass gemacht, nach der Arbeit meines Vaters oder am Wochenende Tennis mit ihm in Seedorf (Uri) zu spielen."</p>
+                                        </div>
+                                    </div>
+                                    <div class="milestone-image">
+                                        <img src="public/images/2009starttennis.jpg" alt="Young Nicola starting tennis">
+                                    </div>
+                                </div>
+                                
+                                <div class="journey-milestone">
+                                    <div class="milestone-left">
+                                        <div class="milestone-year">2014</div>
+                                        <div class="milestone-content">
+                                            <h4 data-en="Junior Interclub" data-de="Junior Interclub">Junior Interclub</h4>
+                                            <p data-en="At the age of 10 I Started competing in junior interclub tournaments. This was my first taste of competitive tennis and team play." data-de="Mit 10 Jahren begann ich an Junior-Interclub-Turnieren teilzunehmen. Dies war meine erste Erfahrung mit Wettkampftennis und Teamspiel.">Mit 10 Jahren begann ich an Junior-Interclub-Turnieren teilzunehmen. Dies war meine erste Erfahrung mit Wettkampftennis und Teamspiel.</p>
+                                            <p class="quote" data-en="Playing my first matches with my cousin and a friend of mine was so much fun and it was a great time for me." data-de="Meine ersten Matches mit meinem Cousin und einem Freund zu spielen, hat mir viel Spaß gemacht und es war eine tolle Zeit für mich.">"Meine ersten Matches mit meinem Cousin und einem Freund zu spielen, hat mir viel Spaß gemacht und es war eine tolle Zeit für mich."</p>
+                                        </div>
+                                    </div>
+                                    <div class="milestone-image">
+                                        <img src="public/images/junior 2014 interclub.jpg" alt="Junior Interclub">
+                                    </div>
+                                </div>
+                                
+                                <div class="journey-milestone">
+                                    <div class="milestone-left">
+                                        <div class="milestone-year">2023</div>
+                                        <div class="milestone-content">
+                                            <h4 data-en="Professional Debut" data-de="Professionelles Debüt">Professionelles Debüt</h4>
+                                            <p data-en="At the age of 19 I made my professional debut at the ITF Mens in Metzingen (GER). A big step in my tennis career, competing against professional players." data-de="Im Alter von 19 Jahren gab ich mein Profidebüt beim ITF Mens in Metzingen (GER). Ein grosser Schritt in meiner Tenniskarriere, im Wettkampf gegen Profispieler zu spielen.">Im Alter von 19 Jahren gab ich mein Profidebüt beim ITF Mens in Metzingen (GER). Ein grosser Schritt in meiner Tenniskarriere, im Wettkampf gegen Profispieler zu spielen.</p>
+                                            <p class="quote" data-en="My first pro match was nerve-wracking but amazing." data-de="Mein erstes Profi-Match war nervenaufreibend, aber großartig.">"Mein erstes Profi-Match war nervenaufreibend, aber großartig."</p>
+                                        </div>
+                                    </div>
+                                    <div class="milestone-image">
+                                        <img src="public/images/professionaldebut2023.jpg" alt="Professional Debut">
+                                    </div>
+                                </div>
+                                
+                                <div class="journey-milestone">
+                                    <div class="milestone-left">
+                                        <div class="milestone-year">2025</div>
+                                        <div class="milestone-content">
+                                            <h4 data-en="ITF Circuit" data-de="ITF Circuit">ITF Circuit</h4>
+                                            <p data-en="Currently playing ITF tournaments, working hard to improve my ranking and gain more experience." data-de="Spiele derzeit ITF-Turniere, arbeite hart daran, mein Ranking zu verbessern und mehr Erfahrung zu sammeln.">Spiele derzeit ITF-Turniere, arbeite hart daran, mein Ranking zu verbessern und mehr Erfahrung zu sammeln.</p>
+                                            <p class="quote" data-en="Every tournament teaches me something new." data-de="Jedes Turnier lehrt mich etwas Neues.">"Jedes Turnier lehrt mich etwas Neues."</p>
+                                        </div>
+                                    </div>
+                                    <div class="milestone-image">
+                                        <img src="public/images/IMG_9838.JPG" alt="ITF Circuit">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="journey-cta">
+                                <a href="updates.html" class="cta-button secondary">
+                                    <span data-en="Latest Results" data-de="Neueste Ergebnisse">Neueste Ergebnisse</span>
+                                    <div class="button-fx"></div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Life Outside Tennis Column -->
+                    <div class="section-column">
+                        <div class="life-outside">
+                            <div class="section-header">
+                                <h2 data-en="Life outside of the tennis court" data-de="Leben abseits des Tennisplatzes">Leben abseits des Tennisplatzes</h2>
+                                <p data-en="Balancing my professional career with other passions" data-de="Meine professionelle Karriere mit anderen Leidenschaften in Einklang bringen">Meine professionelle Karriere mit anderen Leidenschaften in Einklang bringen</p>
+                            </div>
+                            
+                            <div class="life-intro">
+                                <p data-en="I believe that maintaining interests outside of tennis helps me stay mentally fresh and brings new perspectives to my professional career. These activities reconnect me with nature and provide valuable contrast to the structured competitive environment of tennis." data-de="Ich glaube, dass die Pflege von Interessen außerhalb des Tennis mir hilft, geistig frisch zu bleiben und neue Perspektiven in meine professionelle Karriere einzubringen. Diese Aktivitäten verbinden mich wieder mit der Natur und bieten einen wertvollen Kontrast zur strukturierten Wettkampfumgebung des Tennis.">Ich glaube, dass die Pflege von Interessen außerhalb des Tennis mir hilft, geistig frisch zu bleiben und neue Perspektiven in meine professionelle Karriere einzubringen. Diese Aktivitäten verbinden mich wieder mit der Natur und bieten einen wertvollen Kontrast zur strukturierten Wettkampfumgebung des Tennis.</p>
+                            </div>
+                            
+                            <div class="activities-container">
+                                <div class="activity-card">
+                                    <div class="activity-image">
+                                        <img src="public/images/windsurf.jpg" alt="Nicola wingfoil">
+                                    </div>
+                                    <div class="activity-content">
+                                        <h3 data-en="WingFoil" data-de="WingFoil">WingFoil</h3>
+                                        <p data-en="When I'm not on the tennis court, you'll often find me on the water. WingFoil provides me with both physical challenges and mental relaxation. The Swiss lakes offer beautiful settings to practice this sport that I've enjoyed since my teenage years." data-de="Wenn ich nicht auf dem Tennisplatz bin, findet man mich oft auf dem Wasser. WingFoil bietet mir sowohl körperliche Herausforderungen als auch geistige Entspannung. Die Schweizer Seen bieten wunderschöne Kulissen, um diesen Sport zu praktizieren, den ich seit meiner Jugend genieße.">Wenn ich nicht auf dem Tennisplatz bin, findet man mich oft auf dem Wasser. WingFoil bietet mir sowohl körperliche Herausforderungen als auch geistige Entspannung. Die Schweizer Seen bieten wunderschöne Kulissen, um diesen Sport zu praktizieren, den ich seit meiner Jugend genieße.</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="activity-card">
+                                    <div class="activity-image">
+                                        <img src="public/images/Imagem WhatsApp 2025-04-27 às 21.13.57_0c178d46.jpg" alt="Nicola working at GIPO">
+                                    </div>
+                                    <div class="activity-content">
+                                        <h3 data-en="Academic Work" data-de="Berufliche Tätigkeit">Berufliche Tätigkeit</h3>
+                                        <p data-en="In addition to my career as a professional tennis player, I work part-time (50%) as a design engineer at GIPO AG. This combination allows me to pursue my passion for sports while also applying my technical skills in a professional environment" data-de="Neben meiner Karriere als professioneller Tennisspieler arbeite ich Teilzeit (50%) als Konstrukteur bei der GIPO AG. Diese Kombination ermöglicht es mir, meine Leidenschaft für Sport zu verfolgen und gleichzeitig meine technischen Fähigkeiten in einem professionellen Umfeld anzuwenden">Neben meiner Karriere als professioneller Tennisspieler arbeite ich Teilzeit (50%) als Konstrukteur bei der GIPO AG. Diese Kombination ermöglicht es mir, meine Leidenschaft für Sport zu verfolgen und gleichzeitig meine technischen Fähigkeiten in einem professionellen Umfeld anzuwenden</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sponsors Section -->
+        <section id="sponsors" class="sponsors">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-en="My Sponsors & Partners" data-de="Meine Sponsoren & Partner">Meine Sponsoren & Partner</h2>
+                    <p data-en="The amazing brands that support my tennis journey" data-de="Die großartigen Marken, die meine Tennis-Reise unterstützen">Die großartigen Marken, die meine Tennis-Reise unterstützen</p>
+                </div>
+                
+                <style>
+                    /* Simplified Sponsor Cards Grid */
+                    .sponsors-grid {
+                        display: grid;
+                        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                        gap: 2rem;
+                        margin-top: 2.5rem;
+                    }
+                    
+                    /* Partner slot styling */
+                    .partner-card {
+                        position: relative;
+                        border-radius: 12px;
+                        background: rgba(30, 30, 30, 0.5);
+                        border: 1px solid rgba(255, 255, 255, 0.05);
+                        transition: all 0.3s ease;
+                        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+                        overflow: hidden;
+                        display: flex;
+                        flex-direction: column;
+                        height: 100%;
+                    }
+                    
+                    .partner-card:hover {
+                        transform: translateY(-5px);
+                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+                        background: rgba(40, 40, 40, 0.6);
+                    }
+                    
+                    .partner-badge {
+                        position: absolute;
+                        top: 15px;
+                        right: 15px;
+                        font-size: 0.8rem;
+                        font-weight: 600;
+                        padding: 5px 12px;
+                        border-radius: 30px;
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        z-index: 5;
+                    }
+                    
+                    .partner-badge.main {
+                        background: linear-gradient(135deg, #FFD700, #FFA500);
+                        color: #000;
+                    }
+                    
+                    .partner-badge.outfitter {
+                        background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                        color: #fff;
+                    }
+                    
+                    .partner-header {
+                        padding: 25px 25px 15px;
+                        display: flex;
+                        align-items: center;
+                    }
+                    
+                    .partner-logo {
+                        width: 80px;
+                        height: 80px;
+                        object-fit: contain;
+                        margin-right: 15px;
+                        background: #fff;
+                        padding: 10px;
+                        border-radius: 8px;
+                        filter: none !important;
+                    }
+                    
+                    .partner-name {
+                        font-size: 1.5rem;
+                        color: #fff;
+                        margin: 0 0 5px 0;
+                    }
+                    
+                    .partner-content {
+                        padding: 0 25px 25px;
+                        flex-grow: 1;
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    
+                    .partner-description {
+                        font-size: 0.95rem;
+                        color: #ccc;
+                        line-height: 1.6;
+                        margin-bottom: 20px;
+                        flex-grow: 1;
+                    }
+                    
+                    .partner-link {
+                        margin-top: auto;
+                    }
+                    
+                    .visit-partner {
+                        display: inline-flex;
+                        align-items: center;
+                        color: var(--color-primary);
+                        font-weight: 500;
+                        font-size: 0.95rem;
+                        text-decoration: none;
+                        padding: 8px 0;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .visit-partner i {
+                        margin-left: 8px;
+                        transition: transform 0.3s ease;
+                    }
+                    
+                    .visit-partner:hover {
+                        color: #fff;
+                    }
+                    
+                    .visit-partner:hover i {
+                        transform: translateX(5px);
+                    }
+                    
+                    /* Available partner card styling */
+                    .available-card {
+                        background: rgba(30, 30, 30, 0.3);
+                        border: 1px dashed rgba(var(--color-primary-rgb), 0.5);
+                    }
+                    
+                    .available-card:hover {
+                        background: rgba(40, 40, 40, 0.4);
+                        border: 1px dashed rgba(var(--color-primary-rgb), 0.8);
+                    }
+                    
+                    .available-icon {
+                        width: 80px;
+                        height: 80px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(var(--color-primary-rgb), 0.1);
+                        border-radius: 8px;
+                        margin-right: 15px;
+                    }
+                    
+                    .available-icon i {
+                        font-size: 2rem;
+                        color: var(--color-primary);
+                    }
+                    
+                    .partner-badge.available {
+                        background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.6), rgba(var(--color-primary-rgb), 0.3));
+                        color: #fff;
+                    }
+                    
+                    /* Responsive adjustments */
+                    @media (max-width: 992px) {
+                        .sponsors-grid {
+                            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+                        }
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .sponsors-grid {
+                            grid-template-columns: 1fr;
+                            max-width: 400px;
+                            margin-left: auto;
+                            margin-right: auto;
+                        }
+                    }
+                </style>
+                
+                <!-- Sponsors Grid -->
+                <div class="sponsors-grid">
+                    <!-- GIPO -->
+                    <div class="partner-card">
+                        <div class="partner-badge"></div>
+                        <div class="partner-header">
+                            <img src="public/images/gipo.png" alt="GIPO" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">GIPO</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="Local company dedicated to supporting my tennis journey through reliable resources and community engagement." data-de="Lokales Unternehmen, das meine Tennis-Reise durch zuverlässige Ressourcen und Engagement in der Gemeinschaft unterstützt.">Lokales Unternehmen, das meine Tennis-Reise durch zuverlässige Ressourcen und Engagement in der Gemeinschaft unterstützt.</p>
+                            <div class="partner-link">
+                                <a href="https://www.gipo.ch" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Imholz Sport -->
+                    <div class="partner-card">
+                        <div class="partner-badge"></div>
+                        <div class="partner-header">
+                            <img src="public/images/imholzsport .jpg" alt="Imholz Sport" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">Imholz Sport</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="My local sports store providing quality equipment and personalized expertise for all my tennis needs." data-de="Mein lokales Sportgeschäft, das qualitativ hochwertige Ausrüstung und persönliche Expertise für alle meine Tennis-Bedürfnisse bietet.">Mein lokales Sportgeschäft, das qualitativ hochwertige Ausrüstung und persönliche Expertise für alle meine Tennis-Bedürfnisse bietet.</p>
+                            <div class="partner-link">
+                                <a href="https://www.imholzsport.ch/" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Head - Outfitter -->
+                    <div class="partner-card">
+                        <div class="partner-badge outfitter" data-en="Outfitter" data-de="Ausrüster">Ausrüster</div>
+                        <div class="partner-header">
+                            <img src="public/images/Head-Logo.jpg" alt="Head" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">Head</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="My official tennis equipment provider, supplying high-performance racquets and gear for optimal play." data-de="Mein offizieller Tennis-Ausrüster, der hochleistungsfähige Schläger und Ausrüstung für optimales Spiel liefert.">Mein offizieller Tennis-Ausrüster, der hochleistungsfähige Schläger und Ausrüstung für optimales Spiel liefert.</p>
+                            <div class="partner-link">
+                                <a href="https://www.head.com" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Available Main Partner Slot -->
+                    <div class="partner-card available-card">
+                        <div class="partner-badge main" data-en="Available" data-de="Verfügbar">Verfügbar</div>
+                        <div class="partner-header">
+                            <div class="available-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="partner-title">
+                                <h3 class="partner-name">Premium Position</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="Secure this exclusive Main Partnership position for maximum exposure and brand visibility." data-de="Sichern Sie sich diese exklusive Hauptpartnerposition für maximale Sichtbarkeit Ihrer Marke.">Sichern Sie sich diese exklusive Hauptpartnerposition für maximale Sichtbarkeit Ihrer Marke.</p>
+                            <div class="partner-link">
+                                <a href="#contact" class="visit-partner">
+                                    <span data-en="Become a partner" data-de="Partner werden">Partner werden</span> <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Available Bronze Partner Slot -->
+                    <div class="partner-card available-card">
+                        <div class="partner-badge bronze" data-en="Available" data-de="Verfügbar">Verfügbar</div>
+                        <div class="partner-header">
+                            <div class="available-icon">
+                                <i class="fas fa-medal"></i>
+                            </div>
+                            <div class="partner-title">
+                                <h3 class="partner-name" data-en="Your Brand Here" data-de="Ihre Marke hier">Ihre Marke hier</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="Become a Bronze Partner with quality exposure and connect your brand to my growing tennis career." data-de="Werden Sie Bronze-Partner mit hochwertiger Präsenz und verbinden Sie Ihre Marke mit meiner wachsenden Tennis-Karriere.">Werden Sie Bronze-Partner mit hochwertiger Präsenz und verbinden Sie Ihre Marke mit meiner wachsenden Tennis-Karriere.</p>
+                            <div class="partner-link">
+                                <a href="#contact" class="visit-partner">
+                                    <span data-en="Join" data-de="Beitreten">Beitreten</span> <i class="fas fa-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="partnership-download">
+                    <a href="pdf/Sponsoring_Pack_V1.pdf" class="cta-button primary download-btn" download="Sponsoring_Pack_V1.pdf" type="application/pdf" id="sponsoring-pdf-download-about">
+                        <i class="fas fa-file-pdf"></i>
+                        <span data-en="Check out all sponsor possibilities" data-de="Alle Sponsoring-Möglichkeiten ansehen">Alle Sponsoring-Möglichkeiten ansehen</span>
+                        <div class="button-fx"></div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="contact-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-en="Get in Touch" data-de="Kontaktieren Sie mich">Kontaktieren Sie mich</h2>
+                    <p data-en="Feel free to contact me for partnerships, media inquiries, or just to say hello" data-de="Kontaktieren Sie mich gerne für Partnerschaften, Medienanfragen oder einfach, um Hallo zu sagen">Kontaktieren Sie mich gerne für Partnerschaften, Medienanfragen oder einfach, um Hallo zu sagen</p>
+                </div>
+                
+                <style>
+                    /* Contact Section Styling */
+                    .contact-section {
+                        background: var(--color-darker);
+                        padding: 5rem 0;
+                        position: relative;
+                    }
+                    
+                    .contact-content {
+                        display: grid;
+                        grid-template-columns: 3fr 2fr;
+                        gap: 3rem;
+                        margin-top: 2rem;
+                    }
+                    
+                    /* Form Styling */
+                    .contact-form-container {
+                        background: rgba(30, 30, 30, 0.5);
+                        border-radius: 12px;
+                        padding: 2.5rem;
+                        border: 1px solid rgba(255, 255, 255, 0.05);
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .contact-form {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.2rem;
+                    }
+                    
+                    .form-control {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 0.5rem;
+                    }
+                    
+                    .form-control label {
+                        font-size: 0.95rem;
+                        color: #ddd;
+                        margin-bottom: 0.3rem;
+                    }
+                    
+                    .contact-form input,
+                    .contact-form textarea {
+                        width: 100%;
+                        padding: 12px 15px;
+                        background: rgba(255, 255, 255, 0.05);
+                        border: 1px solid rgba(255, 255, 255, 0.1);
+                        border-radius: 8px;
+                        color: #fff;
+                        font-family: inherit;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .contact-form input:focus,
+                    .contact-form textarea:focus {
+                        outline: none;
+                        border-color: var(--color-primary);
+                        background: rgba(255, 255, 255, 0.08);
+                        box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.25);
+                    }
+                    
+                    .contact-form textarea {
+                        resize: vertical;
+                        min-height: 120px;
+                    }
+                    
+                    .submit-btn {
+                        background: var(--color-primary);
+                        color: var(--color-darker);
+                        border: none;
+                        padding: 12px 24px;
+                        font-weight: 600;
+                        border-radius: 8px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
+                        margin-top: 0.5rem;
+                        font-size: 1rem;
+                        display: inline-block;
+                        width: auto;
+                        align-self: flex-start;
+                    }
+                    
+                    .submit-btn:hover {
+                        background: #fff;
+                        transform: translateY(-2px);
+                        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+                    }
+                    
+                    .form-status {
+                        margin-top: 1rem;
+                        padding: 10px;
+                        border-radius: 8px;
+                        font-size: 0.95rem;
+                    }
+                    
+                    .form-status.success {
+                        background: rgba(46, 213, 115, 0.15);
+                        color: #2ed573;
+                        border: 1px solid rgba(46, 213, 115, 0.3);
+                    }
+                    
+                    .form-status.error {
+                        background: rgba(255, 71, 87, 0.15);
+                        color: #ff4757;
+                        border: 1px solid rgba(255, 71, 87, 0.3);
+                    }
+                    
+                    .form-status.loading {
+                        background: rgba(var(--color-primary-rgb), 0.15);
+                        color: var(--color-primary);
+                        border: 1px solid rgba(var(--color-primary-rgb), 0.3);
+                    }
+                    
+                    /* Contact Info Styling */
+                    .contact-info {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.5rem;
+                    }
+                    
+                    .info-card {
+                        display: flex;
+                        align-items: flex-start;
+                        gap: 1rem;
+                        background: rgba(30, 30, 30, 0.5);
+                        border-radius: 12px;
+                        padding: 1.5rem;
+                        border: 1px solid rgba(255, 255, 255, 0.05);
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .info-card:hover {
+                        background: rgba(40, 40, 40, 0.6);
+                        transform: translateY(-3px);
+                        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .info-icon {
+                        width: 42px;
+                        height: 42px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: rgba(var(--color-primary-rgb), 0.15);
+                        border-radius: 50%;
+                        font-size: 1rem;
+                        color: var(--color-primary);
+                    }
+                    
+                    .info-content {
+                        flex: 1;
+                    }
+                    
+                    .info-content h3 {
+                        font-size: 1.1rem;
+                        margin-bottom: 0.5rem;
+                        color: #fff;
+                    }
+                    
+                    .info-content p,
+                    .info-content a {
+                        color: #ccc;
+                        text-decoration: none;
+                        transition: color 0.3s ease;
+                    }
+                    
+                    .info-content a:hover {
+                        color: var(--color-primary);
+                    }
+                    
+                    /* Responsive styles */
+                    @media (max-width: 992px) {
+                        .contact-content {
+                            grid-template-columns: 1fr;
+                        }
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .contact-form-container {
+                            padding: 1.5rem;
+                        }
+                        
+                        .contact-form input,
+                        .contact-form textarea {
+                            padding: 10px 12px;
+                        }
+                    }
+                </style>
+                
+                <div class="contact-content">
+                    <div class="contact-form-container">
+                        <form id="contactForm" class="contact-form" action="https://formspree.io/f/xdkgkyaq" method="POST">
+                            <div class="form-control">
+                                <label for="name" data-en="Name" data-de="Name">Name</label>
+                                <input type="text" id="name" name="name" required placeholder="Ihr Name" data-en-placeholder="Your Name" data-de-placeholder="Ihr Name">
+                            </div>
+                            
+                            <div class="form-control">
+                                <label for="email" data-en="Email" data-de="E-Mail">E-Mail</label>
+                                <input type="email" id="email" name="email" required placeholder="Ihre E-Mail-Adresse" data-en-placeholder="Your Email Address" data-de-placeholder="Ihre E-Mail Adresse">
+                            </div>
+                            
+                            <div class="form-control">
+                                <label for="subject" data-en="Subject" data-de="Betreff">Betreff</label>
+                                <input type="text" id="subject" name="subject" required placeholder="Betreff Ihrer Nachricht" data-en-placeholder="Message Subject" data-de-placeholder="Betreff Ihrer Nachricht">
+                            </div>
+                            
+                            <div class="form-control">
+                                <label for="message" data-en="Message" data-de="Nachricht">Nachricht</label>
+                                <textarea id="message" name="message" required placeholder="Ihre Nachricht..." data-en-placeholder="Your Message..." data-de-placeholder="Ihre Nachricht..."></textarea>
+                            </div>
+                            
+                            <div class="form-control">
+                                <button type="submit" class="submit-btn" data-en="Send Message" data-de="Nachricht senden">Nachricht senden</button>
+                            </div>
+                            
+                            <div id="form-status" class="form-status"></div>
+                        </form>
+                    </div>
+                    
+                    <div class="contact-info">
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3 data-en="Email" data-de="E-Mail">E-Mail</h3>
+                                <p><a href="mailto:contact@nicola-senn.ch">contact@nicola-senn.ch</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3 data-en="Location" data-de="Standort">Standort</h3>
+                                <p data-en="Based in Uri, Switzerland" data-de="Ansässig in Uri, Schweiz">Ansässig in Uri, Schweiz</p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fab fa-instagram"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3 data-en="Social Media" data-de="Soziale Medien">Soziale Medien</h3>
+                                <p><a href="https://www.instagram.com/senn_nicola/" target="_blank" rel="noopener noreferrer">@senn_nicola</a></p>
+                            </div>
+                        </div>
+                        
+                        <div class="info-card">
+                            <div class="info-icon">
+                                <i class="fab fa-whatsapp"></i>
+                            </div>
+                            <div class="info-content">
+                                <h3 data-en="WhatsApp" data-de="WhatsApp">WhatsApp</h3>
+                                <p><a href="https://whatsapp.com/channel/0029VadmV4t6xCSSIpPQFn14" target="_blank" rel="noopener noreferrer" data-en="Join my channel" data-de="Kanal beitreten">Kanal beitreten</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div class="cutstudios-badge">
+        <a href="https://www.instagram.com/cutstudios.pt/" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-logo">
+            <a href="index.html">
+                <img src="public/images/NICOLA logo.png" alt="Nicola Senn Logo" class="logo-image">
+            </a>
+        </div>
+        
+        <div class="social-icons">
+            <a href="https://www.instagram.com/nicola_senn/" target="_blank" class="social-icon" aria-label="Instagram">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <a href="https://www.facebook.com/nicola.senn.33" target="_blank" class="social-icon" aria-label="Facebook">
+                <i class="fab fa-facebook"></i>
+            </a>
+            <a href="https://whatsapp.com/channel/0029VadmV4t6xCSSIpPQFn14" target="_blank" class="social-icon" aria-label="WhatsApp Channel">
+                <i class="fab fa-whatsapp"></i>
+            </a>
+        </div>
+
+        <nav class="footer-nav">
+            <a href="index.html" data-en="Home" data-de="Startseite">Startseite</a>
+            <a href="about.html" data-en="About" data-de="Über mich">Über mich</a>
+            <a href="team.html" data-en="Team" data-de="Team">Team</a>
+            <a href="updates.html" data-en="Updates" data-de="Updates">Updates</a>
+            <a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a>
+            <a href="about.html#contact" data-en="Contact" data-de="Kontakt">Kontakt</a>
+        </nav>
+
+        <div class="copyright">
+            © 2025 Nicola Senn. <span data-en="All rights reserved." data-de="Alle Rechte vorbehalten.">Alle Rechte vorbehalten.</span>
+        </div>
+    </footer>
+
+    <!-- PDF Viewer Modal -->
+    <div id="pdf-viewer-modal" class="pdf-modal">
+        <div class="pdf-modal-content">
+            <div class="pdf-modal-header">
+                <h3 id="pdf-modal-title">Sponsoring Options</h3>
+                <button class="pdf-modal-close"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="pdf-modal-body">
+                <div class="sponsor-image-container">
+                    <img src="public/images/Sponsoring_Pack_V1-1.png" alt="Sponsoring Options" class="sponsor-detail-image">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .pdf-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .pdf-modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+        }
+        
+        .pdf-modal-content {
+            background: #1a1a1a;
+            width: 90%;
+            max-width: 1200px;
+            max-height: 90vh;
+            border-radius: 8px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            flex-direction: column;
+            animation: modalIn 0.3s ease-out forwards;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+        
+        @keyframes modalIn {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .pdf-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .pdf-modal-header h3 {
+            color: var(--color-primary);
+            margin: 0;
+            font-size: 1.4rem;
+        }
+        
+        .pdf-modal-close {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .pdf-modal-close:hover {
+            color: var(--color-primary);
+            transform: rotate(90deg);
+        }
+        
+        .pdf-modal-body {
+            flex: 1;
+            padding: 0;
+            overflow: auto;
+            background: #fff;
+            border-radius: 0 0 8px 8px;
+        }
+        
+        .sponsor-image-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            overflow: auto;
+            max-height: calc(90vh - 60px);
+            background: #fff;
+        }
+        
+        .sponsor-detail-image {
+            max-width: 100%;
+            height: auto;
+            display: block;
+            object-fit: contain;
+            filter: none !important;
+        }
+        
+        @media (max-width: 768px) {
+            .pdf-modal-content {
+                width: 95%;
+                height: auto;
+                max-height: 85vh;
+            }
+            
+            .sponsor-image-container {
+                max-height: calc(85vh - 60px);
+            }
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const newsletterForm = document.getElementById('newsletter-form');
+            const newsletterMessage = document.getElementById('newsletter-message');
+
+            if (newsletterForm) {
+                newsletterForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    const email = this.querySelector('input[type="email"]').value;
+                    
+                    try {
+                        const response = await fetch('https://api.brevo.com/v3/contacts', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'api-key': config.BREVO_API_KEY
+                            },
+                            body: JSON.stringify({ email, listIds: [7] })
+                        });
+
+                        if (response.ok) {
+                            newsletterMessage.textContent = 'Thank you for subscribing!';
+                            newsletterMessage.style.color = '#4CAF50';
+                            this.reset();
+                        } else {
+                            const data = await response.json();
+                            newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
+                            newsletterMessage.style.color = '#f44336';
+                        }
+                    } catch (error) {
+                        newsletterMessage.textContent = 'Error subscribing to newsletter';
+                        newsletterMessage.style.color = '#f44336';
+                    }
+                });
+            }
+        });
+
+        // Enhanced language switcher that handles placeholders
+        document.addEventListener('DOMContentLoaded', function() {
+            // Language selector
+            const langButtons = document.querySelectorAll('.lang-btn');
+            langButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    enhancedSetLanguage(lang);
+                    // Update active state
+                    langButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Check for saved language preference
+            const savedLang = localStorage.getItem('language') || 'de';
+            enhancedSetLanguage(savedLang);
+            
+            // Set active class on the appropriate language button
+            document.querySelector(`.lang-btn[data-lang="${savedLang}"]`)?.classList.add('active');
+        });
+
+        // Enhanced setLanguage function that handles input placeholders
+        function enhancedSetLanguage(lang) {
+            // Handle text content
+            const elements = document.querySelectorAll('[data-en], [data-de]');
+            elements.forEach(element => {
+                if (element.getAttribute(`data-${lang}`)) {
+                    element.textContent = element.getAttribute(`data-${lang}`);
+                }
+            });
+
+            // Handle placeholders
+            const inputElements = document.querySelectorAll('input[data-en-placeholder], input[data-de-placeholder], textarea[data-en-placeholder], textarea[data-de-placeholder]');
+            inputElements.forEach(input => {
+                if (input.getAttribute(`data-${lang}-placeholder`)) {
+                    input.placeholder = input.getAttribute(`data-${lang}-placeholder`);
+                }
+            });
+
+            // Save language preference
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+        }
+    </script>
+</body>
+</html>
