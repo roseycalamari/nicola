@@ -1070,6 +1070,280 @@
                 background: rgba(255, 255, 255, 0.3);
             }
         }
+
+        /* Dynamic Creative Newsletter */
+        .newsletter-creative {
+            padding: 4rem 0;
+            background: linear-gradient(135deg, #121212, #1a1a1a);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .newsletter-box {
+            background: rgba(40, 40, 40, 0.7);
+            border-radius: 16px;
+            overflow: hidden;
+            display: flex;
+            position: relative;
+            max-width: 900px;
+            margin: 0 auto;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .newsletter-graphic {
+            flex: 0 0 40%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        
+        .newsletter-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            display: block;
+            max-height: 100%;
+            filter: none !important;
+        }
+        
+        .circle-1, .circle-2 {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .circle-1 {
+            width: 150px;
+            height: 150px;
+            top: -30px;
+            left: -30px;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        .circle-2 {
+            width: 100px;
+            height: 100px;
+            bottom: -20px;
+            right: -20px;
+            animation: float 7s ease-in-out infinite reverse;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+        
+        .newsletter-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+        }
+        
+        .newsletter-icon i {
+            font-size: 1.6rem;
+            color: #fff;
+        }
+        
+        .newsletter-content {
+            flex: 1;
+            padding: 2.5rem;
+        }
+        
+        .newsletter-creative h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #fff, #ccc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .newsletter-creative h3::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--color-primary);
+            border-radius: 2px;
+        }
+        
+        .newsletter-creative p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1.8rem;
+            max-width: 90%;
+        }
+        
+        .newsletter-form {
+            position: relative;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        #newsletter-email {
+            flex: 1;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #fff;
+            transition: all 0.3s ease;
+        }
+        
+        #newsletter-email:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        #newsletter-email::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+        
+        .newsletter-button {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0 1.5rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .newsletter-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+        }
+        
+        .newsletter-button:hover {
+            background: #0088cc;
+            transform: translateY(-2px);
+        }
+        
+        .newsletter-button:hover::before {
+            transform: translateX(100%);
+            transition: transform 0.8s ease;
+        }
+        
+        .newsletter-button i {
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .newsletter-button:hover i {
+            transform: translateX(3px);
+        }
+        
+        .newsletter-message {
+            min-height: 1.5rem;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        /* Success animation */
+        .newsletter-success {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+            animation: fadeIn 0.5s forwards;
+            text-align: center;
+            padding: 1rem 0;
+        }
+        
+        .success-icon {
+            color: #4CAF50;
+            font-size: 2.5rem;
+            animation: scaleIn 0.5s forwards;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes scaleIn {
+            from { transform: scale(0.5); }
+            to { transform: scale(1); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .newsletter-box {
+                flex-direction: column;
+            }
+            
+            .newsletter-graphic {
+                flex: 0 0 200px;
+            }
+            
+            .newsletter-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .newsletter-content {
+                padding: 2rem;
+            }
+            
+            .newsletter-creative h3 {
+                font-size: 1.8rem;
+            }
+            
+            .newsletter-creative p {
+                margin-bottom: 1.5rem;
+                max-width: 100%;
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .form-row {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .newsletter-button {
+                width: 100%;
+                justify-content: center;
+                padding: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body class="updates-page">
@@ -1091,6 +1365,7 @@
                 <li><a href="team.html" data-en="Team" data-de="Team">Team</a></li>
                 <li><a href="updates.html" class="active" data-en="Updates" data-de="Updates">Updates</a></li>
                 <li><a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a></li>
+                <li><a href="https://donate.stripe.com/4gw5mYd6WeSG67CdQQ" target="_blank" class="support-btn" data-en="Support" data-de="Unterstützen"><i class="fas fa-heart"></i> Unterstützen</a></li>
                 <li><a href="about.html#contact" class="contact-btn" data-en="Contact" data-de="Kontakt">Kontakt</a></li>
             </ul>
             <div class="language-selector">
@@ -1166,6 +1441,31 @@
         </div>
     </main>
 
+    <!-- Newsletter Section -->
+    <section class="newsletter-creative">
+        <div class="container">
+            <div class="newsletter-box">
+                <div class="newsletter-graphic">
+                    <img src="public/images/website on the making NICO.png?v=2" alt="Nicola Senn Newsletter" class="newsletter-image">
+                </div>
+                <div class="newsletter-content">
+                    <h3 data-en="Stay Updated" data-de="Bleibe auf dem Laufenden">Bleibe auf dem Laufenden</h3>
+                    <p data-en="Get the latest news about tournaments, training insights and exclusive content" data-de="Erhalte die neuesten Nachrichten über Turniere, Trainingseinblicke und exklusive Inhalte">Erhalte die neuesten Nachrichten über Turniere, Trainingseinblicke und exklusive Inhalte</p>
+                    <form id="newsletter-form" class="newsletter-form">
+                        <div class="form-row">
+                            <input type="email" id="newsletter-email" name="email" required placeholder="email@example.com">
+                            <button type="submit" class="newsletter-button">
+                                <span data-en="Subscribe" data-de="Abonnieren">Abonnieren</span>
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div id="newsletter-message" class="newsletter-message"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <footer class="footer">
         <div class="footer-logo">
             <a href="index.html">
@@ -1191,6 +1491,7 @@
             <a href="team.html" data-en="Team" data-de="Team">Team</a>
             <a href="updates.html" data-en="Updates" data-de="Updates">Updates</a>
             <a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a>
+            <a href="https://donate.stripe.com/4gw5mYd6WeSG67CdQQ" target="_blank" class="support-btn" data-en="Support" data-de="Unterstützen"><i class="fas fa-heart"></i> Unterstützen</a>
             <a href="about.html#contact" data-en="Contact" data-de="Kontakt">Kontakt</a>
         </nav>
 
@@ -1215,6 +1516,13 @@
                 <div id="modal-content" class="glass-modal-body"></div>
             </div>
         </div>
+    </div>
+
+    <div class="cutstudios-badge">
+        <a href="https://www.instagram.com/cutstudios.pt/" target="_blank" rel="noopener noreferrer">
+            <span>created by</span>
+            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
+        </a>
     </div>
 
     <script>
@@ -1324,15 +1632,36 @@
             loadUpdates();
             loadGalleries();
 
-            // Initialize language buttons
+            // Language selector
             const langButtons = document.querySelectorAll('.lang-btn');
             langButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    currentLanguage = this.getAttribute('data-lang');
-                    localStorage.setItem('language', currentLanguage);
+                    const lang = this.getAttribute('data-lang');
+                    setLanguage(lang);
+                    // Update active state
+                    langButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
                     loadUpdates(); // Reload updates with new language
                 });
             });
+
+            // Check for saved language preference and apply it immediately
+            const savedLang = localStorage.getItem('language') || 'de';
+            
+            // Set active class on the appropriate language button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === savedLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Apply the language immediately on page load
+            setTimeout(() => {
+                setLanguage(savedLang);
+                currentLanguage = savedLang; // Ensure current language is set for date formatting
+            }, 0);
             
             // Add intersection observer for lazy loading images
             if ('IntersectionObserver' in window) {
@@ -1355,6 +1684,33 @@
                 });
             }
         });
+        
+        // Set language function
+        function setLanguage(lang) {
+            // Handle text content for all elements with data attributes
+            const elements = document.querySelectorAll('[data-en], [data-de]');
+            elements.forEach(element => {
+                if (element.getAttribute(`data-${lang}`)) {
+                    element.textContent = element.getAttribute(`data-${lang}`);
+                }
+            });
+
+            // Handle placeholders
+            const inputElements = document.querySelectorAll('input[data-en-placeholder], input[data-de-placeholder], textarea[data-en-placeholder], textarea[data-de-placeholder]');
+            inputElements.forEach(input => {
+                if (input.getAttribute(`data-${lang}-placeholder`)) {
+                    input.placeholder = input.getAttribute(`data-${lang}-placeholder`);
+                }
+            });
+
+            // Save language preference
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+            currentLanguage = lang;
+            
+            // Also update any dynamic content that might have been added after initial load
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+        }
         
         // View update details function
         async function viewUpdateDetails(updateId) {
@@ -1857,38 +2213,49 @@
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
+                    // Show loading state
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    submitButton.disabled = true;
+                    
                     try {
-                        const response = await fetch('https://api.brevo.com/v3/contacts', {
+                        const response = await fetch('/api/subscribe', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'api-key': config.BREVO_API_KEY
-                            },
-                            body: JSON.stringify({ email, listIds: [7] })
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email })
                         });
-
+                        const data = await response.json();
                         if (response.ok) {
-                            newsletterMessage.textContent = 'Thank you for subscribing!';
-                            newsletterMessage.style.color = '#4CAF50';
-                            this.reset();
+                            // Replace form with success animation
+                            newsletterForm.innerHTML = `
+                                <div class="newsletter-success">
+                                    <div class="success-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h4 data-en="Thank You!" data-de="Vielen Dank!">Vielen Dank!</h4>
+                                    <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
+                                </div>
+                            `;
                         } else {
-                            const data = await response.json();
                             newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
                             newsletterMessage.style.color = '#f44336';
+                            
+                            // Reset button
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
                         }
                     } catch (error) {
                         newsletterMessage.textContent = 'Error subscribing to newsletter';
                         newsletterMessage.style.color = '#f44336';
+                        
+                        // Reset button
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
                     }
                 });
             }
         });
     </script>
-    <div class="cutstudios-badge">
-        <a href="https://www.instagram.com/cutstudios.pt/" target="_blank" rel="noopener noreferrer">
-            <span>created by</span>
-            <img src="public/images/logo normal site png.png" alt="CUT STUDIOS" class="cut-logo">
-        </a>
-    </div>
 </body>
 </html>

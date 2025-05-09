@@ -35,6 +35,7 @@
                 <li><a href="team.html" data-en="Team" data-de="Team">Team</a></li>
                 <li><a href="updates.html" data-en="Updates" data-de="Updates">Updates</a></li>
                 <li><a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a></li>
+                <li><a href="https://donate.stripe.com/4gw5mYd6WeSG67CdQQ" target="_blank" class="support-btn" data-en="Support" data-de="Unterstützen"><i class="fas fa-heart"></i> Unterstützen</a></li>
                 <li><a href="about.html#contact" class="contact-btn" data-en="Contact" data-de="Kontakt">Kontakt</a></li>
             </ul>
             <div class="language-selector">
@@ -1537,7 +1538,7 @@
                 </div>
                 
                 <style>
-                    /* Simplified Sponsor Cards Grid */
+                    /* Completely redesigned Partner Cards */
                     .sponsors-grid {
                         display: grid;
                         grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -1545,56 +1546,82 @@
                         margin-top: 2.5rem;
                     }
                     
-                    /* Partner slot styling */
                     .partner-card {
                         position: relative;
-                        border-radius: 12px;
-                        background: rgba(30, 30, 30, 0.5);
-                        border: 1px solid rgba(255, 255, 255, 0.05);
-                        transition: all 0.3s ease;
-                        box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+                        border-radius: 16px;
+                        background: rgba(20, 20, 20, 0.2);
                         overflow: hidden;
                         display: flex;
                         flex-direction: column;
                         height: 100%;
+                        transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+                        border: 1px solid rgba(255, 255, 255, 0.03);
+                    }
+                    
+                    .partner-card::before {
+                        content: '';
+                        position: absolute;
+                        inset: 0;
+                        background: linear-gradient(
+                            135deg,
+                            rgba(255, 255, 255, 0.03) 0%,
+                            rgba(255, 255, 255, 0) 50%
+                        );
+                        z-index: 1;
+                        opacity: 0;
+                        transition: opacity 0.5s ease;
                     }
                     
                     .partner-card:hover {
-                        transform: translateY(-5px);
-                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-                        background: rgba(40, 40, 40, 0.6);
+                        transform: translateY(-8px);
+                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+                        border-color: rgba(var(--color-primary-rgb, 0, 168, 255), 0.2);
+                    }
+                    
+                    .partner-card:hover::before {
+                        opacity: 1;
                     }
                     
                     .partner-badge {
                         position: absolute;
                         top: 15px;
                         right: 15px;
-                        font-size: 0.8rem;
+                        font-size: 0.75rem;
                         font-weight: 600;
                         padding: 5px 12px;
                         border-radius: 30px;
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                         z-index: 5;
+                        backdrop-filter: blur(5px);
+                        -webkit-backdrop-filter: blur(5px);
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .partner-card:hover .partner-badge {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
                     }
                     
                     .partner-badge.main {
-                        background: linear-gradient(135deg, #FFD700, #FFA500);
+                        background: linear-gradient(135deg, rgba(255, 215, 0, 0.85), rgba(255, 165, 0, 0.85));
                         color: #000;
                     }
                     
                     .partner-badge.silver {
-                        background: linear-gradient(135deg, #C0C0C0, #E8E8E8);
+                        background: linear-gradient(135deg, rgba(192, 192, 192, 0.85), rgba(232, 232, 232, 0.85));
                         color: #333;
                     }
                     
                     .partner-badge.bronze {
-                        background: linear-gradient(135deg, #CD7F32, #E6BE8A);
+                        background: linear-gradient(135deg, rgba(205, 127, 50, 0.85), rgba(230, 190, 138, 0.85));
                         color: #333;
                     }
                     
                     .partner-badge.outfitter {
-                        background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                        background: linear-gradient(135deg, rgba(76, 175, 80, 0.85), rgba(139, 195, 74, 0.85));
                         color: #fff;
                     }
                     
@@ -1602,23 +1629,38 @@
                         padding: 25px 25px 15px;
                         display: flex;
                         align-items: center;
+                        position: relative;
+                        z-index: 2;
                     }
                     
                     .partner-logo {
                         width: 80px;
                         height: 80px;
                         object-fit: contain;
-                        margin-right: 15px;
+                        margin-right: 20px;
                         background: #fff;
                         padding: 10px;
-                        border-radius: 8px;
-                        filter: none !important; /* Ensure logos display in full color */
+                        border-radius: 10px;
+                        filter: none !important;
+                        transition: transform 0.4s ease;
+                        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+                    }
+                    
+                    .partner-card:hover .partner-logo {
+                        transform: scale(1.05) rotate(2deg);
                     }
                     
                     .partner-name {
-                        font-size: 1.5rem;
+                        font-size: 1.4rem;
                         color: #fff;
                         margin: 0 0 5px 0;
+                        font-weight: 600;
+                        transition: transform 0.3s ease, color 0.3s ease;
+                    }
+                    
+                    .partner-card:hover .partner-name {
+                        color: var(--color-primary, #00a8ff);
+                        transform: translateY(-2px);
                     }
                     
                     .partner-content {
@@ -1626,14 +1668,21 @@
                         flex-grow: 1;
                         display: flex;
                         flex-direction: column;
+                        position: relative;
+                        z-index: 2;
                     }
                     
                     .partner-description {
                         font-size: 0.95rem;
-                        color: #ccc;
-                        line-height: 1.6;
+                        color: rgba(255, 255, 255, 0.7);
+                        line-height: 1.7;
                         margin-bottom: 20px;
                         flex-grow: 1;
+                        transition: color 0.3s ease;
+                    }
+                    
+                    .partner-card:hover .partner-description {
+                        color: rgba(255, 255, 255, 0.9);
                     }
                     
                     .partner-link {
@@ -1643,12 +1692,28 @@
                     .visit-partner {
                         display: inline-flex;
                         align-items: center;
-                        color: var(--color-primary);
+                        color: var(--color-primary, #00a8ff);
                         font-weight: 500;
                         font-size: 0.95rem;
                         text-decoration: none;
                         padding: 8px 0;
                         transition: all 0.3s ease;
+                        position: relative;
+                    }
+                    
+                    .visit-partner::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 5px;
+                        left: 0;
+                        width: 0;
+                        height: 1px;
+                        background-color: var(--color-primary, #00a8ff);
+                        transition: width 0.3s ease;
+                    }
+                    
+                    .visit-partner:hover::after {
+                        width: 100%;
                     }
                     
                     .visit-partner i {
@@ -1666,13 +1731,15 @@
                     
                     /* Available partner card styling */
                     .available-card {
-                        background: rgba(30, 30, 30, 0.3);
-                        border: 1px dashed rgba(var(--color-primary-rgb), 0.5);
+                        background: rgba(20, 20, 20, 0.15);
+                        border: 1px dashed rgba(var(--color-primary-rgb, 0, 168, 255), 0.3);
+                        backdrop-filter: blur(5px);
+                        -webkit-backdrop-filter: blur(5px);
                     }
                     
                     .available-card:hover {
-                        background: rgba(40, 40, 40, 0.4);
-                        border: 1px dashed rgba(var(--color-primary-rgb), 0.8);
+                        background: rgba(20, 20, 20, 0.25);
+                        border: 1px dashed rgba(var(--color-primary-rgb, 0, 168, 255), 0.5);
                     }
                     
                     .available-icon {
@@ -1681,16 +1748,37 @@
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        background: rgba(255, 255, 255, 0.02);
-                        border-radius: 8px;
-                        color: rgba(var(--color-primary-rgb), 0.7);
+                        background: rgba(var(--color-primary-rgb, 0, 168, 255), 0.05);
+                        border-radius: 10px;
+                        color: rgba(var(--color-primary-rgb, 0, 168, 255), 0.7);
                         font-size: 32px;
-                        margin-right: 15px;
+                        margin-right: 20px;
+                        transition: all 0.4s ease;
+                        border: 1px dashed rgba(var(--color-primary-rgb, 0, 168, 255), 0.2);
+                    }
+                    
+                    .available-card:hover .available-icon {
+                        background: rgba(var(--color-primary-rgb, 0, 168, 255), 0.1);
+                        transform: scale(1.05) rotate(5deg);
+                        color: rgba(var(--color-primary-rgb, 0, 168, 255), 0.9);
                     }
                     
                     @media (max-width: 768px) {
                         .sponsors-grid {
                             grid-template-columns: repeat(auto-fit, minmax(100%, 1fr));
+                        }
+                        
+                        .partner-header {
+                            padding: 20px 20px 10px;
+                        }
+                        
+                        .partner-content {
+                            padding: 0 20px 20px;
+                        }
+                        
+                        .partner-logo, .available-icon {
+                            width: 70px;
+                            height: 70px;
                         }
                     }
                 </style>
@@ -2079,6 +2167,313 @@
             </div>
         </section>
 
+        <!-- Newsletter Section -->
+        <section class="newsletter-creative">
+            <div class="container">
+                <div class="newsletter-box">
+                    <div class="newsletter-graphic">
+                        <img src="public/images/website on the making NICO.png?v=2" alt="Nicola Senn Newsletter" class="newsletter-image">
+                    </div>
+                    <div class="newsletter-content">
+                        <h3 data-en="Stay Updated" data-de="Bleibe auf dem Laufenden">Bleibe auf dem Laufenden</h3>
+                        <p data-en="Get the latest news about tournaments, training insights and exclusive content" data-de="Erhalte die neuesten Nachrichten über Turniere, Trainingseinblicke und exklusive Inhalte">Erhalte die neuesten Nachrichten über Turniere, Trainingseinblicke und exklusive Inhalte</p>
+                        
+                        <form id="newsletter-form" class="newsletter-form">
+                            <div class="form-row">
+                                <input type="email" id="newsletter-email" name="email" required placeholder="email@example.com">
+                                <button type="submit" class="newsletter-button">
+                                    <span data-en="Subscribe" data-de="Abonnieren">Abonnieren</span>
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </div>
+                            <div id="newsletter-message" class="newsletter-message"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            /* Dynamic Creative Newsletter */
+            .newsletter-creative {
+                padding: 4rem 0;
+                background: linear-gradient(135deg, #121212, #1a1a1a);
+                position: relative;
+                overflow: hidden;
+            }
+            
+            .newsletter-box {
+                background: rgba(40, 40, 40, 0.7);
+                border-radius: 16px;
+                overflow: hidden;
+                display: flex;
+                position: relative;
+                max-width: 900px;
+                margin: 0 auto;
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+            }
+            
+            .newsletter-graphic {
+                flex: 0 0 40%;
+                position: relative;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+            
+            .newsletter-image {
+                width: 100%;
+                height: 100%;
+                object-fit: contain;
+                display: block;
+                max-height: 100%;
+                filter: none !important; /* Ensure the image displays in full color */
+            }
+            
+            .circle-1, .circle-2 {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .circle-1 {
+                width: 150px;
+                height: 150px;
+                top: -30px;
+                left: -30px;
+                animation: float 8s ease-in-out infinite;
+            }
+            
+            .circle-2 {
+                width: 100px;
+                height: 100px;
+                bottom: -20px;
+                right: -20px;
+                animation: float 7s ease-in-out infinite reverse;
+            }
+            
+            @keyframes float {
+                0% { transform: translateY(0) rotate(0deg); }
+                50% { transform: translateY(-15px) rotate(5deg); }
+                100% { transform: translateY(0) rotate(0deg); }
+            }
+            
+            .newsletter-icon {
+                width: 60px;
+                height: 60px;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                position: relative;
+                z-index: 2;
+                animation: pulse 2s infinite;
+            }
+            
+            @keyframes pulse {
+                0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+                70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 255, 255, 0); }
+                100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+            }
+            
+            .newsletter-icon i {
+                font-size: 1.6rem;
+                color: #fff;
+            }
+            
+            .newsletter-content {
+                flex: 1;
+                padding: 2.5rem;
+            }
+            
+            .newsletter-creative h3 {
+                font-size: 2rem;
+                margin-bottom: 1rem;
+                background: linear-gradient(135deg, #fff, #ccc);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                position: relative;
+                display: inline-block;
+            }
+            
+            .newsletter-creative h3::after {
+                content: '';
+                position: absolute;
+                bottom: -5px;
+                left: 0;
+                width: 40px;
+                height: 3px;
+                background: var(--color-primary);
+                border-radius: 2px;
+            }
+            
+            .newsletter-creative p {
+                color: rgba(255, 255, 255, 0.8);
+                margin-bottom: 1.8rem;
+                max-width: 90%;
+            }
+            
+            .newsletter-form {
+                position: relative;
+            }
+            
+            .form-row {
+                display: flex;
+                gap: 0.5rem;
+            }
+            
+            #newsletter-email {
+                flex: 1;
+                padding: 0.8rem 1.2rem;
+                background: rgba(255, 255, 255, 0.07);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 8px;
+                color: #fff;
+                transition: all 0.3s ease;
+            }
+            
+            #newsletter-email:focus {
+                outline: none;
+                border-color: var(--color-primary);
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            #newsletter-email::placeholder {
+                color: rgba(255, 255, 255, 0.4);
+            }
+            
+            .newsletter-button {
+                background: var(--color-primary);
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 0 1.5rem;
+                cursor: pointer;
+                font-weight: 600;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+                position: relative;
+                overflow: hidden;
+                transition: all 0.3s ease;
+            }
+            
+            .newsletter-button::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+                transform: translateX(-100%);
+            }
+            
+            .newsletter-button:hover {
+                background: #0088cc;
+                transform: translateY(-2px);
+            }
+            
+            .newsletter-button:hover::before {
+                transform: translateX(100%);
+                transition: transform 0.8s ease;
+            }
+            
+            .newsletter-button i {
+                font-size: 0.9rem;
+                transition: transform 0.3s ease;
+            }
+            
+            .newsletter-button:hover i {
+                transform: translateX(3px);
+            }
+            
+            #newsletter-message {
+                min-height: 1.5rem;
+                margin-top: 0.8rem;
+                font-size: 0.9rem;
+                color: rgba(255, 255, 255, 0.8);
+            }
+            
+            /* Success animation */
+            .newsletter-success {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+                animation: fadeIn 0.5s forwards;
+                text-align: center;
+                padding: 1rem 0;
+            }
+            
+            .success-icon {
+                color: #4CAF50;
+                font-size: 2.5rem;
+                animation: scaleIn 0.5s forwards;
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes scaleIn {
+                from { transform: scale(0.5); }
+                to { transform: scale(1); }
+            }
+            
+            /* Responsive styles for newsletter */
+            @media (max-width: 768px) {
+                .newsletter-box {
+                    flex-direction: column;
+                }
+                
+                .newsletter-graphic {
+                    flex: 0 0 200px;
+                }
+                
+                .newsletter-image {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+                
+                .newsletter-content {
+                    padding: 2rem;
+                }
+                
+                .newsletter-creative h3 {
+                    font-size: 1.8rem;
+                }
+                
+                .newsletter-creative p {
+                    margin-bottom: 1.5rem;
+                    max-width: 100%;
+                }
+            }
+            
+            @media (max-width: 576px) {
+                .form-row {
+                    flex-direction: column;
+                    gap: 1rem;
+                }
+                
+                .newsletter-button {
+                    width: 100%;
+                    justify-content: center;
+                    padding: 0.8rem;
+                }
+            }
+            
+            /* Ensure all images display in full color */
+            img, .image, [class*="image"], [class*="img"] {
+                filter: none !important;
+            }
+        </style>
+
         <footer class="footer">
             <div class="footer-logo">
                 <a href="index.html">
@@ -2104,6 +2499,7 @@
                 <a href="team.html" data-en="Team" data-de="Team">Team</a>
                 <a href="updates.html" data-en="Updates" data-de="Updates">Updates</a>
                 <a href="about.html#sponsors" data-en="Sponsors" data-de="Sponsoren">Sponsoren</a>
+                <a href="https://donate.stripe.com/4gw5mYd6WeSG67CdQQ" target="_blank" class="support-btn" data-en="Support" data-de="Unterstützen"><i class="fas fa-heart"></i> Unterstützen</a>
                 <a href="about.html#contact" data-en="Contact" data-de="Kontakt">Kontakt</a>
             </nav>
 
@@ -2148,10 +2544,18 @@
 
             // Check for saved language preference
             const savedLang = localStorage.getItem('language') || 'de';
-            setLanguage(savedLang);
             
             // Set active class on the appropriate language button
-            document.querySelector(`.lang-btn[data-lang="${savedLang}"]`)?.classList.add('active');
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === savedLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Apply the language immediately on page load
+            setTimeout(() => setLanguage(savedLang), 0);
         });
 
         // Set language function
@@ -2162,16 +2566,28 @@
                     element.textContent = element.getAttribute(`data-${lang}`);
                 }
             });
+            
+            // Handle placeholders
+            const inputElements = document.querySelectorAll('input[data-en-placeholder], input[data-de-placeholder], textarea[data-en-placeholder], textarea[data-de-placeholder]');
+            inputElements.forEach(input => {
+                if (input.getAttribute(`data-${lang}-placeholder`)) {
+                    input.placeholder = input.getAttribute(`data-${lang}-placeholder`);
+                }
+            });
+            
             // Save language preference
             localStorage.setItem('language', lang);
             document.documentElement.lang = lang;
+            
+            // Also update any dynamic content that might have been added after initial load
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
         }
         
         // Initialize Supabase client
         const supabaseClient = supabase.createClient(config.supabaseUrl, config.supabaseKey);
 
         // Initialize language
-        let currentLanguage = localStorage.getItem('language') || 'en';
+        let currentLanguage = localStorage.getItem('language') || 'de';
 
         // Load updates
         async function loadUpdates() {
@@ -2745,28 +3161,45 @@
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
+                    // Show loading state
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    submitButton.disabled = true;
+                    
                     try {
-                        const response = await fetch('https://api.brevo.com/v3/contacts', {
+                        const response = await fetch('/api/subscribe', {
                             method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'api-key': config.BREVO_API_KEY
-                            },
-                            body: JSON.stringify({ email, listIds: [7] })
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email })
                         });
-
+                        const data = await response.json();
                         if (response.ok) {
-                            newsletterMessage.textContent = 'Thank you for subscribing!';
-                            newsletterMessage.style.color = '#4CAF50';
-                            this.reset();
+                            // Replace form with success animation
+                            newsletterForm.innerHTML = `
+                                <div class="newsletter-success">
+                                    <div class="success-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h4 data-en="Thank You!" data-de="Vielen Dank!">Vielen Dank!</h4>
+                                    <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
+                                </div>
+                            `;
                         } else {
-                            const data = await response.json();
                             newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
                             newsletterMessage.style.color = '#f44336';
+                            
+                            // Reset button
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
                         }
                     } catch (error) {
                         newsletterMessage.textContent = 'Error subscribing to newsletter';
                         newsletterMessage.style.color = '#f44336';
+                        
+                        // Reset button
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
                     }
                 });
             }

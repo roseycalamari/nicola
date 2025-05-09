@@ -5110,3 +5110,32 @@ footer {
         transform: translateY(0);
     }
 }
+
+/* Create new support-btn that's an exact copy of contact-btn with red color */
+.support-btn {
+    background-color: #ff4b4b;
+    color: #fff !important;
+    padding: 0.5rem 1.2rem;
+    border-radius: 30px;
+    font-weight: 600;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 10px rgba(255, 75, 75, 0.3);
+}
+
+.support-btn:hover {
+    background-color: #ff3333;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(255, 75, 75, 0.4);
+}
+
+/* Add mobile styles for support-btn to match contact-btn */
+@media (max-width: 992px) {
+    .nav-links .support-btn {
+        padding: 0.8rem 2.5rem;
+        font-size: 1.2rem;
+        min-width: 200px;
+        text-align: center;
+        margin: 1rem 0;
+    }
+}
