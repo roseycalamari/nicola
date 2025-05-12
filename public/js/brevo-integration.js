@@ -36,13 +36,18 @@ document.addEventListener('DOMContentLoaded', function() {
             newsletterMessage.textContent = '';
 
             try {
-                // Call our Vercel API endpoint
-                const response = await fetch('/api/subscribe', {
+                // Direct connection to Brevo API
+                const response = await fetch('https://api.brevo.com/v3/contacts', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
+                        'api-key': process.env.BREVO_API_KEY,
                     },
-                    body: JSON.stringify({ email }),
+                    body: JSON.stringify({
+                        email: email,
+                        listIds: [7], // Your list ID
+                        updateEnabled: true,
+                    }),
                 });
 
                 const data = await response.json();
@@ -59,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         </div>
                     `;
                 } else {
-                    throw new Error(data.error || 'Subscription failed');
+                    throw new Error(data.message || 'Subscription failed');
                 }
             } catch (error) {
                 console.error('Newsletter subscription error:', error);
