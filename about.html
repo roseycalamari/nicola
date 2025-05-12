@@ -1713,22 +1713,47 @@
         document.addEventListener('DOMContentLoaded', function() {
             const newsletterForm = document.getElementById('newsletter-form');
             const newsletterMessage = document.getElementById('newsletter-message');
+
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
+                newsletterForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
+                    
+                    // Basic email validation
+                    if (!email || !email.includes('@') || !email.includes('.')) {
+                        newsletterMessage.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+                        newsletterMessage.style.color = '#f44336';
+                        return;
+                    }
+                    
+                    // Show loading state
                     const submitButton = this.querySelector('button[type="submit"]');
                     const originalButtonText = submitButton.innerHTML;
                     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     submitButton.disabled = true;
-                    try {
-                        const response = await fetch('/api/subscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email })
-                        });
-                        const data = await response.json();
-                        if (response.ok) {
+                    
+                    // Clear any previous error messages
+                    newsletterMessage.textContent = '';
+                    
+                    // Simulate API call with timeout
+                    setTimeout(() => {
+                        try {
+                            // Store email in localStorage (for demo purposes)
+                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
+                            
+                            // Check if email is already subscribed
+                            if (subscribers.includes(email)) {
+                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
+                                newsletterMessage.style.color = '#f44336';
+                                submitButton.innerHTML = originalButtonText;
+                                submitButton.disabled = false;
+                                return;
+                            }
+                            
+                            subscribers.push(email);
+                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
+                            
+                            // Replace form with success animation
                             newsletterForm.innerHTML = `
                                 <div class="newsletter-success">
                                     <div class="success-icon">
@@ -1738,18 +1763,14 @@
                                     <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
                                 </div>
                             `;
-                        } else {
-                            newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
+                        } catch (error) {
+                            // Handle any errors
+                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
                             newsletterMessage.style.color = '#f44336';
                             submitButton.innerHTML = originalButtonText;
                             submitButton.disabled = false;
                         }
-                    } catch (error) {
-                        newsletterMessage.textContent = 'Error subscribing to newsletter';
-                        newsletterMessage.style.color = '#f44336';
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                    }
+                    }, 1000);
                 });
             }
         });
@@ -1930,29 +1951,62 @@
             const newsletterMessage = document.getElementById('newsletter-message');
 
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
+                newsletterForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
-                    try {
-                        const response = await fetch('/api/subscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email })
-                        });
-                        const data = await response.json();
-                        if (response.ok) {
-                            newsletterMessage.textContent = 'Thank you for subscribing!';
-                            newsletterMessage.style.color = '#4CAF50';
-                            this.reset();
-                        } else {
-                            newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
-                            newsletterMessage.style.color = '#f44336';
-                        }
-                    } catch (error) {
-                        newsletterMessage.textContent = 'Error subscribing to newsletter';
+                    // Basic email validation
+                    if (!email || !email.includes('@') || !email.includes('.')) {
+                        newsletterMessage.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
                         newsletterMessage.style.color = '#f44336';
+                        return;
                     }
+                    
+                    // Show loading state
+                    const submitButton = this.querySelector('button[type="submit"]');
+                    const originalButtonText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                    submitButton.disabled = true;
+                    
+                    // Clear any previous error messages
+                    newsletterMessage.textContent = '';
+                    
+                    // Simulate API call with timeout
+                    setTimeout(() => {
+                        try {
+                            // Store email in localStorage (for demo purposes)
+                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
+                            
+                            // Check if email is already subscribed
+                            if (subscribers.includes(email)) {
+                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
+                                newsletterMessage.style.color = '#f44336';
+                                submitButton.innerHTML = originalButtonText;
+                                submitButton.disabled = false;
+                                return;
+                            }
+                            
+                            subscribers.push(email);
+                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
+                            
+                            // Replace form with success animation
+                            newsletterForm.innerHTML = `
+                                <div class="newsletter-success">
+                                    <div class="success-icon">
+                                        <i class="fas fa-check-circle"></i>
+                                    </div>
+                                    <h4 data-en="Thank You!" data-de="Vielen Dank!">Vielen Dank!</h4>
+                                    <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
+                                </div>
+                            `;
+                        } catch (error) {
+                            // Handle any errors
+                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+                            newsletterMessage.style.color = '#f44336';
+                            submitButton.innerHTML = originalButtonText;
+                            submitButton.disabled = false;
+                        }
+                    }, 1000);
                 });
             }
         });
@@ -2021,9 +2075,16 @@
             const newsletterMessage = document.getElementById('newsletter-message');
 
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
+                newsletterForm.addEventListener('submit', function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
+                    
+                    // Basic email validation
+                    if (!email || !email.includes('@') || !email.includes('.')) {
+                        newsletterMessage.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+                        newsletterMessage.style.color = '#f44336';
+                        return;
+                    }
                     
                     // Show loading state
                     const submitButton = this.querySelector('button[type="submit"]');
@@ -2031,14 +2092,27 @@
                     submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
                     submitButton.disabled = true;
                     
-                    try {
-                        const response = await fetch('/api/subscribe', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email })
-                        });
-                        const data = await response.json();
-                        if (response.ok) {
+                    // Clear any previous error messages
+                    newsletterMessage.textContent = '';
+                    
+                    // Simulate API call with timeout
+                    setTimeout(() => {
+                        try {
+                            // Store email in localStorage (for demo purposes)
+                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
+                            
+                            // Check if email is already subscribed
+                            if (subscribers.includes(email)) {
+                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
+                                newsletterMessage.style.color = '#f44336';
+                                submitButton.innerHTML = originalButtonText;
+                                submitButton.disabled = false;
+                                return;
+                            }
+                            
+                            subscribers.push(email);
+                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
+                            
                             // Replace form with success animation
                             newsletterForm.innerHTML = `
                                 <div class="newsletter-success">
@@ -2049,22 +2123,14 @@
                                     <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
                                 </div>
                             `;
-                        } else {
-                            newsletterMessage.textContent = data.message || 'Error subscribing to newsletter';
+                        } catch (error) {
+                            // Handle any errors
+                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
                             newsletterMessage.style.color = '#f44336';
-                            
-                            // Reset button
                             submitButton.innerHTML = originalButtonText;
                             submitButton.disabled = false;
                         }
-                    } catch (error) {
-                        newsletterMessage.textContent = 'Error subscribing to newsletter';
-                        newsletterMessage.style.color = '#f44336';
-                        
-                        // Reset button
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                    }
+                    }, 1000);
                 });
             }
         });
