@@ -1539,12 +1539,18 @@
         // Load updates
         async function loadUpdates() {
             try {
+                console.log('Attempting to load updates from Supabase...');
                 const { data: updates, error } = await supabaseClient
                     .from('updates')
                     .select('id, title, content, category, image_url, date')
                     .order('date', { ascending: false });
                 
-                if (error) throw error;
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
+                
+                console.log('Updates loaded:', updates);
                 
                 const updatesFeed = document.getElementById('updatesFeed');
                 if (!updatesFeed) {

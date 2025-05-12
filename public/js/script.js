@@ -15,25 +15,32 @@
  */
 
 document.addEventListener('DOMContentLoaded', async function() {
+    console.log('DOM Content Loaded');
     // Initialize components based on page type
     const isAdminPage = window.location.pathname.includes('admin-dashboard');
     
     if (isAdminPage) {
+        console.log('Loading career stats...');
         // Admin page specific initializations
         const stats = await loadCareerStats();
-    updateStatsDisplay(stats);
+        console.log('Career stats loaded:', stats);
+        updateStatsDisplay(stats);
     }
     
     // Initialize stats counter if on a page with stats
     if (document.querySelector('.stat')) {
-    initializeStatsCounter();
+        console.log('Initializing stats counter...');
+        initializeStatsCounter();
     }
     
     // Initialize other components
+    console.log('Initializing gallery...');
+    initializeGallery();
+    console.log('Initializing album gallery...');
+    initializeAlbumGallery();
     initializeNavigation();
     initializeCustomCursor();
     initializeScrollAnimations();
-    initializeGallery();
     initializeCountdown();
     initializeContactForm();
     initializeExpandableContent();
@@ -45,13 +52,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     initializeUpdateCards();
     initializeUpdateFilter();
     initializeLanguageSwitcher();
-    initializeAlbumGallery();
     initializeDonationForm();
     initializePdfDownloads();
     
     // Load next tournament display if element exists
     if (document.querySelector('.next-tournament')) {
-    loadNextTournamentDisplay();
+        console.log('Loading next tournament display...');
+        loadNextTournamentDisplay();
     }
     
     // Handle hash links for cross-page navigation
