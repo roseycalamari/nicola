@@ -555,7 +555,7 @@
             const newsletterMessage = document.getElementById('newsletter-message');
 
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', function(e) {
+                newsletterForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
@@ -575,24 +575,18 @@
                     // Clear any previous error messages
                     newsletterMessage.textContent = '';
                     
-                    // Simulate API call with timeout
-                    setTimeout(() => {
-                        try {
-                            // Store email in localStorage (for demo purposes)
-                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
-                            
-                            // Check if email is already subscribed
-                            if (subscribers.includes(email)) {
-                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
-                                newsletterMessage.style.color = '#f44336';
-                                submitButton.innerHTML = originalButtonText;
-                                submitButton.disabled = false;
-                                return;
-                            }
-                            
-                            subscribers.push(email);
-                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
-                            
+                    try {
+                        const response = await fetch('/api/subscribe', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
                             // Replace form with success animation
                             newsletterForm.innerHTML = `
                                 <div class="newsletter-success">
@@ -603,14 +597,16 @@
                                     <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
                                 </div>
                             `;
-                        } catch (error) {
-                            // Handle any errors
-                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                            newsletterMessage.style.color = '#f44336';
-                            submitButton.innerHTML = originalButtonText;
-                            submitButton.disabled = false;
+                        } else {
+                            throw new Error(data.message || 'Subscription failed');
                         }
-                    }, 1000);
+                    } catch (error) {
+                        // Handle any errors
+                        newsletterMessage.textContent = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+                        newsletterMessage.style.color = '#f44336';
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                    }
                 });
             }
         });

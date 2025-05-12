@@ -987,6 +987,299 @@
             </div>
         </section>
 
+        <!-- Tennis Goals and Aspirations Section -->
+        <section id="tennis-goals" class="tennis-goals-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 data-en="My Tennis Goals and Aspirations" data-de="Meine Tennis-Ziele und Ambitionen">Meine Tennis-Ziele und Ambitionen</h2>
+                    <p data-en="The path I'm working toward in my professional tennis career" data-de="Der Weg, an dem ich in meiner professionellen Tennis-Karriere arbeite">Der Weg, an dem ich in meiner professionellen Tennis-Karriere arbeite</p>
+                </div>
+                
+                <style>
+                    /* Tennis Goals Section Styling */
+                    .tennis-goals-section {
+                        padding: 5rem 0;
+                        position: relative;
+                        background: var(--color-darker);
+                        overflow: hidden;
+                    }
+                    
+                    .tennis-goals-section::before {
+                        content: '';
+                        position: absolute;
+                        top: -100px;
+                        right: -100px;
+                        width: 300px;
+                        height: 300px;
+                        border-radius: 50%;
+                        background: radial-gradient(circle, rgba(160, 235, 255, 0.08) 0%, rgba(160, 235, 255, 0) 70%);
+                        pointer-events: none;
+                        z-index: 1;
+                    }
+                    
+                    .tennis-goals-section::after {
+                        content: '';
+                        position: absolute;
+                        bottom: -100px;
+                        left: -100px;
+                        width: 300px;
+                        height: 300px;
+                        border-radius: 50%;
+                        background: radial-gradient(circle, rgba(160, 235, 255, 0.05) 0%, rgba(160, 235, 255, 0) 70%);
+                        pointer-events: none;
+                        z-index: 1;
+                    }
+                    
+                    .goals-content {
+                        display: grid;
+                        grid-template-columns: 1fr 1fr;
+                        gap: 3rem;
+                        margin-top: 2rem;
+                        position: relative;
+                        z-index: 2;
+                    }
+                    
+                    .goals-image-container {
+                        position: relative;
+                        border-radius: 16px;
+                        overflow: hidden;
+                        height: 100%;
+                        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+                        border: 1px solid rgba(160, 235, 255, 0.1);
+                        transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                    }
+                    
+                    .goals-image-container:hover {
+                        transform: translateY(-8px);
+                        border-color: rgba(160, 235, 255, 0.3);
+                        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(160, 235, 255, 0.2);
+                    }
+                    
+                    .goals-image {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                        transition: all 0.7s ease;
+                        filter: brightness(1.05);
+                    }
+                    
+                    .goals-image-container:hover .goals-image {
+                        transform: scale(1.05);
+                    }
+                    
+                    .goals-cards {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 1.5rem;
+                    }
+                    
+                    .goal-card {
+                        background: rgba(30, 30, 30, 0.5);
+                        border: 1px solid rgba(255, 255, 255, 0.05);
+                        border-radius: 12px;
+                        padding: 2rem;
+                        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                        display: flex;
+                        flex-direction: column;
+                        position: relative;
+                        overflow: hidden;
+                    }
+                    
+                    .goal-card::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 4px;
+                        height: 100%;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .goal-card.short-term::before {
+                        background: #64DFDF;
+                    }
+                    
+                    .goal-card.mid-term::before {
+                        background: #56CFE1;
+                    }
+                    
+                    .goal-card.long-term::before {
+                        background: #4895EF;
+                    }
+                    
+                    .goal-card:hover {
+                        transform: translateY(-5px) translateX(5px);
+                        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+                        background: rgba(40, 40, 40, 0.7);
+                    }
+                    
+                    .goal-card:hover::before {
+                        width: 6px;
+                    }
+                    
+                    .goal-timeframe {
+                        font-size: 0.9rem;
+                        text-transform: uppercase;
+                        letter-spacing: 1px;
+                        font-weight: 600;
+                        margin-bottom: 1rem;
+                        position: relative;
+                        display: inline-block;
+                        padding-bottom: 8px;
+                    }
+                    
+                    .goal-timeframe::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 0;
+                        left: 0;
+                        width: 40px;
+                        height: 2px;
+                        border-radius: 2px;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .goal-card:hover .goal-timeframe::after {
+                        width: 60px;
+                    }
+                    
+                    .short-term .goal-timeframe {
+                        color: #64DFDF;
+                    }
+                    
+                    .short-term .goal-timeframe::after {
+                        background: #64DFDF;
+                    }
+                    
+                    .mid-term .goal-timeframe {
+                        color: #56CFE1;
+                    }
+                    
+                    .mid-term .goal-timeframe::after {
+                        background: #56CFE1;
+                    }
+                    
+                    .long-term .goal-timeframe {
+                        color: #4895EF;
+                    }
+                    
+                    .long-term .goal-timeframe::after {
+                        background: #4895EF;
+                    }
+                    
+                    .goal-description {
+                        font-size: 1.25rem;
+                        color: #fff;
+                        line-height: 1.5;
+                        flex-grow: 1;
+                    }
+                    
+                    .goal-icon {
+                        margin-top: 1.5rem;
+                        align-self: flex-end;
+                        width: 45px;
+                        height: 45px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 50%;
+                        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                        position: relative;
+                        z-index: 2;
+                    }
+                    
+                    .short-term .goal-icon {
+                        background: rgba(100, 223, 223, 0.1);
+                        color: #64DFDF;
+                    }
+                    
+                    .mid-term .goal-icon {
+                        background: rgba(86, 207, 225, 0.1);
+                        color: #56CFE1;
+                    }
+                    
+                    .long-term .goal-icon {
+                        background: rgba(72, 149, 239, 0.1);
+                        color: #4895EF;
+                    }
+                    
+                    .short-term:hover .goal-icon {
+                        background: #64DFDF;
+                        color: #121212;
+                        transform: scale(1.1) rotate(10deg);
+                        box-shadow: 0 0 15px rgba(100, 223, 223, 0.4);
+                    }
+                    
+                    .mid-term:hover .goal-icon {
+                        background: #56CFE1;
+                        color: #121212;
+                        transform: scale(1.1) rotate(10deg);
+                        box-shadow: 0 0 15px rgba(86, 207, 225, 0.4);
+                    }
+                    
+                    .long-term:hover .goal-icon {
+                        background: #4895EF;
+                        color: #121212;
+                        transform: scale(1.1) rotate(10deg);
+                        box-shadow: 0 0 15px rgba(72, 149, 239, 0.4);
+                    }
+                    
+                    @media (max-width: 992px) {
+                        .goals-content {
+                            grid-template-columns: 1fr;
+                            gap: 2rem;
+                        }
+                        
+                        .goals-image-container {
+                            height: 400px;
+                        }
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .goals-image-container {
+                            height: 300px;
+                        }
+                    }
+                </style>
+                
+                <div class="goals-content">
+                    <div class="goals-image-container">
+                        <img src="public/images/tennisgoals.jpg" alt="Tennis Goals" class="goals-image">
+                    </div>
+                    
+                    <div class="goals-cards">
+                        <!-- Short-term Goal -->
+                        <div class="goal-card short-term">
+                            <div class="goal-timeframe" data-en="Short-term" data-de="Kurzfristig">Kurzfristig</div>
+                            <div class="goal-description" data-en="Gain my first ATP Point on Tour and break into the top 1500ATP" data-de="Meinen ersten ATP-Punkt auf der Tour gewinnen und in die Top 1500 ATP einsteigen">Meinen ersten ATP-Punkt auf der Tour gewinnen und in die Top 1500 ATP einsteigen</div>
+                            <div class="goal-icon">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Mid-term Goal -->
+                        <div class="goal-card mid-term">
+                            <div class="goal-timeframe" data-en="Mid-term" data-de="Mittelfristig">Mittelfristig</div>
+                            <div class="goal-description" data-en="Break into the top 600ATP and play Qualifing for ATP Challengers" data-de="In die Top 600 ATP einsteigen und mich für ATP Challengers qualifizieren">In die Top 600 ATP einsteigen und mich für ATP Challengers qualifizieren</div>
+                            <div class="goal-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- Long-term Goal -->
+                        <div class="goal-card long-term">
+                            <div class="goal-timeframe" data-en="Long-term" data-de="Langfristig">Langfristig</div>
+                            <div class="goal-description" data-en="Reach the Top 10 and compete in Grand Slams" data-de="Die Top 10 erreichen und an Grand Slams teilnehmen">Die Top 10 erreichen und an Grand Slams teilnehmen</div>
+                            <div class="goal-icon">
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- WhatsApp Updates Section -->
         <section class="whatsapp-updates-section">
             <div class="container">
@@ -1715,7 +2008,7 @@
             const newsletterMessage = document.getElementById('newsletter-message');
 
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', function(e) {
+                newsletterForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
@@ -1735,24 +2028,18 @@
                     // Clear any previous error messages
                     newsletterMessage.textContent = '';
                     
-                    // Simulate API call with timeout
-                    setTimeout(() => {
-                        try {
-                            // Store email in localStorage (for demo purposes)
-                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
-                            
-                            // Check if email is already subscribed
-                            if (subscribers.includes(email)) {
-                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
-                                newsletterMessage.style.color = '#f44336';
-                                submitButton.innerHTML = originalButtonText;
-                                submitButton.disabled = false;
-                                return;
-                            }
-                            
-                            subscribers.push(email);
-                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
-                            
+                    try {
+                        const response = await fetch('/api/subscribe', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
                             // Replace form with success animation
                             newsletterForm.innerHTML = `
                                 <div class="newsletter-success">
@@ -1763,14 +2050,16 @@
                                     <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
                                 </div>
                             `;
-                        } catch (error) {
-                            // Handle any errors
-                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                            newsletterMessage.style.color = '#f44336';
-                            submitButton.innerHTML = originalButtonText;
-                            submitButton.disabled = false;
+                        } else {
+                            throw new Error(data.message || 'Subscription failed');
                         }
-                    }, 1000);
+                    } catch (error) {
+                        // Handle any errors
+                        newsletterMessage.textContent = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+                        newsletterMessage.style.color = '#f44336';
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                    }
                 });
             }
         });
@@ -1951,7 +2240,7 @@
             const newsletterMessage = document.getElementById('newsletter-message');
 
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', function(e) {
+                newsletterForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
@@ -1971,24 +2260,18 @@
                     // Clear any previous error messages
                     newsletterMessage.textContent = '';
                     
-                    // Simulate API call with timeout
-                    setTimeout(() => {
-                        try {
-                            // Store email in localStorage (for demo purposes)
-                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
-                            
-                            // Check if email is already subscribed
-                            if (subscribers.includes(email)) {
-                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
-                                newsletterMessage.style.color = '#f44336';
-                                submitButton.innerHTML = originalButtonText;
-                                submitButton.disabled = false;
-                                return;
-                            }
-                            
-                            subscribers.push(email);
-                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
-                            
+                    try {
+                        const response = await fetch('/api/subscribe', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
                             // Replace form with success animation
                             newsletterForm.innerHTML = `
                                 <div class="newsletter-success">
@@ -1999,14 +2282,16 @@
                                     <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
                                 </div>
                             `;
-                        } catch (error) {
-                            // Handle any errors
-                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                            newsletterMessage.style.color = '#f44336';
-                            submitButton.innerHTML = originalButtonText;
-                            submitButton.disabled = false;
+                        } else {
+                            throw new Error(data.message || 'Subscription failed');
                         }
-                    }, 1000);
+                    } catch (error) {
+                        // Handle any errors
+                        newsletterMessage.textContent = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+                        newsletterMessage.style.color = '#f44336';
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                    }
                 });
             }
         });
@@ -2075,7 +2360,7 @@
             const newsletterMessage = document.getElementById('newsletter-message');
 
             if (newsletterForm) {
-                newsletterForm.addEventListener('submit', function(e) {
+                newsletterForm.addEventListener('submit', async function(e) {
                     e.preventDefault();
                     const email = this.querySelector('input[type="email"]').value;
                     
@@ -2095,24 +2380,18 @@
                     // Clear any previous error messages
                     newsletterMessage.textContent = '';
                     
-                    // Simulate API call with timeout
-                    setTimeout(() => {
-                        try {
-                            // Store email in localStorage (for demo purposes)
-                            const subscribers = JSON.parse(localStorage.getItem('newsletterSubscribers') || '[]');
-                            
-                            // Check if email is already subscribed
-                            if (subscribers.includes(email)) {
-                                newsletterMessage.textContent = 'Diese E-Mail-Adresse ist bereits angemeldet';
-                                newsletterMessage.style.color = '#f44336';
-                                submitButton.innerHTML = originalButtonText;
-                                submitButton.disabled = false;
-                                return;
-                            }
-                            
-                            subscribers.push(email);
-                            localStorage.setItem('newsletterSubscribers', JSON.stringify(subscribers));
-                            
+                    try {
+                        const response = await fetch('/api/subscribe', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ email })
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
                             // Replace form with success animation
                             newsletterForm.innerHTML = `
                                 <div class="newsletter-success">
@@ -2123,14 +2402,16 @@
                                     <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
                                 </div>
                             `;
-                        } catch (error) {
-                            // Handle any errors
-                            newsletterMessage.textContent = 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                            newsletterMessage.style.color = '#f44336';
-                            submitButton.innerHTML = originalButtonText;
-                            submitButton.disabled = false;
+                        } else {
+                            throw new Error(data.message || 'Subscription failed');
                         }
-                    }, 1000);
+                    } catch (error) {
+                        // Handle any errors
+                        newsletterMessage.textContent = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
+                        newsletterMessage.style.color = '#f44336';
+                        submitButton.innerHTML = originalButtonText;
+                        submitButton.disabled = false;
+                    }
                 });
             }
         });
