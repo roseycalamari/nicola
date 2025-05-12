@@ -1,4 +1,5 @@
-const handler = async (req, res) => {
+// Vercel serverless function
+export default async function handler(req, res) {
     // Enable CORS
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -63,6 +64,4 @@ const handler = async (req, res) => {
             details: error.message
         });
     }
-};
-
-module.exports = handler;
+}
