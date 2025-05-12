@@ -3,6 +3,10 @@
 .env.local
 .env.*.local
 
+# Configuration files with sensitive data
+public/js/config.js
+config.js
+
 # Dependencies
 node_modules/
 
