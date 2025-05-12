@@ -2003,66 +2003,61 @@
         }
         </style>
         <script>
+        // Enhanced language switcher that handles placeholders
         document.addEventListener('DOMContentLoaded', function() {
-            const newsletterForm = document.getElementById('newsletter-form');
-            const newsletterMessage = document.getElementById('newsletter-message');
-
-            if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    const email = this.querySelector('input[type="email"]').value;
-                    
-                    // Basic email validation
-                    if (!email || !email.includes('@') || !email.includes('.')) {
-                        newsletterMessage.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
-                        newsletterMessage.style.color = '#f44336';
-                        return;
-                    }
-                    
-                    // Show loading state
-                    const submitButton = this.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    submitButton.disabled = true;
-                    
-                    // Clear any previous error messages
-                    newsletterMessage.textContent = '';
-                    
-                    try {
-                        const response = await fetch('/api/subscribe', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ email })
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok) {
-                            // Replace form with success animation
-                            newsletterForm.innerHTML = `
-                                <div class="newsletter-success">
-                                    <div class="success-icon">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-                                    <h4 data-en="Thank You!" data-de="Vielen Dank!">Vielen Dank!</h4>
-                                    <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
-                                </div>
-                            `;
-                        } else {
-                            throw new Error(data.message || 'Subscription failed');
-                        }
-                    } catch (error) {
-                        // Handle any errors
-                        newsletterMessage.textContent = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                        newsletterMessage.style.color = '#f44336';
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                    }
+            // Language selector
+            const langButtons = document.querySelectorAll('.lang-btn');
+            langButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const lang = this.getAttribute('data-lang');
+                    enhancedSetLanguage(lang);
+                    // Update active state
+                    langButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
                 });
-            }
+            });
+
+            // Check for saved language preference and apply it immediately
+            const savedLang = localStorage.getItem('language') || 'de';
+            
+            // Set active class on the appropriate language button
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                if (btn.getAttribute('data-lang') === savedLang) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            // Apply the language immediately on page load
+            setTimeout(() => enhancedSetLanguage(savedLang), 0);
         });
+
+        // Enhanced setLanguage function that handles input placeholders
+        function enhancedSetLanguage(lang) {
+            // Handle text content for all elements with data attributes
+            const elements = document.querySelectorAll('[data-en], [data-de]');
+            elements.forEach(element => {
+                if (element.getAttribute(`data-${lang}`)) {
+                    element.textContent = element.getAttribute(`data-${lang}`);
+                }
+            });
+
+            // Handle placeholders
+            const inputElements = document.querySelectorAll('input[data-en-placeholder], input[data-de-placeholder], textarea[data-en-placeholder], textarea[data-de-placeholder]');
+            inputElements.forEach(input => {
+                if (input.getAttribute(`data-${lang}-placeholder`)) {
+                    input.placeholder = input.getAttribute(`data-${lang}-placeholder`);
+                }
+            });
+
+            // Save language preference
+            localStorage.setItem('language', lang);
+            document.documentElement.lang = lang;
+            
+            // Also update any dynamic content that might have been added after initial load
+            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
+        }
         </script>
     </main>
 
@@ -2235,126 +2230,6 @@
     </style>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const newsletterForm = document.getElementById('newsletter-form');
-            const newsletterMessage = document.getElementById('newsletter-message');
-
-            if (newsletterForm) {
-                newsletterForm.addEventListener('submit', async function(e) {
-                    e.preventDefault();
-                    const email = this.querySelector('input[type="email"]').value;
-                    
-                    // Basic email validation
-                    if (!email || !email.includes('@') || !email.includes('.')) {
-                        newsletterMessage.textContent = 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
-                        newsletterMessage.style.color = '#f44336';
-                        return;
-                    }
-                    
-                    // Show loading state
-                    const submitButton = this.querySelector('button[type="submit"]');
-                    const originalButtonText = submitButton.innerHTML;
-                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-                    submitButton.disabled = true;
-                    
-                    // Clear any previous error messages
-                    newsletterMessage.textContent = '';
-                    
-                    try {
-                        const response = await fetch('/api/subscribe', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({ email })
-                        });
-
-                        const data = await response.json();
-
-                        if (response.ok) {
-                            // Replace form with success animation
-                            newsletterForm.innerHTML = `
-                                <div class="newsletter-success">
-                                    <div class="success-icon">
-                                        <i class="fas fa-check-circle"></i>
-                                    </div>
-                                    <h4 data-en="Thank You!" data-de="Vielen Dank!">Vielen Dank!</h4>
-                                    <p data-en="You've successfully subscribed to my newsletter" data-de="Du hast dich erfolgreich für meinen Newsletter angemeldet">Du hast dich erfolgreich für meinen Newsletter angemeldet</p>
-                                </div>
-                            `;
-                        } else {
-                            throw new Error(data.message || 'Subscription failed');
-                        }
-                    } catch (error) {
-                        // Handle any errors
-                        newsletterMessage.textContent = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es später erneut.';
-                        newsletterMessage.style.color = '#f44336';
-                        submitButton.innerHTML = originalButtonText;
-                        submitButton.disabled = false;
-                    }
-                });
-            }
-        });
-
-        // Enhanced language switcher that handles placeholders
-        document.addEventListener('DOMContentLoaded', function() {
-            // Language selector
-            const langButtons = document.querySelectorAll('.lang-btn');
-            langButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const lang = this.getAttribute('data-lang');
-                    enhancedSetLanguage(lang);
-                    // Update active state
-                    langButtons.forEach(btn => btn.classList.remove('active'));
-                    this.classList.add('active');
-                });
-            });
-
-            // Check for saved language preference and apply it immediately
-            const savedLang = localStorage.getItem('language') || 'de';
-            
-            // Set active class on the appropriate language button
-            document.querySelectorAll('.lang-btn').forEach(btn => {
-                if (btn.getAttribute('data-lang') === savedLang) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            
-            // Apply the language immediately on page load
-            setTimeout(() => enhancedSetLanguage(savedLang), 0);
-        });
-
-        // Enhanced setLanguage function that handles input placeholders
-        function enhancedSetLanguage(lang) {
-            // Handle text content for all elements with data attributes
-            const elements = document.querySelectorAll('[data-en], [data-de]');
-            elements.forEach(element => {
-                if (element.getAttribute(`data-${lang}`)) {
-                    element.textContent = element.getAttribute(`data-${lang}`);
-                }
-            });
-
-            // Handle placeholders
-            const inputElements = document.querySelectorAll('input[data-en-placeholder], input[data-de-placeholder], textarea[data-en-placeholder], textarea[data-de-placeholder]');
-            inputElements.forEach(input => {
-                if (input.getAttribute(`data-${lang}-placeholder`)) {
-                    input.placeholder = input.getAttribute(`data-${lang}-placeholder`);
-                }
-            });
-
-            // Save language preference
-            localStorage.setItem('language', lang);
-            document.documentElement.lang = lang;
-            
-            // Also update any dynamic content that might have been added after initial load
-            document.dispatchEvent(new CustomEvent('languageChanged', { detail: { language: lang } }));
-        }
-    </script>
-
-    <script>
-        // Update newsletter form submission to display loading and success animations
         document.addEventListener('DOMContentLoaded', function() {
             const newsletterForm = document.getElementById('newsletter-form');
             const newsletterMessage = document.getElementById('newsletter-message');
