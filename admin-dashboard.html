@@ -767,7 +767,7 @@
         .modal-header h3 {
             font-size: 1.8rem;
             margin-bottom: var(--spacing-sm);
-            color: var(--color-light);
+            color: white;
         }
         
         .modal-category {
@@ -1918,6 +1918,10 @@
                     </select>
                 </div>
                 <div class="form-group">
+                    <label for="editDate">Date</label>
+                    <input type="date" id="editDate" name="date" required>
+                </div>
+                <div class="form-group">
                     <label for="editContent">Content</label>
                     <textarea id="editContent" name="content" required></textarea>
                 </div>
@@ -2226,6 +2230,11 @@
                 document.getElementById('editTitle').value = update.title;
                 document.getElementById('editCategory').value = update.category;
                 document.getElementById('editContent').value = update.content;
+                
+                // Format date for input (YYYY-MM-DD)
+                const updateDate = new Date(update.date);
+                const formattedDate = updateDate.toISOString().split('T')[0];
+                document.getElementById('editDate').value = formattedDate;
 
                 // Display current image
                 const currentImageContainer = document.getElementById('editCurrentImage');
@@ -2426,6 +2435,7 @@
             const title = document.getElementById('editTitle').value;
             const category = document.getElementById('editCategory').value;
             const content = document.getElementById('editContent').value;
+            const date = document.getElementById('editDate').value;
             const newMediaFile = document.getElementById('editMedia').files[0];
             const currentImageContainer = document.querySelector('#editCurrentImage .image-container');
             const shouldDeleteImage = currentImageContainer && currentImageContainer.getAttribute('data-delete') === 'true';
@@ -2474,7 +2484,7 @@
                     title,
                     category,
                     content,
-                    date: new Date().toISOString()
+                    date
                 };
 
                 // Handle image URL updates
