@@ -690,7 +690,7 @@
                                     </div>
                                     <div class="activity-content">
                                         <h3 data-en="Academic Work" data-de="Berufliche Tätigkeit">Berufliche Tätigkeit</h3>
-                                        <p data-en="In addition to my career as a professional tennis player, I work part-time (50%) as a design engineer at GIPO AG. This combination allows me to pursue my passion for sports while also applying my technical skills in a professional environment" data-de="Neben meiner Karriere als professioneller Tennisspieler arbeite ich Teilzeit (50%) als Konstrukteur bei der GIPO AG. Diese Kombination ermöglicht es mir, meine Leidenschaft für Sport zu verfolgen und gleichzeitig meine technischen Fähigkeiten in einem professionellen Umfeld anzuwenden">Neben meiner Karriere als professioneller Tennisspieler arbeite ich Teilzeit (50%) als Konstrukteur bei der GIPO AG. Diese Kombination ermöglicht es mir, meine Leidenschaft für Sport zu verfolgen und gleichzeitig meine technischen Fähigkeiten in einem professionellen Umfeld anzuwenden</p>
+                                        <p data-en="In addition to my career as a professional tennis player, I work part-time (50%) as a design engineer at GIPO AG. This combination allows me to pursue my passion for sports while also applying my technical skills in a professional environment." data-de="Neben meiner Karriere als professioneller Tennisspieler arbeite ich Teilzeit (50%) als Konstrukteur bei der GIPO AG. Diese Kombination ermöglicht es mir, meine Leidenschaft für Sport zu verfolgen und gleichzeitig meine technischen Fähigkeiten in einem professionellen Umfeld anzuwenden.">Neben meiner Karriere als professioneller Tennisspieler arbeite ich Teilzeit (50%) als Konstrukteur bei der GIPO AG. Diese Kombination ermöglicht es mir, meine Leidenschaft für Sport zu verfolgen und gleichzeitig meine technischen Fähigkeiten in einem professionellen Umfeld anzuwenden.</p>
                                     </div>
                                 </div>
                             </div>
@@ -731,10 +731,31 @@
                         height: 100%;
                     }
                     
+                    .partner-card::before {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        background: linear-gradient(
+                            135deg,
+                            rgba(255, 255, 255, 0.03) 0%,
+                            rgba(255, 255, 255, 0) 50%
+                        );
+                        z-index: 1;
+                        opacity: 0;
+                        transition: opacity 0.5s ease;
+                    }
+                    
                     .partner-card:hover {
-                        transform: translateY(-5px);
-                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-                        background: rgba(40, 40, 40, 0.6);
+                        transform: translateY(-8px);
+                        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+                        border-color: rgba(var(--color-primary-rgb), 0.2);
+                    }
+                    
+                    .partner-card:hover::before {
+                        opacity: 1;
                     }
                     
                     .partner-badge {
@@ -748,6 +769,15 @@
                         text-transform: uppercase;
                         letter-spacing: 0.5px;
                         z-index: 5;
+                        backdrop-filter: blur(5px);
+                        -webkit-backdrop-filter: blur(5px);
+                        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .partner-card:hover .partner-badge {
+                        transform: translateY(-2px);
+                        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
                     }
                     
                     .partner-badge.main {
@@ -757,6 +787,11 @@
                     
                     .partner-badge.outfitter {
                         background: linear-gradient(135deg, #4CAF50, #8BC34A);
+                        color: #fff;
+                    }
+                    
+                    .partner-badge.training {
+                        background: linear-gradient(135deg, #3498db, #2980b9);
                         color: #fff;
                     }
                     
@@ -775,12 +810,24 @@
                         padding: 10px;
                         border-radius: 8px;
                         filter: none !important;
+                        transition: transform 0.4s ease;
+                        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.08);
+                    }
+                    
+                    .partner-card:hover .partner-logo {
+                        transform: scale(1.05) rotate(2deg);
                     }
                     
                     .partner-name {
                         font-size: 1.5rem;
                         color: #fff;
                         margin: 0 0 5px 0;
+                        transition: transform 0.3s ease, color 0.3s ease;
+                    }
+                    
+                    .partner-card:hover .partner-name {
+                        color: var(--color-primary);
+                        transform: translateY(-2px);
                     }
                     
                     .partner-content {
@@ -796,6 +843,11 @@
                         line-height: 1.6;
                         margin-bottom: 20px;
                         flex-grow: 1;
+                        transition: color 0.3s ease;
+                    }
+                    
+                    .partner-card:hover .partner-description {
+                        color: rgba(255, 255, 255, 0.9);
                     }
                     
                     .partner-link {
@@ -811,6 +863,22 @@
                         text-decoration: none;
                         padding: 8px 0;
                         transition: all 0.3s ease;
+                        position: relative;
+                    }
+                    
+                    .visit-partner::after {
+                        content: '';
+                        position: absolute;
+                        bottom: 5px;
+                        left: 0;
+                        width: 0;
+                        height: 1px;
+                        background-color: var(--color-primary);
+                        transition: width 0.3s ease;
+                    }
+                    
+                    .visit-partner:hover::after {
+                        width: 100%;
                     }
                     
                     .visit-partner i {
@@ -887,7 +955,7 @@
                             </div>
                         </div>
                         <div class="partner-content">
-                            <p class="partner-description" data-en="Local company dedicated to supporting my tennis journey through reliable resources and community engagement." data-de="Lokales Unternehmen, das meine Tennis-Reise durch zuverlässige Ressourcen und Engagement in der Gemeinschaft unterstützt.">Lokales Unternehmen, das meine Tennis-Reise durch zuverlässige Ressourcen und Engagement in der Gemeinschaft unterstützt.</p>
+                            <p class="partner-description" data-en="Global company based in Uri dedicated to supporting my tennis journey through reliable resources and community engagement." data-de="Globales Unternehmen mit Sitz in Uri, das meine Tennis-Reise durch zuverlässige Ressourcen und Engagement in der Gemeinschaft unterstützt.">Globales Unternehmen mit Sitz in Uri, das meine Tennis-Reise durch zuverlässige Ressourcen und Engagement in der Gemeinschaft unterstützt.</p>
                             <div class="partner-link">
                                 <a href="https://www.gipo.ch" target="_blank" rel="noopener noreferrer" class="visit-partner">
                                     <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
@@ -928,6 +996,44 @@
                             <p class="partner-description" data-en="My official tennis equipment provider, supplying high-performance racquets and gear for optimal play." data-de="Mein offizieller Tennis-Ausrüster, der hochleistungsfähige Schläger und Ausrüstung für optimales Spiel liefert.">Mein offizieller Tennis-Ausrüster, der hochleistungsfähige Schläger und Ausrüstung für optimales Spiel liefert.</p>
                             <div class="partner-link">
                                 <a href="https://www.head.com" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tennis Club Luzern Lido - Training -->
+                    <div class="partner-card">
+                        <div class="partner-badge training" data-en="Training" data-de="Training">Training</div>
+                        <div class="partner-header">
+                            <img src="public/images/RZ_TCLL_Jubilaeumslogo_blau.jpg" alt="Tennis Club Luzern Lido" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">Tennis Club Luzern&nbsp;Lido</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="Tennis Club Luzern Lido provides exceptional training facilities that support my development as a tennis player." data-de="Tennis Club Luzern Lido bietet hervorragende Trainingseinrichtungen, die meine Entwicklung als Tennisspieler unterstützen.">Tennis Club Luzern Lido bietet hervorragende Trainingseinrichtungen, die meine Entwicklung als Tennisspieler unterstützen.</p>
+                            <div class="partner-link">
+                                <a href="https://tcl.ch/" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RTC Seedorf - Training -->
+                    <div class="partner-card">
+                        <div class="partner-badge training" data-en="Training" data-de="Training">Training</div>
+                        <div class="partner-header">
+                            <img src="public/images/RTC-Seedorf-Logo_300px.png" alt="RTC Seedorf" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">RTC Seedorf</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="RTC Seedorf is an integral part of my training regime, offering top-quality courts and professional training environment." data-de="RTC Seedorf ist ein integraler Bestandteil meines Trainingsplans und bietet erstklassige Plätze und eine professionelle Trainingsumgebung.">RTC Seedorf ist ein integraler Bestandteil meines Trainingsplans und bietet erstklassige Plätze und eine professionelle Trainingsumgebung.</p>
+                            <div class="partner-link">
+                                <a href="https://www.rtc-seedorf.ch/" target="_blank" rel="noopener noreferrer" class="visit-partner">
                                     <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
                                 </a>
                             </div>
@@ -2076,7 +2182,7 @@
         </div>
         
         <div class="social-icons">
-            <a href="https://www.instagram.com/nicola_senn/" target="_blank" class="social-icon" aria-label="Instagram">
+            <a href="https://www.instagram.com/senn_nicola/" target="_blank" class="social-icon" aria-label="Instagram">
                 <i class="fab fa-instagram"></i>
             </a>
             <a href="https://www.facebook.com/nicola.senn.33" target="_blank" class="social-icon" aria-label="Facebook">

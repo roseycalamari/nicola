@@ -36,18 +36,13 @@ document.addEventListener('DOMContentLoaded', function() {
             newsletterMessage.textContent = '';
 
             try {
-                // Direct connection to Brevo API
-                const response = await fetch('https://api.brevo.com/v3/contacts', {
+                // Call our serverless function
+                const response = await fetch('/api/subscribe', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'api-key': process.env.BREVO_API_KEY,
                     },
-                    body: JSON.stringify({
-                        email: email,
-                        listIds: [7], // Your list ID
-                        updateEnabled: true,
-                    }),
+                    body: JSON.stringify({ email }),
                 });
 
                 const data = await response.json();
