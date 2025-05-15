@@ -561,19 +561,24 @@
            margin: 1rem 0;
        }
        
-       /* Added logo positioning for mobile menu */
+       /* Remove before pseudo element and replace with proper logo link */
        .nav-links::before {
-           content: "";
+           display: none;
+       }
+       
+       /* Add mobile logo link */
+       .mobile-menu-logo {
            position: absolute;
-           top: 40px;
+           top: 30px;
            left: 50%;
            transform: translateX(-50%);
+           z-index: 101;
+           display: block;
+       }
+       
+       .mobile-menu-logo img {
            width: 140px;
-           height: 70px;
-           background-image: url('../images/NICOLA logo.png');
-           background-size: contain;
-           background-position: center;
-           background-repeat: no-repeat;
+           height: auto;
        }
        
        /* Hide the header logo when mobile menu is active */
