@@ -2141,7 +2141,10 @@
                 }
 
                 // Upload all media files
-                const mediaUrls = await Promise.all(uploadedFiles.map(async (file) => {
+                let image_url = null;
+                let media_type = null;
+                if (uploadedFiles.length > 0) {
+                    const file = uploadedFiles[0]; // Only the first file is used for the update
                     const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
                     const { data, error } = await supabaseClient.storage
                         .from('updates-images')
@@ -2152,15 +2155,13 @@
 
                     if (error) throw error;
 
-                const { data: { publicUrl } } = supabaseClient.storage
+                    const { data: { publicUrl } } = supabaseClient.storage
                         .from('updates-images')
-                    .getPublicUrl(fileName);
+                        .getPublicUrl(fileName);
 
-                    return {
-                        url: publicUrl,
-                        type: file.type.startsWith('image/') ? 'image' : 'video'
-                    };
-                }));
+                    image_url = publicUrl;
+                    media_type = file.type;
+                }
 
                 // Create update with media
                 const { data, error } = await supabaseClient
@@ -2170,7 +2171,8 @@
                             title,
                             content,
                             category,
-                            image_url: mediaUrls.length > 0 ? mediaUrls[0].url : null,
+                            image_url: image_url,
+                            media_type: media_type,
                             date: dateInput.value
                         }
                     ]);
@@ -2363,12 +2365,42 @@
                     
                     // Prepare thumbnail section
                     let thumbnailHTML = '';
-                    if (update.image_url) {
-                        thumbnailHTML = `
-                            <div class="update-thumbnail">
-                                <img src="${update.image_url}" alt="${update.title}">
-                            </div>
-                        `;
+                    if (update.image_url && update.media_type) {
+                        if (update.media_type.startsWith('image/')) {
+                            thumbnailHTML = `
+                                <div class="update-thumbnail">
+                                    <img src="${update.image_url}" alt="${update.title}">
+                                </div>
+                            `;
+                        } else if (update.media_type.startsWith('video/')) {
+                            thumbnailHTML = `
+                                <div class="update-thumbnail">
+                                    <video src="${update.image_url}" controls></video>
+                                </div>
+                            `;
+                        }
+                    } else if (update.image_url) {
+                        // Fallback: guess by file extension
+                        const ext = update.image_url.split('.').pop().toLowerCase();
+                        if (["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext)) {
+                            thumbnailHTML = `
+                                <div class="update-thumbnail">
+                                    <img src="${update.image_url}" alt="${update.title}">
+                                </div>
+                            `;
+                        } else if (["mp4","webm","ogg"].includes(ext)) {
+                            thumbnailHTML = `
+                                <div class="update-thumbnail">
+                                    <video src="${update.image_url}" controls></video>
+                                </div>
+                            `;
+                        } else {
+                            thumbnailHTML = `
+                                <div class="update-thumbnail update-no-image">
+                                    <i class="fas fa-image"></i>
+                                </div>
+                            `;
+                        }
                     } else {
                         thumbnailHTML = `
                             <div class="update-thumbnail update-no-image">
@@ -2385,7 +2417,7 @@
                             <span class="update-date"><i class="far fa-calendar-alt"></i> ${formattedDate}</span>
                         </div>
                         <div class="update-content">
-                            <h3 class="update-title">${update.title}</h3>
+                            <h3 class="update-title" style="color: #fff;">${update.title}</h3>
                             <p class="update-excerpt">${update.content.substring(0, 120)}${update.content.length > 120 ? '...' : ''}</p>
                             <div class="update-actions">
                                 <button class="edit-update-btn" data-id="${update.id}">
