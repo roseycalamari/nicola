@@ -1542,7 +1542,7 @@
                 console.log('Attempting to load updates from Supabase...');
                 const { data: updates, error } = await supabaseClient
                     .from('updates')
-                    .select('id, title, content, category, image_url, date')
+                    .select('id, title, content, category, image_url, date, media_type')
                     .order('date', { ascending: false });
                 
                 if (error) {
@@ -1576,8 +1576,24 @@
                     const updateElement = document.createElement('div');
                     updateElement.className = 'update-card';
                     updateElement.setAttribute('data-category', update.category.toLowerCase());
+                    let mediaHTML = '';
+                    if (update.image_url && update.media_type) {
+                        if (update.media_type.startsWith('image/')) {
+                            mediaHTML = `<img src="${update.image_url}" alt="${update.title}" class="update-image">`;
+                        } else if (update.media_type.startsWith('video/')) {
+                            mediaHTML = `<video src="${update.image_url}" class="update-image" controls></video>`;
+                        }
+                    } else if (update.image_url) {
+                        // Fallback: guess by file extension
+                        const ext = update.image_url.split('.').pop().toLowerCase();
+                        if (["jpg","jpeg","png","gif","webp","bmp","svg"].includes(ext)) {
+                            mediaHTML = `<img src="${update.image_url}" alt="${update.title}" class="update-image">`;
+                        } else if (["mp4","webm","ogg"].includes(ext)) {
+                            mediaHTML = `<video src="${update.image_url}" class="update-image" controls></video>`;
+                        }
+                    }
                     updateElement.innerHTML = `
-                        ${update.image_url ? `<img src="${update.image_url}" alt="${update.title}" class="update-image">` : ''}
+                        ${mediaHTML}
                         <div class="update-content">
                             <span class="update-category">${update.category}</span>
                             <h3 class="update-title">${update.title}</h3>
