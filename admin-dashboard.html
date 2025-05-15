@@ -2155,9 +2155,9 @@
 
                     if (error) throw error;
 
-                    const { data: { publicUrl } } = supabaseClient.storage
+                const { data: { publicUrl } } = supabaseClient.storage
                         .from('updates-images')
-                        .getPublicUrl(fileName);
+                    .getPublicUrl(fileName);
 
                     image_url = publicUrl;
                     media_type = file.type;
@@ -2221,86 +2221,143 @@
                     return;
                 }
 
-                // Reset the form
-                const editForm = document.getElementById('editUpdateForm');
-                if (editForm) {
-                    editForm.reset();
-                }
+                console.log("Opening edit modal for update:", update);
 
-                // Set form values
-                document.getElementById('editUpdateId').value = update.id;
-                document.getElementById('editTitle').value = update.title;
-                document.getElementById('editCategory').value = update.category;
-                document.getElementById('editContent').value = update.content;
-                
-                // Format date for input (YYYY-MM-DD)
-                const updateDate = new Date(update.date);
-                const formattedDate = updateDate.toISOString().split('T')[0];
-                document.getElementById('editDate').value = formattedDate;
-
-                // Display current image
-                const currentImageContainer = document.getElementById('editCurrentImage');
-                if (currentImageContainer) {
-                    if (update.image_url) {
-                        const imageContainer = document.createElement('div');
-                        imageContainer.className = 'image-container';
-                        imageContainer.innerHTML = `
-                            <img src="${update.image_url}" alt="${update.title}">
-                            <button type="button" class="remove-btn" title="Remove image">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        `;
-
-                        // Add remove button functionality
-                        const removeBtn = imageContainer.querySelector('.remove-btn');
-                        removeBtn.addEventListener('click', () => {
-                            imageContainer.classList.add('marked-for-deletion');
-                            imageContainer.setAttribute('data-delete', 'true');
-                            
-                            const undoBtn = document.createElement('button');
-                            undoBtn.className = 'undo-delete-btn';
-                            undoBtn.innerHTML = '<i class="fas fa-undo"></i> Undo';
-                            undoBtn.addEventListener('click', (e) => {
-                                e.preventDefault();
-                                imageContainer.classList.remove('marked-for-deletion');
-                                imageContainer.removeAttribute('data-delete');
-                                undoBtn.remove();
-                            });
-                            
-                            imageContainer.appendChild(undoBtn);
-                        });
-
-                        currentImageContainer.innerHTML = '';
-                        currentImageContainer.appendChild(imageContainer);
-                    } else {
-                        currentImageContainer.innerHTML = '<p class="no-images">No image for this update</p>';
-                    }
-                }
-
-                // Clear file input and preview
-                document.getElementById('editMedia').value = '';
-                const previewContainer = document.getElementById('editMediaPreview');
-                if (previewContainer) {
-                    previewContainer.innerHTML = '';
-                }
-
-                // Show modal
+                // Get the modal element
                 const modal = document.getElementById('editUpdateModal');
-                if (modal) {
-                    modal.style.display = 'block';
-                    modal.classList.add('show');
+                if (!modal) {
+                    console.error("Edit modal not found in DOM");
+                    return;
                 }
+
+                // Ensure the modal is visible with proper styles
+                modal.style.display = 'block';
+                modal.classList.add('show');
+                
+                // First make sure the modal is visible, then populate the form
+                setTimeout(() => {
+                    try {
+                        // Reset the form
+                        const editForm = document.getElementById('editUpdateForm');
+                        if (editForm) {
+                            editForm.reset();
+                        }
+
+                        // Always populate all form fields first
+                        document.getElementById('editUpdateId').value = update.id;
+                        document.getElementById('editTitle').value = update.title || '';
+                        document.getElementById('editCategory').value = update.category || 'Matches';
+                        document.getElementById('editContent').value = update.content || '';
+                        
+                        // Format date for input (YYYY-MM-DD)
+                        const updateDate = new Date(update.date || new Date());
+                        const formattedDate = updateDate.toISOString().split('T')[0];
+                        document.getElementById('editDate').value = formattedDate;
+
+                        // Last, handle the image section which can be different based on if there's an image
+                        const currentImageContainer = document.getElementById('editCurrentImage');
+                        if (currentImageContainer) {
+                            currentImageContainer.innerHTML = '';
+                            
+                            if (update.image_url) {
+                                const imageContainer = document.createElement('div');
+                                imageContainer.className = 'image-container';
+                                imageContainer.innerHTML = `
+                                    <img src="${update.image_url}" alt="${update.title}">
+                                    <button type="button" class="remove-btn" title="Remove image">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                `;
+                                
+                                // Add remove button functionality
+                                const removeBtn = imageContainer.querySelector('.remove-btn');
+                                if (removeBtn) {
+                                    removeBtn.addEventListener('click', () => {
+                                        imageContainer.classList.add('marked-for-deletion');
+                                        imageContainer.setAttribute('data-delete', 'true');
+                                        
+                                        const undoBtn = document.createElement('button');
+                                        undoBtn.className = 'undo-delete-btn';
+                                        undoBtn.innerHTML = '<i class="fas fa-undo"></i> Undo';
+                                        undoBtn.addEventListener('click', (e) => {
+                                            e.preventDefault();
+                                            imageContainer.classList.remove('marked-for-deletion');
+                                            imageContainer.removeAttribute('data-delete');
+                                            undoBtn.remove();
+                                        });
+                                        
+                                        imageContainer.appendChild(undoBtn);
+                                    });
+                                }
+                                
+                                currentImageContainer.appendChild(imageContainer);
+                            } else {
+                                // Show a message for no image
+                                const noImageMessage = document.createElement('p');
+                                noImageMessage.className = 'no-images';
+                                noImageMessage.textContent = 'No image for this update';
+                                currentImageContainer.appendChild(noImageMessage);
+                            }
+                        } else {
+                            console.error("Current image container not found");
+                        }
+
+                        // Clear file input and preview
+                        const editMediaInput = document.getElementById('editMedia');
+                        if (editMediaInput) {
+                            editMediaInput.value = '';
+                        }
+                        
+                        const previewContainer = document.getElementById('editMediaPreview');
+                        if (previewContainer) {
+                            previewContainer.innerHTML = '';
+                        }
+                        
+                        // Make sure all form elements are visible
+                        const formGroups = modal.querySelectorAll('.form-group');
+                        formGroups.forEach(group => {
+                            group.style.display = 'flex';
+                        });
+                        
+                        const buttons = modal.querySelectorAll('button');
+                        buttons.forEach(button => {
+                            button.style.display = 'inline-flex';
+                        });
+                        
+                        console.log("Edit modal populated successfully");
+                    } catch (innerError) {
+                        console.error("Error populating edit modal:", innerError);
+                    }
+                }, 100);
             } catch (error) {
                 console.error('Error opening edit modal:', error);
                 alert('Failed to open edit modal. Please try again.');
             }
         };
 
+        // Also update the close edit modal function to ensure it resets properly
         window.closeEditModal = function() {
             const modal = document.getElementById('editUpdateModal');
             if (modal) {
-            modal.style.display = 'none';
-            modal.classList.remove('show');
+                modal.style.display = 'none';
+                modal.classList.remove('show');
+                
+                // Reset form for next use
+                const editForm = document.getElementById('editUpdateForm');
+                if (editForm) {
+                    editForm.reset();
+                }
+                
+                // Clear image preview
+                const currentImageContainer = document.getElementById('editCurrentImage');
+                if (currentImageContainer) {
+                    currentImageContainer.innerHTML = '';
+                }
+                
+                const previewContainer = document.getElementById('editMediaPreview');
+                if (previewContainer) {
+                    previewContainer.innerHTML = '';
+                }
             }
         };
 
@@ -2367,11 +2424,11 @@
                     let thumbnailHTML = '';
                     if (update.image_url && update.media_type) {
                         if (update.media_type.startsWith('image/')) {
-                            thumbnailHTML = `
-                                <div class="update-thumbnail">
-                                    <img src="${update.image_url}" alt="${update.title}">
-                                </div>
-                            `;
+                        thumbnailHTML = `
+                            <div class="update-thumbnail">
+                                <img src="${update.image_url}" alt="${update.title}">
+                            </div>
+                        `;
                         } else if (update.media_type.startsWith('video/')) {
                             thumbnailHTML = `
                                 <div class="update-thumbnail">
@@ -2523,11 +2580,13 @@
                 if (shouldDeleteImage && !newMediaFile) {
                     // If image was deleted and no new image uploaded, set image_url to null
                     updateData.image_url = null;
+                    updateData.media_type = null;
                 } else if (image_url) {
                     // If new image was uploaded, use the new URL
                     updateData.image_url = image_url;
+                    updateData.media_type = newMediaFile.type;
                 }
-                // If neither condition is true, the image_url remains unchanged
+                // If neither condition is true, the image_url and media_type remain unchanged
 
                 const { error: updateError } = await supabaseClient
                     .from('updates')

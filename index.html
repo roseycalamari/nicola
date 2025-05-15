@@ -828,6 +828,35 @@
             -webkit-box-orient: vertical;
             overflow: hidden;
             text-overflow: ellipsis;
+            position: relative;
+        }
+        
+        .read-more-btn {
+            color: var(--color-primary);
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .read-more-btn:hover {
+            color: var(--color-primary-light);
+            gap: 0.5rem;
+        }
+        
+        .read-more-btn i {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .read-more-btn:hover i {
+            transform: translateX(2px);
         }
 
         /* Sponsor Card Styles - Fixed Version */
@@ -2689,19 +2718,34 @@
                         <div class="update-content">
                             <span class="update-category">${update.category}</span>
                             <h3 class="update-title">${update.title}</h3>
-                            <p class="update-text">${update.content}</p>
+                            <p class="update-excerpt">${update.content}</p>
+                            <button class="read-more-btn" data-update-id="${update.id}">
+                                <span data-en="Read more" data-de="Weiterlesen">${currentLanguage === 'en' ? 'Read more' : 'Weiterlesen'}</span>
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
                             <div class="update-meta">
                                 <span class="update-date"><i class="far fa-calendar"></i> ${formattedDate}</span>
                             </div>
-                            <button class="update-view-btn">
-                                <i class="fas fa-arrow-right"></i>
-                                <span data-en="Read More" data-de="Mehr lesen">Mehr lesen</span>
-                            </button>
                         </div>
                     `;
                     
                     // Add click handler for the update card
-                    updateElement.addEventListener('click', () => viewUpdateDetails(update.id));
+                    updateElement.addEventListener('click', (e) => {
+                        // Don't trigger if clicking the read more button (it has its own handler)
+                        if (!e.target.closest('.read-more-btn')) {
+                            viewUpdateDetails(update.id);
+                        }
+                    });
+                    
+                    // Add specific click handler for the read more button
+                    const readMoreBtn = updateElement.querySelector('.read-more-btn');
+                    if (readMoreBtn) {
+                        readMoreBtn.addEventListener('click', (e) => {
+                            e.stopPropagation(); // Prevent the card click event
+                            viewUpdateDetails(update.id);
+                        });
+                    }
+                    
                     updatesFeed.appendChild(updateElement);
                 });
                 
@@ -2709,7 +2753,7 @@
                 initializeFilters();
             } catch (error) {
                 console.error('Error loading updates:', error);
-                document.getElementById('updatesFeed').innerHTML = '<div class="error-message">Failed to load updates. Please try again later.</div>';
+                document.getElementById('updatesFeed').innerHTML = '<div class="error-message" data-en="Failed to load updates. Please try again later." data-de="Updates konnten nicht geladen werden. Bitte versuche es später erneut.">Updates konnten nicht geladen werden. Bitte versuche es später erneut.</div>';
             }
         }
 
@@ -2776,12 +2820,53 @@
                     day: 'numeric'
                 });
                 
+                // Populate the text content
                 document.getElementById('modal-title').textContent = update.title;
                 document.getElementById('modal-category').textContent = update.category;
                 document.getElementById('modal-date').querySelector('span').textContent = formattedDate;
-                document.getElementById('modal-image').src = update.image_url;
-                document.getElementById('modal-image').alt = update.title;
                 document.getElementById('modal-content').textContent = update.content;
+                
+                // Handle the media based on its type
+                const modalImageContainer = document.querySelector('.glass-modal-image');
+                if (modalImageContainer) {
+                    modalImageContainer.innerHTML = ''; // Clear previous content
+                    
+                    if (update.image_url) {
+                        // Check if it's a video or an image
+                        if (update.media_type && update.media_type.startsWith('video/')) {
+                            // It's a video - removed autoplay attribute
+                            modalImageContainer.innerHTML = `
+                                <video src="${update.image_url}" controls style="max-width: 100%; max-height: 80vh;"></video>
+                            `;
+                        } else if (update.media_type && update.media_type.startsWith('image/')) {
+                            // It's an image with known media type
+                            modalImageContainer.innerHTML = `
+                                <img src="${update.image_url}" alt="${update.title}" style="max-width: 100%; max-height: 80vh;">
+                            `;
+                        } else {
+                            // Try to determine by file extension
+                            const fileExt = update.image_url.split('.').pop().toLowerCase();
+                            if (['mp4', 'webm', 'ogg', 'mov'].includes(fileExt)) {
+                                // It's likely a video - removed autoplay attribute
+                                modalImageContainer.innerHTML = `
+                                    <video src="${update.image_url}" controls style="max-width: 100%; max-height: 80vh;"></video>
+                                `;
+                            } else {
+                                // Default to image
+                                modalImageContainer.innerHTML = `
+                                    <img src="${update.image_url}" alt="${update.title}" style="max-width: 100%; max-height: 80vh;">
+                                `;
+                            }
+                        }
+                    } else {
+                        // No media, show placeholder
+                        modalImageContainer.innerHTML = `
+                            <div style="width: 100%; height: 200px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2);">
+                                <i class="fas fa-image" style="font-size: 3rem; color: rgba(255,255,255,0.3);"></i>
+                            </div>
+                        `;
+                    }
+                }
                 
                 const modal = document.getElementById('update-modal');
                 modal.classList.add('show');
@@ -2795,6 +2880,14 @@
         // Close modal function
         function closeUpdateModal() {
             const modal = document.getElementById('update-modal');
+            
+            // Find and stop any playing videos
+            const videoElement = modal.querySelector('video');
+            if (videoElement) {
+                videoElement.pause();
+                videoElement.currentTime = 0;
+            }
+            
             modal.classList.remove('show');
             document.body.style.overflow = '';
         }
