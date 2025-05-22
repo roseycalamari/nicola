@@ -1434,11 +1434,24 @@
 
             .updates-feed {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                grid-template-columns: repeat(3, 1fr);
                 gap: 2rem;
                 margin: 0 auto;
                 max-width: 1200px;
                 padding: 0 2rem;
+            }
+
+            @media (max-width: 1024px) {
+                .updates-feed {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+            }
+
+            @media (max-width: 768px) {
+                .updates-feed {
+                    grid-template-columns: 1fr;
+                    padding: 0 1rem;
+                }
             }
 
             .update-card {
@@ -2669,7 +2682,8 @@
                 const { data: updates, error } = await supabaseClient
                     .from('updates')
                     .select('id, title, content, category, image_url, date, media_type')
-                    .order('date', { ascending: false });
+                    .order('date', { ascending: false })
+                    .limit(3); // Only get the latest 3 updates
                 
                 if (error) throw error;
                 
