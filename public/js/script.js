@@ -53,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     initializeUpdateFilter();
     initializeLanguageSwitcher();
     initializeDonationForm();
-    initializePdfDownloads();
+    // initializePdfDownloads(); // Disabled to allow direct PDF downloads
     
     // Load next tournament display if element exists
     if (document.querySelector('.next-tournament')) {

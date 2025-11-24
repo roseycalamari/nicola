@@ -1839,7 +1839,12 @@
                         </div>
                         
                         <div class="form-group">
-                            <label for="intl-ranking">International Ranking</label>
+                            <label for="atp-ranking">ATP Ranking</label>
+                            <input type="number" id="atp-ranking" name="atp_ranking" min="0" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="intl-ranking">International Ranking (ITF)</label>
                             <input type="number" id="intl-ranking" name="intl_ranking" min="0" required>
                         </div>
                         
@@ -3113,6 +3118,7 @@
             const elements = {
                 tournaments: document.getElementById('tournaments'),
                 matchWins: document.getElementById('match-wins'),
+                atpRanking: document.getElementById('atp-ranking'),
                 intlRanking: document.getElementById('intl-ranking'),
                 swissRanking: document.getElementById('swiss-ranking'),
                 maxServeSpeed: document.getElementById('max-serve-speed'),
@@ -3136,6 +3142,7 @@
             const formData = {
                 tournaments: parseInt(elements.tournaments.value) || 0,
                 match_wins: parseInt(elements.matchWins.value) || 0,
+                atp_ranking: parseInt(elements.atpRanking.value) || 0,
                 intl_ranking: parseInt(elements.intlRanking.value) || 0,
                 swiss_ranking: parseInt(elements.swissRanking.value) || 0,
                 max_serve_speed: parseInt(elements.maxServeSpeed.value) || 0,
@@ -3220,6 +3227,7 @@
             const formElements = {
                 'tournaments': data.tournaments,
                 'match-wins': data.match_wins,
+                'atp-ranking': data.atp_ranking,
                 'intl-ranking': data.intl_ranking,
                 'swiss-ranking': data.swiss_ranking,
                 'max-serve-speed': data.max_serve_speed,
@@ -3237,6 +3245,7 @@
             const displayElements = {
                 'tournaments-display': data.tournaments,
                 'match-wins-display': data.match_wins,
+                'atp-ranking-display': data.atp_ranking,
                 'intl-ranking-display': data.intl_ranking,
                 'swiss-ranking-display': data.swiss_ranking,
                 'max-serve-speed-display': data.max_serve_speed,

@@ -1340,7 +1340,7 @@
                     <p data-en="Every match and tournament brings me closer to my goals" data-de="Jedes Match und Turnier bringt mich näher an meine Ziele">Jedes Match und Turnier bringt mich näher an meine Ziele</p>
                 </div>
                 
-                <!-- Primary Stats - 4 columns with large numbers -->
+                <!-- Primary Stats - 5 columns with large numbers -->
                 <div class="stats-wrapper">
                     <div class="stat">
                         <span class="stat-number" data-count="0" data-stat="tournaments">0</span>
@@ -1349,6 +1349,10 @@
                     <div class="stat">
                         <span class="stat-number" data-count="0" data-stat="match_wins">0</span>
                         <span class="stat-label" data-en="Match Wins" data-de="Match-Siege">Match-Siege</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-number" data-count="0" data-stat="atp_ranking">0</span>
+                        <span class="stat-label" data-en="ATP Ranking" data-de="ATP Platzierung">ATP Platzierung</span>
                     </div>
                     <div class="stat">
                         <span class="stat-number" data-count="0" data-stat="intl_ranking">0</span>
@@ -1928,6 +1932,44 @@
                         </div>
                     </div>
 
+                    <!-- SAX GmbH - Silver Partner -->
+                    <div class="partner-card">
+                        <div class="partner-badge silver" data-en="Silver Partner" data-de="Silber-Partner">Silber-Partner</div>
+                        <div class="partner-header">
+                            <img src="public/images/Imagem WhatsApp 2025-11-14 às 20.55.27_3b32fe63.jpg" alt="SAX GmbH" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">SAX GmbH</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="A construction company with 28 years of experience, supporting my tennis journey with dedication and expertise." data-de="Ein Bauunternehmen mit 28 Jahren Erfahrung, das meine Tennis-Reise mit Hingabe und Fachkompetenz unterstützt.">Ein Bauunternehmen mit 28 Jahren Erfahrung, das meine Tennis-Reise mit Hingabe und Fachkompetenz unterstützt.</p>
+                            <div class="partner-link">
+                                <a href="https://www.sax-gmbh.ch/home" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Ristorante Pizzeria Moosbad -->
+                    <div class="partner-card">
+                        <div class="partner-badge"></div>
+                        <div class="partner-header">
+                            <img src="public/images/logo.svg" alt="Ristorante Pizzeria Moosbad" class="partner-logo">
+                            <div class="partner-title">
+                                <h3 class="partner-name">Ristorante Pizzeria Moosbad</h3>
+                            </div>
+                        </div>
+                        <div class="partner-content">
+                            <p class="partner-description" data-en="Italian restaurant bringing authentic Italian hospitality and culinary excellence to Uri for over 30 years." data-de="Italienisches Restaurant, das seit über 30 Jahren echte italienische Gastfreundschaft und kulinarische Exzellenz nach Uri bringt.">Italienisches Restaurant, das seit über 30 Jahren echte italienische Gastfreundschaft und kulinarische Exzellenz nach Uri bringt.</p>
+                            <div class="partner-link">
+                                <a href="https://ristorante-moosbad.ch/" target="_blank" rel="noopener noreferrer" class="visit-partner">
+                                    <span data-en="Visit" data-de="Besuchen">Besuchen</span> <i class="fas fa-external-link-alt"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Available Main Partner Slot -->
                     <div class="partner-card available-card">
                         <div class="partner-badge main" data-en="Available" data-de="Verfügbar">Verfügbar</div>
@@ -1972,7 +2014,7 @@
                 </div>
                 
                 <div class="partnership-download">
-                    <a href="pdf/Sponsoring_Pack_V1.pdf" class="cta-button primary download-btn" download="Sponsoring_Pack_V1.pdf" type="application/pdf" id="sponsoring-pdf-download">
+                    <a href="public/images/sponsoring/sponsoring Broschüre Nicola Senn_v1.1.pdf" class="cta-button primary download-btn" download="Sponsoring_Broschüre_Nicola_Senn.pdf" type="application/pdf" id="sponsoring-pdf-download">
                         <i class="fas fa-file-pdf"></i>
                         <span data-en="Check out all sponsor possibilities" data-de="Alle Sponsoring-Möglichkeiten ansehen">Alle Sponsoring-Möglichkeiten ansehen</span>
                         <div class="button-fx"></div>
@@ -2938,6 +2980,7 @@
         const defaultStats = {
             tournaments: 0,
             match_wins: 0,
+            atp_ranking: 0,
             intl_ranking: 0,
             swiss_ranking: 0,
             max_serve_speed: 0,
@@ -3166,7 +3209,7 @@
             event.preventDefault();
             
             // Get the PDF URL
-            const pdfUrl = '/pdf/Sponsoring_Pack_V1.pdf';
+            const pdfUrl = '/public/images/sponsoring/sponsoring Broschüre Nicola Senn_v1.1.pdf';
             
             // Check if we're on a mobile device
             const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
