@@ -463,6 +463,7 @@
             margin-bottom: var(--spacing-md);
             line-height: 1.6;
             display: -webkit-box;
+            line-clamp: 2;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
             overflow: hidden;
@@ -1740,6 +1741,15 @@
         <div class="dashboard-content">
             <div class="dashboard-section">
                 <h2>Create New Update</h2>
+                
+                <!-- Storage Setup Info Box -->
+                <div style="background: rgba(52, 152, 219, 0.1); border-left: 4px solid #3498db; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <p style="margin: 0; font-size: 14px; color: #333;">
+                        <strong>📌 Important:</strong> To upload images/videos, make sure the Supabase storage bucket <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">updates-images</code> exists with <strong>public</strong> access permissions.
+                        <br><small style="color: #666;">Go to Supabase Dashboard → Storage → Create bucket → Name: "updates-images" → Public bucket: ON</small>
+                    </p>
+                </div>
+                
                 <form class="update-form" id="updateForm">
                     <div class="form-group">
                         <label for="title">Title</label>
@@ -1790,6 +1800,15 @@
 
             <div class="dashboard-section">
                 <h2>Create New Gallery</h2>
+                
+                <!-- Storage Setup Info Box -->
+                <div style="background: rgba(52, 152, 219, 0.1); border-left: 4px solid #3498db; padding: 15px; margin-bottom: 20px; border-radius: 4px;">
+                    <p style="margin: 0; font-size: 14px; color: #333;">
+                        <strong>📌 Important:</strong> To upload gallery images, make sure the Supabase storage bucket <code style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 3px;">gallery-images</code> exists with <strong>public</strong> access permissions.
+                        <br><small style="color: #666;">Go to Supabase Dashboard → Storage → Create bucket → Name: "gallery-images" → Public bucket: ON</small>
+                    </p>
+                </div>
+                
                 <form id="gallery-form" class="admin-form">
                     <div class="form-group">
                         <label for="gallery-title">Gallery Title</label>
@@ -2151,6 +2170,9 @@
                 if (uploadedFiles.length > 0) {
                     const file = uploadedFiles[0]; // Only the first file is used for the update
                     const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                    
+                    console.log('Attempting to upload file:', fileName, 'Size:', file.size, 'Type:', file.type);
+                    
                     const { data, error } = await supabaseClient.storage
                         .from('updates-images')
                         .upload(fileName, file, {
@@ -2158,7 +2180,18 @@
                         upsert: false
                     });
 
-                    if (error) throw error;
+                    if (error) {
+                        console.error('Upload error details:', error);
+                        if (error.message.includes('not found') || error.message.includes('bucket')) {
+                            throw new Error('Storage bucket "updates-images" does not exist. Please create it in Supabase Storage with public access.');
+                        } else if (error.message.includes('size')) {
+                            throw new Error('File is too large. Maximum file size is 50MB.');
+                        } else if (error.message.includes('permission') || error.message.includes('unauthorized')) {
+                            throw new Error('Permission denied. Please check that the storage bucket has public upload permissions.');
+                        } else {
+                            throw new Error(`Upload failed: ${error.message}`);
+                        }
+                    }
 
                 const { data: { publicUrl } } = supabaseClient.storage
                         .from('updates-images')
@@ -2166,6 +2199,7 @@
 
                     image_url = publicUrl;
                     media_type = file.type;
+                    console.log('Upload successful! URL:', image_url);
                 }
 
                 // Create update with media
@@ -2560,17 +2594,32 @@
                 // Handle new image upload
                 if (newMediaFile) {
                     const fileName = `${Date.now()}-${newMediaFile.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                    
+                    console.log('Uploading new media file:', fileName);
+                    
                     const { error: uploadError } = await supabaseClient.storage
                         .from('updates-images')
                         .upload(fileName, newMediaFile);
 
-                    if (uploadError) throw uploadError;
+                    if (uploadError) {
+                        console.error('Upload error details:', uploadError);
+                        if (uploadError.message.includes('not found') || uploadError.message.includes('bucket')) {
+                            throw new Error('Storage bucket "updates-images" does not exist. Please create it in Supabase Storage with public access.');
+                        } else if (uploadError.message.includes('size')) {
+                            throw new Error('File is too large. Maximum file size is 50MB.');
+                        } else if (uploadError.message.includes('permission') || uploadError.message.includes('unauthorized')) {
+                            throw new Error('Permission denied. Please check that the storage bucket has public upload permissions.');
+                        } else {
+                            throw new Error(`Upload failed: ${uploadError.message}`);
+                        }
+                    }
 
                     const { data: { publicUrl } } = supabaseClient.storage
                         .from('updates-images')
                         .getPublicUrl(fileName);
 
                     image_url = publicUrl;
+                    console.log('Update media uploaded successfully!');
                 }
 
                 // Update the update
@@ -2927,7 +2976,16 @@
                                 .from('gallery-images')
                                 .upload(fileName, file)
                                 .then(({ error: uploadError }) => {
-                                    if (uploadError) throw uploadError;
+                                    if (uploadError) {
+                                        console.error('Gallery upload error:', uploadError);
+                                        if (uploadError.message.includes('not found') || uploadError.message.includes('bucket')) {
+                                            throw new Error('Storage bucket "gallery-images" does not exist. Please create it in Supabase Storage with public access.');
+                                        } else if (uploadError.message.includes('permission') || uploadError.message.includes('unauthorized')) {
+                                            throw new Error('Permission denied. Please check that the storage bucket has public upload permissions.');
+                                        } else {
+                                            throw uploadError;
+                                        }
+                                    }
 
                                     const { data: { publicUrl } } = supabaseClient.storage
                                         .from('gallery-images')
@@ -3564,7 +3622,16 @@
                         .from('gallery-images')
                         .upload(fileName, file);
                         
-                    if (uploadError) throw uploadError;
+                    if (uploadError) {
+                        console.error('Gallery image upload error:', uploadError);
+                        if (uploadError.message.includes('not found') || uploadError.message.includes('bucket')) {
+                            throw new Error('Storage bucket "gallery-images" does not exist. Please create it in Supabase Storage with public access.');
+                        } else if (uploadError.message.includes('permission') || uploadError.message.includes('unauthorized')) {
+                            throw new Error('Permission denied. Please check that the storage bucket has public upload permissions.');
+                        } else {
+                            throw uploadError;
+                        }
+                    }
                     
                     // Get public URL
                     const { data: { publicUrl } } = supabaseClient.storage
