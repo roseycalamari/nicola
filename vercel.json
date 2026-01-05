@@ -16,5 +16,20 @@
     { "src": "/(.*)\\.html", "dest": "/$1.html" },
     { "src": "/", "dest": "/index.html" },
     { "src": "/(.+)", "dest": "/$1.html" }
+  ],
+  "headers": [
+    {
+      "source": "/public/(.*).pdf",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/pdf"
+        },
+        {
+          "key": "Content-Disposition",
+          "value": "inline"
+        }
+      ]
+    }
   ]
 } 
